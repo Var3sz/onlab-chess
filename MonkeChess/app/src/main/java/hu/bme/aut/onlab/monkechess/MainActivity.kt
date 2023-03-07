@@ -2,35 +2,19 @@ package hu.bme.aut.onlab.monkechess
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.animation.OvershootInterpolator
-import android.widget.Toolbar
-import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalTextToolbar
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -40,6 +24,8 @@ import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.onlab.monkechess.ui.theme.MonkeChessTheme
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalContext
+import hu.bme.aut.onlab.monkechess.Login.Login
+import hu.bme.aut.onlab.monkechess.Login.LoginUI
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +54,15 @@ class MainActivity : ComponentActivity() {
                 SplashScreen(navController)
             }
             composable("welcome_screen"){
-                TopAppBarWidget()
+                TopAppBarWidget(navController)
+            }
+
+            composable("login_screen"){
+                LoginUI().LoginActivityNavigation()
+            }
+
+            composable("register_screen"){
+
             }
         }
     }
@@ -92,12 +86,11 @@ class MainActivity : ComponentActivity() {
     /**
      * TopAppBar
      * */
-    @Preview
     @Composable
-    fun TopAppBarWidget() {
+    fun TopAppBarWidget(navController: NavController) {
         Scaffold(
             topBar = {WelcomeScreenTopBar() },
-            content = { WelcomeScreenContent()}
+            content = { WelcomeScreenContent(navController)}
         )
     }
 
@@ -116,7 +109,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun WelcomeScreenContent(){
+    fun WelcomeScreenContent(navController: NavController){
         val mContext = LocalContext.current
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement =  Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
 
@@ -126,7 +119,9 @@ class MainActivity : ComponentActivity() {
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
                 verticalAlignment =  Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -134,7 +129,7 @@ class MainActivity : ComponentActivity() {
                 //login button
                 OutlinedButton(
                     modifier = Modifier.width(100.dp),
-                    onClick = {mContext.startActivity(Intent(mContext, Login::class.java)) },
+                    onClick = {navController.navigate("login_screen")},
                     border = BorderStroke(1.dp, Color.Black),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
@@ -145,7 +140,9 @@ class MainActivity : ComponentActivity() {
                 //register button
                 OutlinedButton(
                     modifier = Modifier.width(100.dp),
-                    onClick = { mContext.startActivity(Intent(mContext, Register::class.java)) },
+                    onClick = { navController.navigate("register_screen")
+
+                              },
                     border = BorderStroke(1.dp, Color.Black),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
