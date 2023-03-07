@@ -28,44 +28,7 @@ public class LoginUI : ComponentActivity(){
     private var password= String()
     private  var email= String()
 
-    @Composable
-    fun LoginActivityNavigation(){
-        val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "login_screen"){
 
-            composable("login_screen"){
-                TopAppBarWidget()
-            }
-        }
-    }
-
-
-    @Preview
-    @Composable
-    fun TopAppBarWidget() {
-        Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                topBar = {LoginScreenTopBar() },
-                content = { LoginScreenContent()},
-                bottomBar = {LoginButton()}
-        )
-
-
-    }
-
-    @Composable
-    fun LoginScreenTopBar(){
-        TopAppBar(
-                title = {
-                        Text(
-                                text = "MonkeyChess",
-                                color = MaterialTheme.colors.background
-                        )
-                },
-                backgroundColor = MaterialTheme.colors.onBackground,
-                contentColor = MaterialTheme.colors.background
-        )
-    }
 
     @Composable
     fun LoginScreenContent(){

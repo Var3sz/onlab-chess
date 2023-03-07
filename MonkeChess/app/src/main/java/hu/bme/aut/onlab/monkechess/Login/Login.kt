@@ -48,7 +48,7 @@ class Login : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    LoginUI().LoginActivityNavigation()
+                    LoginUI().LoginScreenContent()
                 }
             }
         }

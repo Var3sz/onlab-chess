@@ -1,4 +1,4 @@
-package hu.bme.aut.onlab.monkechess
+package hu.bme.aut.onlab.monkechess.Register
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
