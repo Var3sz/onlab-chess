@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "458427181795",
+    "project_id": "monkeychess-b42f5",
+    "storage_bucket": "monkeychess-b42f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458427181795:android:887a7b1c1087907a3473d6",
+        "android_client_info": {
+          "package_name": "hu.bme.aut.android.monkeychess"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "458427181795-7mvv5ejosar2armr9gjus2eef4apuq37.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe6IqRhX1K7CkdSG6cWni5e8a2Yo_Xob4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "458427181795-7mvv5ejosar2armr9gjus2eef4apuq37.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
