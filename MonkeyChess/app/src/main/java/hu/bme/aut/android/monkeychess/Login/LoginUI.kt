@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 
 public class LoginUI : ComponentActivity(){
     private var password= String()
@@ -53,7 +54,6 @@ public class LoginUI : ComponentActivity(){
                         fontWeight = FontWeight.Bold,
                         )
 
-                //Field("Your e-mail address")
                 //email field
                 Text(
                         text = "E-mail",
@@ -72,6 +72,7 @@ public class LoginUI : ComponentActivity(){
 
                 // password field
                 Text(
+                        modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
                         text = "Password",
                         textAlign = TextAlign.Start,
                         )
@@ -84,7 +85,7 @@ public class LoginUI : ComponentActivity(){
                         keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Password
                         ),
-                        label = { Text(text = "password")},
+                        label = { Text(text = "Your password")},
                         visualTransformation = PasswordVisualTransformation()
                 )
             }
@@ -114,20 +115,4 @@ public class LoginUI : ComponentActivity(){
             }
         }
     }
-    @Composable
-    fun Field(name: String,){
-        OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = "Your e-mail address",
-                onValueChange = {registration()},
-                keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email
-                )
-        )
-    }
-
-    fun registration(){
-
-    }
-
 }
