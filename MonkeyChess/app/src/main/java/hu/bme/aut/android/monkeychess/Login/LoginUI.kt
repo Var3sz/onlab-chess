@@ -26,7 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 
-public class LoginUI : ComponentActivity(){
+public class LoginUI{
 
 
     @Composable
