@@ -2,11 +2,13 @@ package hu.bme.aut.android.monkeychess
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -51,6 +53,9 @@ class MainActivity : ComponentActivity() {
             }
             composable("welcome_screen"){
                 TopAppBarWidget(navController = navController, content =  { WelcomeUI().WelcomeScreenContent(navController)}, bottomBar = {WelcomeUI().WelcomeScreenButtons(navController)})
+                BackHandler {
+                   Lifecycle.Event.ON_RESUME
+                }
             }
 
             composable("login_screen"){
