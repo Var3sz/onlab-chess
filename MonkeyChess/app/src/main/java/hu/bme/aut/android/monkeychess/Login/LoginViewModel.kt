@@ -10,12 +10,12 @@ class LoginViewModel: ViewModel() {
     private var email: MutableLiveData<String> = MutableLiveData("")
     private var password: MutableLiveData<String> = MutableLiveData("")
 
-    fun setEmail(value: String) {
-        email.value = value
+    fun setEmail(_email: String) {
+        email.value = _email
     }
 
-    fun setPassword(value: String) {
-        password.value = value
+    fun setPassword(_password: String) {
+        password.value = _password
     }
 
     fun getEmail(): String? {

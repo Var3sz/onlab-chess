@@ -13,7 +13,7 @@ class RegisterViewModel {
     private lateinit var auth: FirebaseAuth
 
     fun registerUser(email: String, password: String){
-        
+
     }
 
     fun settFullname(_fullname: String){
