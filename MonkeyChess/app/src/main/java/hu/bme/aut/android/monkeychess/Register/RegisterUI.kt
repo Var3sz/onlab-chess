@@ -1,6 +1,8 @@
 package hu.bme.aut.android.monkeychess.Register
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,12 +11,11 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,7 +31,7 @@ class RegisterUI {
         val emailState = remember { mutableStateOf("") }
         val usernameState = remember { mutableStateOf("") }
         val passwordState = remember { mutableStateOf("") }
-        val confirmpasswordState = remember { mutableStateOf("") }
+        val confirmPasswordState = remember { mutableStateOf("") }
 
         Box( modifier = Modifier.fillMaxSize()) {
             Column(
@@ -58,7 +59,7 @@ class RegisterUI {
                     modifier = Modifier.fillMaxWidth(),
                     value = fullnameState.value,
                     onValueChange = { typed -> fullnameState.value = typed
-                        viewModel.settFullname(fullnameState.value) },
+                        viewModel.setFullname(fullnameState.value) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Text
                     ),
@@ -134,9 +135,9 @@ class RegisterUI {
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = confirmpasswordState.value,
-                    onValueChange = {typed -> confirmpasswordState.value = typed
-                        viewModel.setConfirmpassword(confirmpasswordState.value)
+                    value = confirmPasswordState.value,
+                    onValueChange = {typed -> confirmPasswordState.value = typed
+                        viewModel.setConfirmpassword(confirmPasswordState.value)
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password
@@ -151,6 +152,7 @@ class RegisterUI {
 
     @Composable
     fun RegisterButton(navController: NavController, viewModel: RegisterViewModel){
+        val context = LocalContext.current
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomCenter
@@ -162,8 +164,15 @@ class RegisterUI {
                     .fillMaxWidth(),
                 onClick = {
                     Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
-                    viewModel.registerUser(viewModel.getEmail().toString(), viewModel.getPassword().toString())
-                    navController.navigate("login_screen")
+                    if(viewModel.isRegistrationInputValid() == "Successful Registration"){
+                        viewModel.registerUser()
+                        navController.navigate("login_screen")
+                        Toast.makeText(context, "Successful Registration", Toast.LENGTH_LONG).show()
+                    }
+                    else{
+                        val message = viewModel.isRegistrationInputValid()
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    }
                 },
                 border = BorderStroke(1.dp, Color.Black),
                 shape = RoundedCornerShape(50),

@@ -1,23 +1,48 @@
 package hu.bme.aut.android.monkeychess.Register
 
+import android.util.Patterns
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 
 class RegisterViewModel {
-    private var lastname: MutableLiveData<String> = MutableLiveData("")
+    private var fullname: MutableLiveData<String> = MutableLiveData("")
     private var email: MutableLiveData<String> = MutableLiveData("")
     private var username: MutableLiveData<String> = MutableLiveData("")
     private var password: MutableLiveData<String> = MutableLiveData("")
-    private var confrimpassword: MutableLiveData<String> = MutableLiveData("")
+    private var confirmPassword: MutableLiveData<String> = MutableLiveData("")
 
     private lateinit var auth: FirebaseAuth
 
-    fun registerUser(email: String, password: String){
-
+    fun registerUser(){
+        auth = FirebaseAuth.getInstance()
+        auth.createUserWithEmailAndPassword(email.value.toString(), password.value.toString())
     }
 
-    fun settFullname(_fullname: String){
-        lastname.value = _fullname
+    fun isRegistrationInputValid(): String{
+        if(fullname.value.toString().isNotEmpty() && username.value.toString().length >= 5 && password.value.toString().length >= 6 && (email.value.toString().isNotEmpty() || Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()) && confirmPassword.value.toString() == password.value.toString()){
+            return "Successful Registration"
+        }
+        else{
+            return if(fullname.value.toString().isEmpty()){
+                "Fullname must not be empty!"
+            }  else if(email.value.toString().isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()){
+                "Please enter a valid e-mail address!"
+            }else if(username.value.toString().length < 5){
+                "Username must be at least 5 characters long!"
+            } else if(password.value.toString().length < 6){
+                "Password must be at least 6 characters long!"
+            }
+            else{
+                "Passwords must match!"
+            }
+        }
+    }
+
+
+
+    fun setFullname(_fullname: String){
+        fullname.value = _fullname
     }
 
     fun setEmail(_email: String) {
@@ -33,11 +58,11 @@ class RegisterViewModel {
     }
 
     fun setConfirmpassword(_confirmpassword: String){
-        confrimpassword.value = _confirmpassword
+        confirmPassword.value = _confirmpassword
     }
 
     fun getFullname(): String?{
-        return lastname.value
+        return fullname.value
     }
 
     fun getEmail(): String?{
@@ -51,6 +76,7 @@ class RegisterViewModel {
     fun getPassword(): String?{
         return password.value
     }
+
 
 
 }

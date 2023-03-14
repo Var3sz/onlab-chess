@@ -1,5 +1,6 @@
 package hu.bme.aut.android.monkeychess
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -39,11 +40,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-
-
-
-
     @Composable
     fun MainActivityNavigation(){
         val navController = rememberNavController()
@@ -61,10 +57,16 @@ class MainActivity : ComponentActivity() {
             composable("login_screen"){
                 val viewModel = LoginViewModel()
                 TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent(viewModel)},bottomBar = {LoginUI().LoginButton(navController, viewModel)} )
+                BackHandler {
+                    navController.navigate("welcome_screen")
+                }
             }
             composable("register_screen"){
                 val viewModel = RegisterViewModel()
                 TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent(viewModel)}, bottomBar = {RegisterUI().RegisterButton(navController, viewModel)})
+                BackHandler {
+                    navController.navigate("welcome_screen")
+                }
             }
 
             composable("MainMenu_screen"){
@@ -78,7 +80,7 @@ class MainActivity : ComponentActivity() {
     /**
      * TopAppBar
      * */
-    //@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun TopAppBarWidget(navController: NavController, content: @Composable () -> Unit={}, bottomBar: @Composable () -> Unit={} ) {
         Scaffold(

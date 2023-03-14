@@ -27,8 +27,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 
 public class LoginUI{
-
-
     @Composable
     fun LoginScreenContent(viewModel: LoginViewModel){
         val emailState = remember { mutableStateOf("") }
