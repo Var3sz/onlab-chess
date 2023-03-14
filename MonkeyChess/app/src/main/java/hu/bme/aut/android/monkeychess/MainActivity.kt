@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.android.monkeychess.WelcomeScreen.WelcomeUI
 import hu.bme.aut.android.monkeychess.Login.LoginUI
+import hu.bme.aut.android.monkeychess.Login.LoginViewModel
 import hu.bme.aut.android.monkeychess.MainMenu.MainMenuUI
 import hu.bme.aut.android.monkeychess.Register.RegisterUI
 import hu.bme.aut.android.monkeychess.SplashScreen.SplashScreenUI
@@ -55,7 +57,8 @@ class MainActivity : ComponentActivity() {
 
             composable("login_screen"){
                //LoginUI().LoginScreenContent()
-                TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent()},bottomBar = {LoginUI().LoginButton(navController)} )
+                val viewModel = LoginViewModel()
+                TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent(viewModel)},bottomBar = {LoginUI().LoginButton(navController, viewModel)} )
             }
             composable("register_screen"){
                 TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent()}, bottomBar = {RegisterUI().RegisterButton()})

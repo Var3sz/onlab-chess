@@ -27,13 +27,10 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 
 public class LoginUI : ComponentActivity(){
-    private var password= String()
-    private  var email= String()
-
 
 
     @Composable
-    fun LoginScreenContent(){
+    fun LoginScreenContent(viewModel: LoginViewModel){
         val emailState = remember { mutableStateOf("") }
         val passwordState = remember { mutableStateOf("") }
         Box( modifier = Modifier.fillMaxSize()) {
@@ -64,7 +61,8 @@ public class LoginUI : ComponentActivity(){
                         modifier = Modifier.fillMaxWidth(),
                         value = emailState.value,
                         onValueChange = { typed -> emailState.value = typed
-                                email= emailState.value },
+                                viewModel.setEmail(emailState.value)
+                                        },
                         keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Email
                         ),
@@ -81,7 +79,7 @@ public class LoginUI : ComponentActivity(){
                         modifier = Modifier.fillMaxWidth(),
                         value = passwordState.value,
                         onValueChange = {typed -> passwordState.value = typed
-                                password=passwordState.value
+                                viewModel.setPassWord(passwordState.value)
                         },
                         keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Password
@@ -94,7 +92,7 @@ public class LoginUI : ComponentActivity(){
     }
 
     @Composable
-    fun LoginButton(navController: NavController){
+    fun LoginButton(navController: NavController, viewModel: LoginViewModel){
         Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
@@ -105,7 +103,7 @@ public class LoginUI : ComponentActivity(){
                             .width(100.dp)
                             .fillMaxWidth(),
                     onClick = {
-                            Log.d("TODO", "password: ${password} email= ${email}")
+                            Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
                             navController.navigate("MainMenu_screen")
                     },
                     border = BorderStroke(1.dp, Color.Black),
