@@ -21,15 +21,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 class RegisterUI {
-    private var password= String()
-    private  var email= String()
-
     @Composable
-    fun RegisterScreenContent(){
+    fun RegisterScreenContent(viewModel: RegisterViewModel){
+        val fullnameState = remember { mutableStateOf("") }
         val emailState = remember { mutableStateOf("") }
+        val usernameState = remember { mutableStateOf("") }
         val passwordState = remember { mutableStateOf("") }
+        val confirmpasswordState = remember { mutableStateOf("") }
+
         Box( modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -37,7 +39,6 @@ class RegisterUI {
                     .padding(24.dp)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Top,
-                //horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     modifier = Modifier
@@ -50,39 +51,25 @@ class RegisterUI {
                 )
 
                 Text(
-                    text = "Lastname",
+                    text = "Fullname",
                     textAlign = TextAlign.Start,
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = emailState.value,
-                    onValueChange = { typed -> emailState.value = typed
-                        email= emailState.value },
+                    value = fullnameState.value,
+                    onValueChange = { typed -> fullnameState.value = typed
+                        viewModel.settFullname(fullnameState.value) },
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email
+                        keyboardType = KeyboardType.Text
                     ),
-                    label = { Text(text = "Your lastname") }
-                )
-
-                Text(
-                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
-                    text = "Firstname",
-                    textAlign = TextAlign.Start,
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = emailState.value,
-                    onValueChange = { typed -> emailState.value = typed
-                        email= emailState.value },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email
-                    ),
-                    label = { Text(text = "Your firstname") }
+                    label = { Text(text = "Your fullname") }
                 )
 
                 //Email field
                 Text(
-                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(),
                     text = "E-mail",
                     textAlign = TextAlign.Start,
                 )
@@ -90,7 +77,7 @@ class RegisterUI {
                     modifier = Modifier.fillMaxWidth(),
                     value = emailState.value,
                     onValueChange = { typed -> emailState.value = typed
-                        email= emailState.value },
+                        viewModel.setEmail(emailState.value) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email
                     ),
@@ -99,24 +86,28 @@ class RegisterUI {
 
                 //Username field
                 Text(
-                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(),
                     text = "Username",
                     textAlign = TextAlign.Start,
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = emailState.value,
-                    onValueChange = { typed -> emailState.value = typed
-                        email= emailState.value },
+                    value = usernameState.value,
+                    onValueChange = { typed -> usernameState.value = typed
+                        viewModel.setUsername(usernameState.value) },
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Email
+                        keyboardType = KeyboardType.Text
                     ),
                     label = { Text(text = "Your username") }
                 )
 
                 //Password field
                 Text(
-                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(),
                     text = "Password",
                     textAlign = TextAlign.Start,
                 )
@@ -124,12 +115,33 @@ class RegisterUI {
                     modifier = Modifier.fillMaxWidth(),
                     value = passwordState.value,
                     onValueChange = {typed -> passwordState.value = typed
-                        password=passwordState.value
+                        viewModel.setPassword(passwordState.value)
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password
                     ),
                     label = { Text(text = "Your password") },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                //Confirm password field
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(),
+                    text = "Confirm password",
+                    textAlign = TextAlign.Start,
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = confirmpasswordState.value,
+                    onValueChange = {typed -> confirmpasswordState.value = typed
+                        viewModel.setConfirmpassword(confirmpasswordState.value)
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    label = { Text(text = "Confirm your password") },
                     visualTransformation = PasswordVisualTransformation()
                 )
             }
@@ -138,7 +150,7 @@ class RegisterUI {
 
 
     @Composable
-    fun RegisterButton(){
+    fun RegisterButton(navController: NavController, viewModel: RegisterViewModel){
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomCenter
@@ -149,8 +161,9 @@ class RegisterUI {
                     .width(100.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    Log.d("TODO", "password: ${password} email= ${email}")
-                    TODO()
+                    Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
+                    viewModel.registerUser(viewModel.getEmail().toString(), viewModel.getPassword().toString())
+                    navController.navigate("login_screen")
                 },
                 border = BorderStroke(1.dp, Color.Black),
                 shape = RoundedCornerShape(50),
@@ -160,5 +173,4 @@ class RegisterUI {
             }
         }
     }
-
 }

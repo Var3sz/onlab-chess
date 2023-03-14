@@ -7,24 +7,23 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class LoginViewModel: ViewModel() {
-
-    var emial: MutableLiveData<String> = MutableLiveData("")
-    var passWord: MutableLiveData<String> = MutableLiveData("")
+    private var email: MutableLiveData<String> = MutableLiveData("")
+    private var password: MutableLiveData<String> = MutableLiveData("")
 
     fun setEmail(value: String) {
-        emial.value = value
+        email.value = value
     }
 
-    fun setPassWord(value: String) {
-        passWord.value = value
+    fun setPassword(value: String) {
+        password.value = value
     }
 
     fun getEmail(): String? {
-        return  emial.value
+        return  email.value
     }
 
     fun getPassword(): String?{
-        return  passWord.value
+        return  email.value
     }
 }
 

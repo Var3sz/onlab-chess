@@ -16,6 +16,7 @@ import hu.bme.aut.android.monkeychess.Login.LoginUI
 import hu.bme.aut.android.monkeychess.Login.LoginViewModel
 import hu.bme.aut.android.monkeychess.MainMenu.MainMenuUI
 import hu.bme.aut.android.monkeychess.Register.RegisterUI
+import hu.bme.aut.android.monkeychess.Register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.SplashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
 
@@ -46,7 +47,6 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "splash_screen"){
             composable("splash_screen"){
-                //SplashScreenUI().SplashScreen(navController)
                 TopAppBarWidget(navController = navController, content =  { SplashScreenUI().SplashScreen(navController)})
             }
             composable("welcome_screen"){
@@ -54,12 +54,12 @@ class MainActivity : ComponentActivity() {
             }
 
             composable("login_screen"){
-               //LoginUI().LoginScreenContent()
                 val viewModel = LoginViewModel()
                 TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent(viewModel)},bottomBar = {LoginUI().LoginButton(navController, viewModel)} )
             }
             composable("register_screen"){
-                TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent()}, bottomBar = {RegisterUI().RegisterButton()})
+                val viewModel = RegisterViewModel()
+                TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent(viewModel)}, bottomBar = {RegisterUI().RegisterButton(navController, viewModel)})
             }
 
             composable("MainMenu_screen"){

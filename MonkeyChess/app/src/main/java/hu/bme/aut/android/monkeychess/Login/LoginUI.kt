@@ -79,7 +79,7 @@ public class LoginUI{
                         modifier = Modifier.fillMaxWidth(),
                         value = passwordState.value,
                         onValueChange = {typed -> passwordState.value = typed
-                                viewModel.setPassWord(passwordState.value)
+                                viewModel.setPassword(passwordState.value)
                         },
                         keyboardOptions = KeyboardOptions.Default.copy(
                                 keyboardType = KeyboardType.Password
