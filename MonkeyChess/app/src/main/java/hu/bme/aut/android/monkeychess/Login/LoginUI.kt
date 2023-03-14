@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -93,7 +94,7 @@ public class LoginUI : ComponentActivity(){
     }
 
     @Composable
-    fun LoginButton(){
+    fun LoginButton(navController: NavController){
         Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
@@ -105,7 +106,7 @@ public class LoginUI : ComponentActivity(){
                             .fillMaxWidth(),
                     onClick = {
                             Log.d("TODO", "password: ${password} email= ${email}")
-                            TODO()
+                            navController.navigate("MainMenu_screen")
                     },
                     border = BorderStroke(1.dp, Color.Black),
                     shape = RoundedCornerShape(50),

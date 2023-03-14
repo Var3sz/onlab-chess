@@ -13,11 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.android.monkeychess.WelcomeScreen.WelcomeUI
 import hu.bme.aut.android.monkeychess.Login.LoginUI
+import hu.bme.aut.android.monkeychess.MainMenu.MainMenuUI
 import hu.bme.aut.android.monkeychess.Register.RegisterUI
 import hu.bme.aut.android.monkeychess.SplashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
 
 class MainActivity : ComponentActivity() {
+
+    var meu =true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -32,9 +35,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    override fun onBackPressed() {
-        //finish()
-    }
+
+
+
+
+
 
     @Composable
     fun MainActivityNavigation(){
@@ -50,11 +55,16 @@ class MainActivity : ComponentActivity() {
 
             composable("login_screen"){
                //LoginUI().LoginScreenContent()
-                TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent()},bottomBar = {LoginUI().LoginButton()} )
+                TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent()},bottomBar = {LoginUI().LoginButton(navController)} )
             }
             composable("register_screen"){
                 TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent()}, bottomBar = {RegisterUI().RegisterButton()})
             }
+
+            composable("MainMenu_screen"){
+                TopAppBarWidget(navController = navController, content = { MainMenuUI().MainMenu()}, bottomBar = {})
+            }
+
         }
     }
 
@@ -62,6 +72,7 @@ class MainActivity : ComponentActivity() {
     /**
      * TopAppBar
      * */
+    //@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun TopAppBarWidget(navController: NavController, content: @Composable () -> Unit={}, bottomBar: @Composable () -> Unit={} ) {
         Scaffold(
