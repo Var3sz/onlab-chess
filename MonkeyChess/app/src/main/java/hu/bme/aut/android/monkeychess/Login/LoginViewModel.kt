@@ -1,15 +1,23 @@
 package hu.bme.aut.android.monkeychess.Login
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.util.Patterns
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginViewModel: ViewModel() {
     private var email: MutableLiveData<String> = MutableLiveData("")
     private var password: MutableLiveData<String> = MutableLiveData("")
 
+    private lateinit var auth: FirebaseAuth
+
+    fun loginUser(){
+
+    }
+
+    fun isLoginInputValid(): String{
+        return ""
+    }
 
     fun setEmail(_email: String) {
         email.value = _email

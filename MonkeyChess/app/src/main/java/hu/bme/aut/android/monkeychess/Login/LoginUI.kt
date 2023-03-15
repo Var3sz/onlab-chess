@@ -1,18 +1,21 @@
 package hu.bme.aut.android.monkeychess.Login
 
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -93,6 +96,7 @@ public class LoginUI{
 
     @Composable
     fun LoginButton(navController: NavController, viewModel: LoginViewModel){
+        val context = LocalContext.current
         Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomCenter
@@ -104,7 +108,6 @@ public class LoginUI{
                             .fillMaxWidth(),
                     onClick = {
                             Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
-                            navController.navigate("MainMenu_screen")
                     },
                     border = BorderStroke(1.dp, Color.Black),
                     shape = RoundedCornerShape(50),

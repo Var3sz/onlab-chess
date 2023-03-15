@@ -1,9 +1,11 @@
 package hu.bme.aut.android.monkeychess.Register
 
+import android.content.Context
 import android.util.Patterns
-import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 
 class RegisterViewModel: ViewModel() {
@@ -15,27 +17,34 @@ class RegisterViewModel: ViewModel() {
 
     private lateinit var auth: FirebaseAuth
 
-    fun registerUser(){
+    private fun registerUser(context: Context, navController: NavController){
         auth = FirebaseAuth.getInstance()
-        auth.createUserWithEmailAndPassword(email.value.toString(), password.value.toString())
+        auth.createUserWithEmailAndPassword(email.value.toString(), password.value.toString()).addOnCompleteListener {
+            if(it.isSuccessful){
+                navController.navigate("login_screen")
+                Toast.makeText(context, "Successful Registration", Toast.LENGTH_LONG).show()
+            }else{
+                Toast.makeText(context, it.exception?.message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
-    fun isRegistrationInputValid(): String{
+    fun isRegistrationInputValid(context: Context, navController: NavController){
         if(fullname.value.toString().isNotEmpty() && username.value.toString().length >= 5 && password.value.toString().length >= 6 && (email.value.toString().isNotEmpty() || Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()) && confirmPassword.value.toString() == password.value.toString()){
-            return "Successful Registration"
+            registerUser(context, navController)
         }
         else{
-            return if(fullname.value.toString().isEmpty()){
-                "Fullname must not be empty!"
+            if(fullname.value.toString().isEmpty()){
+                Toast.makeText(context, "Fullname must not be empty!", Toast.LENGTH_LONG).show()
             }  else if(email.value.toString().isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()){
-                "Please enter a valid e-mail address!"
+                Toast.makeText(context, "Please enter a valid e-mail address!", Toast.LENGTH_LONG).show()
             }else if(username.value.toString().length < 5){
-                "Username must be at least 5 characters long!"
+                Toast.makeText(context,  "Username must be at least 5 characters long!", Toast.LENGTH_LONG).show()
             } else if(password.value.toString().length < 6){
-                "Password must be at least 6 characters long!"
+                Toast.makeText(context, "Password must be at least 6 characters long!", Toast.LENGTH_LONG).show()
             }
             else{
-                "Passwords must match!"
+                Toast.makeText(context, "Passwords must match!", Toast.LENGTH_LONG).show()
             }
         }
     }

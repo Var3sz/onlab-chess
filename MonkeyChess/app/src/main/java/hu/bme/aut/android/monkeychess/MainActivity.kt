@@ -70,11 +70,12 @@ class MainActivity : ComponentActivity() {
                     navController.navigate("welcome_screen")
                 }
             }
-
             composable("MainMenu_screen"){
                 TopAppBarWidget(navController = navController, content = { MainMenuUI().MainMenu(navController)}, bottomBar = {})
+                BackHandler {
+                    Lifecycle.Event.ON_RESUME
+                }
             }
-
             composable("board_screen"){
                 val viewModel =BoardViewModel()
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})

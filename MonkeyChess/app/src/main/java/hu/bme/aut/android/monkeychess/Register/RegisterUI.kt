@@ -166,15 +166,7 @@ class RegisterUI {
                     .fillMaxWidth(),
                 onClick = {
                     Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
-                    if(viewModel.isRegistrationInputValid() == "Successful Registration"){
-                        viewModel.registerUser()
-                        navController.navigate("login_screen")
-                        Toast.makeText(context, "Successful Registration", Toast.LENGTH_LONG).show()
-                    }
-                    else{
-                        val message = viewModel.isRegistrationInputValid()
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                    }
+                    viewModel.isRegistrationInputValid(context, navController)
                 },
                 border = BorderStroke(1.dp, Color.Black),
                 shape = RoundedCornerShape(50),
