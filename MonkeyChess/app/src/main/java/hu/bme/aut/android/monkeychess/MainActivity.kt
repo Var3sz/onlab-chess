@@ -14,13 +14,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import hu.bme.aut.android.monkeychess.WelcomeScreen.WelcomeUI
-import hu.bme.aut.android.monkeychess.Login.LoginUI
-import hu.bme.aut.android.monkeychess.Login.LoginViewModel
+import hu.bme.aut.android.monkeychess.welcomeScreen.WelcomeUI
+import hu.bme.aut.android.monkeychess.login.LoginUI
+import hu.bme.aut.android.monkeychess.login.LoginViewModel
 import hu.bme.aut.android.monkeychess.mainMenu.MainMenuUI
-import hu.bme.aut.android.monkeychess.Register.RegisterUI
-import hu.bme.aut.android.monkeychess.Register.RegisterViewModel
-import hu.bme.aut.android.monkeychess.SplashScreen.SplashScreenUI
+import hu.bme.aut.android.monkeychess.register.RegisterUI
+import hu.bme.aut.android.monkeychess.register.RegisterViewModel
+import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
@@ -58,14 +58,14 @@ class MainActivity : ComponentActivity() {
 
             composable("login_screen"){
                 val viewModel = LoginViewModel()
-                TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent(viewModel)},bottomBar = {LoginUI().LoginButton(navController, viewModel)} )
+                TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent(viewModel)},bottomBar = { LoginUI().LoginButton(navController, viewModel)} )
                 BackHandler {
                     navController.navigate("welcome_screen")
                 }
             }
             composable("register_screen"){
                 val viewModel = RegisterViewModel()
-                TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent(viewModel)}, bottomBar = {RegisterUI().RegisterButton(navController, viewModel)})
+                TopAppBarWidget(navController = navController, content = { RegisterUI().RegisterScreenContent(viewModel)}, bottomBar = { RegisterUI().RegisterButton(navController, viewModel)})
                 BackHandler {
                     navController.navigate("welcome_screen")
                 }

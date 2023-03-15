@@ -1,4 +1,4 @@
-package hu.bme.aut.android.monkeychess.Register
+package hu.bme.aut.android.monkeychess.register
 
 import android.content.Context
 import android.util.Patterns

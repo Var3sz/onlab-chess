@@ -1,6 +1,5 @@
-package hu.bme.aut.android.monkeychess.WelcomeScreen
+package hu.bme.aut.android.monkeychess.welcomeScreen
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

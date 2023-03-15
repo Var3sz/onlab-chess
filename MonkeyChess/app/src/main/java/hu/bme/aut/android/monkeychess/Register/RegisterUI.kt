@@ -1,8 +1,6 @@
-package hu.bme.aut.android.monkeychess.Register
+package hu.bme.aut.android.monkeychess.register
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -138,7 +136,6 @@ class RegisterUI {
                     value = confirmPasswordState.value,
                     onValueChange = {typed -> confirmPasswordState.value = typed
                         viewModel.setConfirmpassword(confirmPasswordState.value)
-
                     },
 
                     keyboardOptions = KeyboardOptions.Default.copy(

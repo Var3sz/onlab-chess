@@ -1,4 +1,4 @@
-package hu.bme.aut.android.monkeychess.SplashScreen
+package hu.bme.aut.android.monkeychess.splashScreen
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image

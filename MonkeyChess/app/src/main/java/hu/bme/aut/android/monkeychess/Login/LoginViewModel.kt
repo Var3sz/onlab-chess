@@ -1,8 +1,11 @@
-package hu.bme.aut.android.monkeychess.Login
+package hu.bme.aut.android.monkeychess.login
 
+import android.content.Context
 import android.util.Patterns
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginViewModel: ViewModel() {
@@ -11,12 +14,31 @@ class LoginViewModel: ViewModel() {
 
     private lateinit var auth: FirebaseAuth
 
-    fun loginUser(){
-
+    private fun loginUser(context: Context, navController: NavController){
+        auth = FirebaseAuth.getInstance()
+        auth.signInWithEmailAndPassword(email.value.toString(), password.value.toString()).addOnCompleteListener {
+            login -> if(login.isSuccessful){
+                navController.navigate("MainMenu_screen")
+                Toast.makeText(context, "Successful login!", Toast.LENGTH_LONG).show()
+            }
+            else{
+                Toast.makeText(context, login.exception?.message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
-    fun isLoginInputValid(): String{
-        return ""
+    fun isLoginInputValid(context: Context, navController: NavController){
+        if(password.value.toString().length >= 6 && (email.value.toString().isNotEmpty() || Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches())){
+            loginUser(context, navController)
+        }
+        else{
+            if(email.value.toString().isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()){
+                Toast.makeText(context, "Please enter a valid e-mail address!", Toast.LENGTH_LONG).show()
+            }
+            else{
+                Toast.makeText(context, "Password must be at least 6 characters long!", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     fun setEmail(_email: String) {
