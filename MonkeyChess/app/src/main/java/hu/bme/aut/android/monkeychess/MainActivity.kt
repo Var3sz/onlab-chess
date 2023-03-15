@@ -17,14 +17,16 @@ import androidx.navigation.compose.rememberNavController
 import hu.bme.aut.android.monkeychess.WelcomeScreen.WelcomeUI
 import hu.bme.aut.android.monkeychess.Login.LoginUI
 import hu.bme.aut.android.monkeychess.Login.LoginViewModel
-import hu.bme.aut.android.monkeychess.MainMenu.MainMenuUI
+import hu.bme.aut.android.monkeychess.mainMenu.MainMenuUI
 import hu.bme.aut.android.monkeychess.Register.RegisterUI
 import hu.bme.aut.android.monkeychess.Register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.SplashScreen.SplashScreenUI
+import hu.bme.aut.android.monkeychess.board.BoardUI
+import hu.bme.aut.android.monkeychess.board.BoardViewModel
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
 
 class MainActivity : ComponentActivity() {
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -70,7 +72,12 @@ class MainActivity : ComponentActivity() {
             }
 
             composable("MainMenu_screen"){
-                TopAppBarWidget(navController = navController, content = { MainMenuUI().MainMenu()}, bottomBar = {})
+                TopAppBarWidget(navController = navController, content = { MainMenuUI().MainMenu(navController)}, bottomBar = {})
+            }
+
+            composable("board_screen"){
+                val viewModel =BoardViewModel()
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
 
         }

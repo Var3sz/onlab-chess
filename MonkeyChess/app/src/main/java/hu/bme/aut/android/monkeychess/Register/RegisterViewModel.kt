@@ -3,9 +3,10 @@ package hu.bme.aut.android.monkeychess.Register
 import android.util.Patterns
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 
-class RegisterViewModel {
+class RegisterViewModel: ViewModel() {
     private var fullname: MutableLiveData<String> = MutableLiveData("")
     private var email: MutableLiveData<String> = MutableLiveData("")
     private var username: MutableLiveData<String> = MutableLiveData("")

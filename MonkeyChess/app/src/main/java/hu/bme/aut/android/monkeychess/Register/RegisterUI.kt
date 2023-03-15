@@ -138,7 +138,9 @@ class RegisterUI {
                     value = confirmPasswordState.value,
                     onValueChange = {typed -> confirmPasswordState.value = typed
                         viewModel.setConfirmpassword(confirmPasswordState.value)
+
                     },
+
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password
                     ),
