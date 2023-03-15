@@ -22,15 +22,13 @@ import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.monkeychess.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-
-
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import hu.bme.aut.android.monkeychess.board.pieces.Piece
 import hu.bme.aut.android.monkeychess.ui.theme.Shapes
-
 
 class BoardUI {
 
@@ -100,7 +98,8 @@ class BoardUI {
 
     @Composable
     fun DrawBoard(viewModel :BoardViewModel) {
-        //val matrixdata by viewModel.matrixLiveData.observeAsState(emptyList<List<Boolean>>())
+        val matrixdata by viewModel.matrixLiveData.observeAsState(emptyList<List<Boolean>>())
+        val piecesLiveData by viewModel.piecesLiveData.observeAsState(emptyList<List<Piece>>())
 
         Column(
         ) {
@@ -116,24 +115,64 @@ class BoardUI {
                                 .size(45.dp)
                                 .background(gridcolor)
                                 .clickable {
+                                    //viewModel.emptyLiveDataMatrix()
+                                    //viewModel.setValue(i, j, !viewModel.getValue(i,j)!!)
                                     Log.d(
-                                        "Board",
-                                        "i: ${i}, j: ${j} board value: "
+                                        "Board1",
+                                        "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.pieceColor } "
                                     )
-                                    viewModel.matrixLiveData.value
-                                    viewModel.setValue(i, j, true)
 
+                                    if(viewModel.getPiece(i,j)!!.pieceColor !="empty"){
+                                        val piece = viewModel.getPiece(i,j)
+                                        val steps = piece!!.getValidSteps()
+
+                                        Log.d(
+                                            "BoardStep",
+                                            "i: ${piece.i}, j: ${piece.j} } "
+                                        )
+                                            steps.forEach(){
+                                                viewModel.setValue(it.first, it.second, true)
+                                                Log.d(
+                                                    "BoardStep",
+                                                    "i: ${it.first}, j: ${it.second} } "
+                                                )
+                                            }
+
+                                    }
+
+                                    //viewModel.matrixLiveData.value
                                 },
                             contentAlignment = Alignment.Center,
 
                         ) {
-                            if(viewModel.getValue(i,j) == true)
+                            Log.d(
+                                "Board2",
+                                "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.pieceColor }"
+                            )
+
+                            if(viewModel.getValue(i,j) == true ){
                                 DrawCircle()
+                            }
+
+
+                            if(viewModel.getPiece(i,j)!!.pieceColor !="empty")
+                                DrawPiece()
                         }
                     }
                 }
             }
         }
+    }
+
+    private @Composable
+    fun DrawPiece() {
+        Image(
+            painter = painterResource(id = R.drawable.pawn),
+            contentDescription = "profile picture",
+            modifier = Modifier
+                .background(color = Color.Black)
+
+        )
     }
 
     @Composable
