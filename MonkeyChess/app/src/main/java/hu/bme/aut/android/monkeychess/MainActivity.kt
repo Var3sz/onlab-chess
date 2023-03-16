@@ -23,6 +23,8 @@ import hu.bme.aut.android.monkeychess.register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.profile.ProfileUI
+import hu.bme.aut.android.monkeychess.profile.ProfileViewModel
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
 
 class MainActivity : ComponentActivity() {
@@ -79,6 +81,10 @@ class MainActivity : ComponentActivity() {
             composable("board_screen"){
                 val viewModel =BoardViewModel()
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
+            }
+            composable("profile_screen"){
+                val viewModel = ProfileViewModel()
+                TopAppBarWidget(navController = navController, content = { ProfileUI().ProfileScreen(viewModel) }, bottomBar = {})
             }
 
         }
