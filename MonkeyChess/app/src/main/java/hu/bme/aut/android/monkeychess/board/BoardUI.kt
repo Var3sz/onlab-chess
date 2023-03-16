@@ -98,8 +98,9 @@ class BoardUI {
 
     @Composable
     fun DrawBoard(viewModel :BoardViewModel) {
-        val matrixdata by viewModel.matrixLiveData.observeAsState(emptyList<List<Boolean>>())
-        val piecesLiveData by viewModel.piecesLiveData.observeAsState(emptyList<List<Piece>>())
+        //val matrixdata by viewModel.matrixLiveData.observeAsState(emptyList<List<Boolean>>())
+        //val piecesLiveData by viewModel.piecesLiveData.observeAsState(emptyList<List<Piece>>())
+        val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
         Column(
         ) {
@@ -128,10 +129,11 @@ class BoardUI {
 
                                         Log.d(
                                             "BoardStep",
-                                            "i: ${piece.i}, j: ${piece.j} } "
+                                            "i: ${piece.i}, j: ${piece.j} "
                                         )
                                             steps.forEach(){
                                                 viewModel.setValue(it.first, it.second, true)
+                                                //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true
                                                 Log.d(
                                                     "BoardStep",
                                                     "i: ${it.first}, j: ${it.second} } "

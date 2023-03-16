@@ -99,7 +99,8 @@ public class LoginUI{
                             .fillMaxWidth(),
                     onClick = {
                         Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
-                        viewModel.isLoginInputValid(context, navController)
+                        //viewModel.isLoginInputValid(context, navController)
+                        navController.navigate("MainMenu_screen")
                     },
                     border = BorderStroke(1.dp, Color.Black),
                     shape = RoundedCornerShape(50),
