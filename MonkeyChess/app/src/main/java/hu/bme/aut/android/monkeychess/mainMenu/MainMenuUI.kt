@@ -29,28 +29,36 @@ class MainMenuUI {
     @Composable
     fun MainMenu(navController: NavController){
         Row{
-            //Spacer(modifier = Modifier.width(12.dp))
             OutlinedButton(
-                onClick = { /*TODO*/ },
+                onClick = { /*TODO: Implement logout*/ },
                 border = BorderStroke(0.dp, Color.White),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 shape = CircleShape
             ) {
                 Image(painter = painterResource(id = R.drawable.baseline_logout_24), contentDescription = "Logout icon",
-                    modifier = Modifier.width(40.dp).height(40.dp))
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp))
             }
             Spacer(modifier = Modifier.weight(1f))
+            Column{
+                Spacer(modifier = Modifier.height(15.dp))
+                Text("Username")        //TODO: Username változtatása felhasználótól függően
+            }
             OutlinedButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                          navController.navigate("profile_screen")
+                },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 border = BorderStroke(0.dp, Color.White),
                 shape = CircleShape
             ) {
                 Image(painter = painterResource(id = R.drawable.baseline_person_24), contentDescription = "Profile icon",
-                    modifier = Modifier.width(40.dp).height(40.dp),
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp),
                 )
             }
-            //Spacer(modifier = Modifier.width(12.dp))
         }
 
 
@@ -71,11 +79,6 @@ class MainMenuUI {
             MainButtons(text = "Friends", click =  {Log.d("MainMenu", " Friends clicked" )})
             //Stats button
             MainButtons(text = "Stats", click =  {Log.d("MainMenu", " Stats clicked" )} )
-
-            /** TODO: Profile button átmeneti megoldás **/
-            MainButtons(text = "Profile", click = {Log.d("MainMenu", "Profile clicked")
-                navController.navigate("profile_screen")
-            })
         }
     }
 
