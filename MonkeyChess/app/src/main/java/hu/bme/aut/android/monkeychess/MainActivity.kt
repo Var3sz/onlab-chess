@@ -23,6 +23,7 @@ import hu.bme.aut.android.monkeychess.register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.mainMenu.MainMenuViewModel
 import hu.bme.aut.android.monkeychess.profile.ProfileUI
 import hu.bme.aut.android.monkeychess.profile.ProfileViewModel
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
@@ -73,7 +74,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable("MainMenu_screen"){
-                TopAppBarWidget(navController = navController, content = { MainMenuUI().MainMenu(navController)}, bottomBar = {})
+                val viewModel = MainMenuViewModel()
+                TopAppBarWidget(navController = navController, content = { MainMenuUI().MainMenu(navController, viewModel)}, bottomBar = {})
                 BackHandler {
                     Lifecycle.Event.ON_RESUME
                 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,16 +31,16 @@ public class LoginUI{
         Box( modifier = Modifier.fillMaxSize()) {
             Column(
                     modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp)
-                            .fillMaxHeight(),
+                        .fillMaxSize()
+                        .padding(24.dp)
+                        .fillMaxHeight(),
                     verticalArrangement = Arrangement.Top,
                     //horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                         modifier = Modifier
-                                .padding(top = 24.dp, bottom = 48.dp)
-                                .fillMaxWidth(),
+                            .padding(top = 24.dp, bottom = 48.dp)
+                            .fillMaxWidth(),
                         text = "Welcome back!",
                         textAlign = TextAlign.Center,
                         fontSize = 30.sp,
@@ -65,21 +66,22 @@ public class LoginUI{
 
                 // password field
                 Text(
-                        modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
+                        modifier = Modifier
+                            .padding(top = 12.dp)
+                            .fillMaxWidth(),
                         text = "Password",
                         textAlign = TextAlign.Start,
                         )
                 OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = passwordState.value,
-                        onValueChange = {typed -> passwordState.value = typed
-                                viewModel.setPassword(passwordState.value)
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                                keyboardType = KeyboardType.Password
-                        ),
-                        label = { Text(text = "Your password")},
-                        visualTransformation = PasswordVisualTransformation()
+                    modifier = Modifier.fillMaxWidth(),
+                    value = passwordState.value,
+                    onValueChange = {typed -> passwordState.value = typed
+                        viewModel.setPassword(passwordState.value) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    label = { Text(text = "Your password")},
+                    visualTransformation = PasswordVisualTransformation()
                 )
             }
         }
@@ -95,11 +97,11 @@ public class LoginUI{
 
             OutlinedButton(
                     modifier = Modifier
-                            .width(100.dp)
-                            .fillMaxWidth(),
+                        .width(100.dp)
+                        .fillMaxWidth(),
                     onClick = {
                         Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
-                        //viewModel.isLoginInputValid(context, navController)
+                       // viewModel.isLoginInputValid(context, navController)
                         navController.navigate("MainMenu_screen")
                     },
                     border = BorderStroke(1.dp, Color.Black),

@@ -1,12 +1,14 @@
 package hu.bme.aut.android.monkeychess.register
 
 import android.content.Context
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterViewModel: ViewModel() {
     private var fullname: MutableLiveData<String> = MutableLiveData("")
@@ -16,11 +18,30 @@ class RegisterViewModel: ViewModel() {
     private var confirmPassword: MutableLiveData<String> = MutableLiveData("")
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var userDB: FirebaseFirestore
 
     private fun registerUser(context: Context, navController: NavController){
         auth = FirebaseAuth.getInstance()
+
+        userDB = FirebaseFirestore.getInstance()
+
         auth.createUserWithEmailAndPassword(email.value.toString(), password.value.toString()).addOnCompleteListener {
             if(it.isSuccessful){
+
+                val user = hashMapOf(
+                    "Name" to fullname.value.toString(),
+                    "E-mail" to email.value.toString(),
+                    "Username" to username.value.toString()
+                )
+
+                userDB.collection("users")
+                    .add(user)
+                    .addOnSuccessListener{ documentReference->
+                        Log.d("FireStore db:", "DocumentSnapshot added with ID: ${documentReference.id}")
+                    }
+                    .addOnFailureListener{ e->
+                        Log.d("FireStore db: ", "Error adding document", e)
+                    }
                 navController.navigate("login_screen")
                 Toast.makeText(context, "Successful Registration", Toast.LENGTH_LONG).show()
             }else{

@@ -17,20 +17,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
+import com.google.firebase.firestore.auth.User
 import hu.bme.aut.android.monkeychess.R
 
 class MainMenuUI {
 
     //@Preview
     @Composable
-    fun MainMenu(navController: NavController){
+    fun MainMenu(navController: NavController, viewModel: MainMenuViewModel){
+        val context = LocalContext.current
         Row{
             OutlinedButton(
-                onClick = { /*TODO: Implement logout*/ },
+                onClick = {
+                          viewModel.logoutUser(context, navController)
+                },
                 border = BorderStroke(0.dp, Color.White),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 shape = CircleShape
@@ -42,12 +48,12 @@ class MainMenuUI {
             }
             Spacer(modifier = Modifier.weight(1f))
             Column{
-                Spacer(modifier = Modifier.height(15.dp))
-                Text("Username")        //TODO: Username változtatása felhasználótól függően
+                Spacer(modifier = Modifier.height(18.dp))
+                Text("Username")     //TODO: Username változtatása felhasználótól függően
             }
             OutlinedButton(
                 onClick = {
-                          navController.navigate("profile_screen")
+                    navController.navigate("profile_screen")
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
                 border = BorderStroke(0.dp, Color.White),
