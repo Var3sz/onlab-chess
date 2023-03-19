@@ -1,13 +1,9 @@
 package hu.bme.aut.android.monkeychess.board
 
-import android.media.Image
-import android.text.style.ClickableSpan
 import android.util.Log
-import android.widget.Space
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,20 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.monkeychess.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import hu.bme.aut.android.monkeychess.board.pieces.Piece
-import hu.bme.aut.android.monkeychess.ui.theme.Shapes
 
 class BoardUI {
 
@@ -116,6 +107,7 @@ class BoardUI {
                                 .size(45.dp)
                                 .background(gridcolor)
                                 .clickable {
+                                    viewModel.HideAvibleSteps()
                                     //viewModel.emptyLiveDataMatrix()
                                     //viewModel.setValue(i, j, !viewModel.getValue(i,j)!!)
                                     Log.d(
@@ -149,7 +141,7 @@ class BoardUI {
                         ) {
                             Log.d(
                                 "Board2",
-                                "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.pieceColor }"
+                                "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.name }"
                             )
 
                             if(viewModel.getValue(i,j) == true ){
@@ -158,7 +150,7 @@ class BoardUI {
 
 
                             if(viewModel.getPiece(i,j)!!.pieceColor !="empty")
-                                DrawPiece()
+                                DrawPiece(viewModel.getPiece(i,j)?.imageID!!)
                         }
                     }
                 }
@@ -167,9 +159,9 @@ class BoardUI {
     }
 
     private @Composable
-    fun DrawPiece() {
+    fun DrawPiece(imageID: Int) {
         Image(
-            painter = painterResource(id = R.drawable.pawn),
+            painter = painterResource(id = imageID),
             contentDescription = "profile picture",
             modifier = Modifier
                 .background(color = Color.Black)

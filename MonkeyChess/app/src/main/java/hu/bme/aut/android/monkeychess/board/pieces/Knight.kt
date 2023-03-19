@@ -5,14 +5,14 @@ import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
 
 
-class Pawn(
+class Knight(
     override var pieceColor: String,
     override var i: Int,
     override var j: Int,
     override val imageID: Int
-    ) : Piece {
+) : Piece {
 
-    override val name: String = "Pawn"
+    override val name: String = "Knight"
     var hasMoved: Boolean = false
 
 

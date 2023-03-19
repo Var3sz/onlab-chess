@@ -1,6 +1,17 @@
 package hu.bme.aut.android.monkeychess.board.pieces
 
+import hu.bme.aut.android.monkeychess.R
+
 class Empty(): Piece {
+
+    override val imageID: Int
+        get() {
+            TODO()
+        }
+
+    override val name: String = "empty"
+
+
     override fun step() {
         TODO("Not yet implemented")
     }
