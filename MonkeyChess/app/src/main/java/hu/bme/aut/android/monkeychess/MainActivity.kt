@@ -23,6 +23,8 @@ import hu.bme.aut.android.monkeychess.register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassUI
+import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
 import hu.bme.aut.android.monkeychess.mainMenu.MainMenuViewModel
 import hu.bme.aut.android.monkeychess.profile.ProfileUI
 import hu.bme.aut.android.monkeychess.profile.ProfileViewModel
@@ -58,13 +60,16 @@ class MainActivity : ComponentActivity() {
                    Lifecycle.Event.ON_RESUME
                 }
             }
-
             composable("login_screen"){
                 val viewModel = LoginViewModel()
                 TopAppBarWidget(navController = navController, content =  { LoginUI().LoginScreenContent(viewModel)},bottomBar = { LoginUI().LoginButton(navController, viewModel)} )
                 BackHandler {
                     navController.navigate("welcome_screen")
                 }
+            }
+            composable("forgottenPass_screen"){
+                val viewModel = ForgottenPassViewModel()
+                TopAppBarWidget(navController = navController, content = { ForgottenPassUI().ForgottenPasswordScreen(navController, viewModel)}, bottomBar = {})
             }
             composable("register_screen"){
                 val viewModel = RegisterViewModel()

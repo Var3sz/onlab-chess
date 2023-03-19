@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -152,11 +155,10 @@ class RegisterUI {
     @Composable
     fun RegisterButton(navController: NavController, viewModel: RegisterViewModel){
         val context = LocalContext.current
-        Box(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.BottomCenter
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             OutlinedButton(
                 modifier = Modifier
                     .width(100.dp)
@@ -170,6 +172,12 @@ class RegisterUI {
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
             ) {
                 Text("Register")
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Row{
+                ClickableText(text = AnnotatedString("Already have an account?"), onClick = {
+                    navController.navigate("login_screen")
+                    }, style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
             }
         }
     }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -90,9 +93,9 @@ public class LoginUI{
     @Composable
     fun LoginButton(navController: NavController, viewModel: LoginViewModel){
         val context = LocalContext.current
-        Box(
+        Column(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
+                horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             OutlinedButton(
@@ -101,7 +104,7 @@ public class LoginUI{
                         .fillMaxWidth(),
                     onClick = {
                         Log.d("TODO", "pass: ${viewModel.getPassword()} email: ${viewModel.getEmail()}")
-                       // viewModel.isLoginInputValid(context, navController)
+                        //viewModel.isLoginInputValid(context, navController)
                         navController.navigate("MainMenu_screen")
                     },
                     border = BorderStroke(1.dp, Color.Black),
@@ -109,6 +112,12 @@ public class LoginUI{
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
                     ) {
                 Text("Login")
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Row{
+                ClickableText(text = AnnotatedString("Forgotten password?"), onClick = {
+                    navController.navigate("forgottenPass_screen")
+                }, style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
             }
         }
     }
