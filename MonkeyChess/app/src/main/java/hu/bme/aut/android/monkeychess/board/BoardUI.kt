@@ -98,7 +98,7 @@ class BoardUI {
             for (i in 0 until 8) {
                 Row {
                     for (j in 0 until 8) {
-                        var gridcolor = Color.Black
+                        var gridcolor = Color.Gray
                         if ((i + j) % 2 == 0) {
                             gridcolor = Color.White
                         }
@@ -158,14 +158,11 @@ class BoardUI {
         }
     }
 
-    private @Composable
-    fun DrawPiece(imageID: Int) {
+    @Composable
+    private fun DrawPiece(imageID: Int) {
         Image(
             painter = painterResource(id = imageID),
-            contentDescription = "profile picture",
-            modifier = Modifier
-                .background(color = Color.Black)
-
+            contentDescription = "profile picture"
         )
     }
 

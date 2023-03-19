@@ -20,12 +20,12 @@ class BoardViewModel:  ViewModel()  {
                 //stepup board
                 //black Pawns
                 if(i==1){
-                    rowList.add(Tile(false,Pawn("Black", i, j,R.drawable.pawn)))
+                    rowList.add(Tile(false,Pawn("Black", i, j, R.drawable.black_pawn)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Rooks
                 else if((i==0 && j==0)||(i==0 && j==7)){
-                    rowList.add(Tile(false,Rook("Black", i, j,R.drawable.pawn)))
+                    rowList.add(Tile(false,Rook("Black", i, j,R.drawable.black_rook)))
                 }
                 //black Bishops
                 else if((i==0 && j==1)||(i==0 && j==6)){

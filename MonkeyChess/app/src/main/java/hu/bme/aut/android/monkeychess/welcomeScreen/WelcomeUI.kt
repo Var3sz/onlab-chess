@@ -24,7 +24,8 @@ class WelcomeUI : ComponentActivity() {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement =  Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
 
             Box(contentAlignment = Alignment.Center){
-                Image(painter = painterResource(id = R.drawable.splash_screen), contentDescription = "Logo",)
+                Image(painter = painterResource(id = R.drawable.splash_screen), contentDescription = "Logo",
+                modifier = Modifier.height(400.dp).width(400.dp))
                 //Text("demo")
             }
 

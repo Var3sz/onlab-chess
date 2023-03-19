@@ -11,14 +11,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 class MainMenuViewModel : ViewModel(){
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private var username: ArrayList<String>? = null
 
-    fun showUsername(){
+    fun getUsername(){
             if(auth.currentUser != null) {
                 val userDB = FirebaseFirestore.getInstance()
                 userDB.collection("users").get().addOnCompleteListener {
                     if (it.isSuccessful) {
                         for (document in it.result) {
                             if (document.data.getValue("E-mail") == auth.currentUser?.email) {
+
                                 Log.d("User inside: ", "${auth.currentUser?.email}")
                                 Log.d("Users: ", "${document.data.getValue("Username")}")
                             }
