@@ -9,13 +9,22 @@ class Pawn(
     override var pieceColor: String,
     override var i: Int,
     override var j: Int,
-    override val imageID: Int
+
     ) : Piece {
 
     override val name: String = "Pawn"
     var hasMoved: Boolean = false
 
+    override var imageID: Int = 0
 
+    init {
+        if(pieceColor == "Black"){
+            imageID = R.drawable.black_pawn
+        }
+        if(pieceColor == "White"){
+            imageID = R.drawable.white_pawn
+        }
+    }
     override fun step(){
 
     }

@@ -20,24 +20,38 @@ class BoardViewModel:  ViewModel()  {
                 //stepup board
                 //black Pawns
                 if(i==1){
-                    rowList.add(Tile(false,Pawn("Black", i, j, R.drawable.black_pawn)))
+                    rowList.add(Tile(false,Pawn("Black", i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Rooks
                 else if((i==0 && j==0)||(i==0 && j==7)){
-                    rowList.add(Tile(false,Rook("Black", i, j,R.drawable.black_rook)))
+                    rowList.add(Tile(false,Rook("Black", i, j)))
                 }
                 //black Bishops
                 else if((i==0 && j==1)||(i==0 && j==6)){
-                   // rowList.add(Tile(false,Bishop("Black", i, j,R.drawable.pawn)))
-                    rowList.add(Tile(false,Empty()))
+                    rowList.add(Tile(false,Bishop("Black", i, j)))
+                    //rowList.add(Tile(false,Empty()))
                 }
                 //black Knights
                 else if((i==0 && j==2)||(i==0 && j==5)){
-                    //rowList.add(Tile(false,Knight("Black", i, j,R.drawable.pawn)))
-                    rowList.add(Tile(false,Empty()))
+                    rowList.add(Tile(false,Knight("Black", i, j)))
+                    //rowList.add(Tile(false,Empty()))
                 }
 
+                else if((i==0 && j==3)){
+                    rowList.add(Tile(false,Queen("Black", i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+                else if((i==0 && j==4)){
+                    rowList.add(Tile(false,King("Black", i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+
+
+
+                else if((i== 4 && j== 4)){
+                    rowList.add(Tile(false,King("White", i, j)))
+                }
                 else
                 rowList.add(Tile(false,Empty()))
             }
@@ -50,7 +64,7 @@ class BoardViewModel:  ViewModel()  {
     fun setValue(row: Int, col: Int, value: Boolean) {
 
         val matrix = tilesLiveData.value
-        tilesLiveData.value = matrix
+       // tilesLiveData.value = matrix
 
         val newRowList = matrix?.get(row)
         newRowList?.set(col, Tile(value,newRowList[col].pice))
@@ -58,10 +72,6 @@ class BoardViewModel:  ViewModel()  {
             matrix.set(row, it)
             tilesLiveData.value= matrix
         }
-
-
-
-
 
     }
 

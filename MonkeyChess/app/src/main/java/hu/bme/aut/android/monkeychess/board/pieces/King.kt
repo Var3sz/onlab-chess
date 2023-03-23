@@ -5,12 +5,12 @@ import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
 
 
-class Bishop(
+class King(
     override var pieceColor: String,
     override var i: Int,
     override var j: Int,
 
-) : Piece {
+    ) : Piece {
 
     override var imageID: Int = 0
     override val name: String = "Bishop"
@@ -20,10 +20,10 @@ class Bishop(
 
     init {
         if(pieceColor == "Black"){
-            imageID = R.drawable.black_bishop
+            imageID = R.drawable.black_king
         }
         if(pieceColor == "White"){
-            imageID = R.drawable.white_bishop
+            imageID = R.drawable.white_king
         }
     }
 
@@ -34,23 +34,27 @@ class Bishop(
     override fun getValidSteps(): List<Pair<Int, Int>>{
         val steps = mutableListOf <Pair<Int, Int>>()
 
-            for (col in 0 until 8){
-                if(col + i != i && col + i < 8  && j+col < 8 )
-                    steps.add(Pair(col + i,j + col))
+        if(i + 1 < 8 ){
+            steps.add(Pair(i + 1, j))
 
-                if(col + i != i && col + i < 8 && j-col >= 0 )
-                    steps.add(Pair(col + i ,j - col))
-
-
-                if(col + i != i && j + col < 8 && i-col >= 0){
-                    steps.add(Pair(i-col,j+col))
-                }
-
-
-                if(col + i != i && j - col >= 0 && i - col >= 0)
-                    steps.add(Pair(i - col,j - col))
-
+            if(j - 1 >= 0){
+                steps.add(Pair(i + 1, j - 1))
+                steps.add(Pair(i, j - 1))
             }
+
+            if(j + 1 < 8 ){
+                steps.add(Pair(i + 1, j + 1))
+                steps.add(Pair(i, j + 1))
+            }
+        }
+
+        if(i - 1 >= 0 ){
+            steps.add(Pair(i - 1, j))
+            if(j - 1 >= 0)
+                steps.add(Pair(i - 1, j - 1))
+            if(j + 1 < 8 )
+                steps.add(Pair(i - 1, j + 1))
+        }
 
 
         return steps

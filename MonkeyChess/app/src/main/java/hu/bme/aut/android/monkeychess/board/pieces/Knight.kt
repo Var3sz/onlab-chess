@@ -9,9 +9,9 @@ class Knight(
     override var pieceColor: String,
     override var i: Int,
     override var j: Int,
-    override val imageID: Int
 ) : Piece {
 
+    override var imageID: Int = 0
     override val name: String = "Knight"
     var hasMoved: Boolean = false
 
@@ -19,18 +19,51 @@ class Knight(
     override fun step(){
 
     }
+    init {
+        if(pieceColor == "Black"){
+            imageID = R.drawable.black_knight
+        }
+        if(pieceColor == "White"){
+            imageID = R.drawable.white_knight
+        }
+    }
 
     override fun getValidSteps(): List<Pair<Int, Int>>{
         val steps = mutableListOf <Pair<Int, Int>>()
-        if(pieceColor == "Black"){
-            if(i==1){
-                steps.add(Pair(i+2,j))
-            }
-            if(i < 8 ){
-                steps.add(Pair(i+1,j))
-            }
 
+        if(i + 2 < 8 && j +1 < 8){
+            steps.add(Pair(i + 2, j +1))
         }
+
+        if(i + 2 < 8 && j - 1 >= 0){
+            steps.add(Pair(i + 2, j - 1))
+        }
+
+        if(i + 1 < 8 && j + 2 < 8){
+            steps.add(Pair(i + 1, j + 2))
+        }
+
+        if(i + 1 < 8 && j - 2 >= 0){
+            steps.add(Pair(i + 1, j - 2))
+        }
+
+        if(i - 1 >= 0 && j - 2 >= 0){
+            steps.add(Pair(i - 1, j - 2))
+        }
+
+        if(i - 1 >= 0 && j + 2 < 8){
+            steps.add(Pair(i - 1,  j + 2))
+        }
+
+        if(i - 2 >= 0 && j +1 < 8){
+            steps.add(Pair(i - 2, j +1))
+        }
+
+        if(i - 2 >= 0 && j - 1 >= 0){
+            steps.add(Pair(i - 2, j - 1))
+        }
+
+
         return steps
     }
 }

@@ -10,13 +10,21 @@ class Rook(
     override var pieceColor: String,
     override var i: Int,
     override var j: Int,
-    override val imageID: Int
 ) : Piece {
 
     override val name: String = "Rook"
     var hasMoved: Boolean = false
 
+    override var imageID: Int = 0
 
+    init {
+        if(pieceColor == "Black"){
+            imageID = R.drawable.black_rook
+        }
+        if(pieceColor == "White"){
+            imageID = R.drawable.white_rook
+        }
+    }
     override fun step(){
 
     }

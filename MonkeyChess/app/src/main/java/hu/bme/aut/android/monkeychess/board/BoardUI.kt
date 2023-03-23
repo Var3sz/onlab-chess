@@ -112,25 +112,30 @@ class BoardUI {
                                     //viewModel.setValue(i, j, !viewModel.getValue(i,j)!!)
                                     Log.d(
                                         "Board1",
-                                        "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.pieceColor } "
+                                        "i: ${i}, j: ${j} board value: ${
+                                            viewModel.getValue(
+                                                i,
+                                                j
+                                            )
+                                        } babu:${viewModel.getPiece(i, j)!!.pieceColor} "
                                     )
 
-                                    if(viewModel.getPiece(i,j)!!.pieceColor !="empty"){
-                                        val piece = viewModel.getPiece(i,j)
+                                    if (viewModel.getPiece(i, j)!!.pieceColor != "empty") {
+                                        val piece = viewModel.getPiece(i, j)
                                         val steps = piece!!.getValidSteps()
 
                                         Log.d(
                                             "BoardStep",
                                             "i: ${piece.i}, j: ${piece.j} "
                                         )
-                                            steps.forEach(){
-                                                viewModel.setValue(it.first, it.second, true)
-                                                //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true
-                                                Log.d(
-                                                    "BoardStep",
-                                                    "i: ${it.first}, j: ${it.second} } "
-                                                )
-                                            }
+                                        steps.forEach() {
+                                            viewModel.setValue(it.first, it.second, true)
+                                            //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true
+                                            Log.d(
+                                                "BoardStep",
+                                                "i: ${it.first}, j: ${it.second} } "
+                                            )
+                                        }
 
                                     }
 

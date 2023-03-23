@@ -30,6 +30,7 @@ class MainMenuViewModel : ViewModel(){
                             Log.d("User inside: ", "${auth.currentUser?.email}")
                             Log.d("Users: ", "${document.data.getValue("Username")}")
                         }
+
                     }
                 }
             }.addOnFailureListener { exception ->
