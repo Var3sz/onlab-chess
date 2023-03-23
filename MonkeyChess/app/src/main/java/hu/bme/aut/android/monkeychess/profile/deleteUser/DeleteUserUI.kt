@@ -1,12 +1,10 @@
-package hu.bme.aut.android.monkeychess.forgottenPassword
+package hu.bme.aut.android.monkeychess.profile.deleteUser
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -25,15 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-class ForgottenPassUI {
-
+class DeleteUserUI {
 
     @Composable
-    fun ForgottenPasswordScreen(navController: NavController, viewModel: ForgottenPassViewModel){
-        val emailState = remember{ mutableStateOf("") }
+    fun DeleteScreen(viewModel: DeleteUserViewModel, navController: NavController) {
+        val passwordState = remember { mutableStateOf("") }
+        val emailState = remember { mutableStateOf("") }
         val context = LocalContext.current
 
-        Box( modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -46,13 +44,12 @@ class ForgottenPassUI {
                     modifier = Modifier
                         .padding(top = 24.dp, bottom = 48.dp)
                         .fillMaxWidth(),
-                    text = "Forgotten Password",
+                    text = "Delete Account!",
                     textAlign = TextAlign.Center,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                 )
 
-                //email field
                 Text(
                     text = "E-mail",
                     textAlign = TextAlign.Start,
@@ -68,6 +65,24 @@ class ForgottenPassUI {
                     ),
                     label = { Text(text = "Your e-mail address")}
                 )
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(),
+                    text = "Password",
+                    textAlign = TextAlign.Start,
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = passwordState.value,
+                    onValueChange = {typed -> passwordState.value = typed
+                        viewModel.setPassword(passwordState.value) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    label = { Text(text = "Your password")},
+                    visualTransformation = PasswordVisualTransformation()
+                )
                 Spacer(modifier = Modifier.height(30.dp))
                 OutlinedButton(
                     modifier = Modifier
@@ -75,15 +90,16 @@ class ForgottenPassUI {
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally),
                     onClick = {
-                        viewModel.isForgottenInputValid(context, navController)
+                        viewModel.isDeleteInputValid(context, navController)
                     },
                     border = BorderStroke(1.dp, Color.Black),
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
                 ) {
-                    Text("Send")
+                    Text("Delete")
                 }
             }
+
         }
     }
 }

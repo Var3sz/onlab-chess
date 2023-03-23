@@ -26,8 +26,9 @@ class MainMenuUI {
     //@Preview
     @Composable
     fun MainMenu(navController: NavController, viewModel: MainMenuViewModel){
-        val usernameLiveData by viewModel.usernameLiveData.observeAsState()
+        val usernameLiveData by viewModel.getUsername().observeAsState()
         val context = LocalContext.current
+
         Row{
             OutlinedButton(
                 onClick = {

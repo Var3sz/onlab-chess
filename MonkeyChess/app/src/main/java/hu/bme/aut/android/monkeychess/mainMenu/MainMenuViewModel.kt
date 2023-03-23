@@ -13,10 +13,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 class MainMenuViewModel : ViewModel(){
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var userDB: FirebaseFirestore = FirebaseFirestore.getInstance()
-    var usernameLiveData = MutableLiveData<String>()
+    private var usernameLiveData = MutableLiveData<String>()
 
     init{
-        usernameLiveData = MutableLiveData<String>()
         showUsername()
     }
 
@@ -37,15 +36,18 @@ class MainMenuViewModel : ViewModel(){
                 Log.d("Exception:", "Error getting documents", exception)
             }
         }
+        else{
+            setUsername("")
+        }
     }
 
     private fun setUsername(string: String){
-        val user: String = string
-        usernameLiveData.value = user
-        Log.d("Value:", user)
+        usernameLiveData.value = string
     }
 
-
+    fun getUsername(): MutableLiveData<String>{
+        return usernameLiveData
+    }
 
     fun logoutUser(context: Context, navController: NavController){
         if(auth.currentUser!=null){
@@ -54,6 +56,4 @@ class MainMenuViewModel : ViewModel(){
             Toast.makeText(context, "Successful logout!", Toast.LENGTH_LONG).show()
         }
     }
-
-
 }

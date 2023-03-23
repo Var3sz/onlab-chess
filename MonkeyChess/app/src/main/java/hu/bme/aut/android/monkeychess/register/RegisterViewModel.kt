@@ -1,5 +1,6 @@
 package hu.bme.aut.android.monkeychess.register
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.util.Patterns
@@ -9,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RegisterViewModel: ViewModel() {
     private var fullname: MutableLiveData<String> = MutableLiveData("")
@@ -28,10 +31,12 @@ class RegisterViewModel: ViewModel() {
         auth.createUserWithEmailAndPassword(email.value.toString(), password.value.toString()).addOnCompleteListener {
             if(it.isSuccessful){
 
+
                 val user = hashMapOf(
                     "Name" to fullname.value.toString(),
                     "E-mail" to email.value.toString(),
-                    "Username" to username.value.toString()
+                    "Username" to username.value.toString(),
+                    "Sign-up date" to dateFormatter()
                 )
 
                 userDB.collection("users")
@@ -50,6 +55,7 @@ class RegisterViewModel: ViewModel() {
         }
     }
 
+    // TODO: Megerősítő e-mail a szűréshez
     fun isRegistrationInputValid(context: Context, navController: NavController){
         if(fullname.value.toString().isNotEmpty() && username.value.toString().length >= 5 && password.value.toString().length >= 6 && (email.value.toString().isNotEmpty() || Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()) && confirmPassword.value.toString() == password.value.toString()){
             registerUser(context, navController)
@@ -70,7 +76,11 @@ class RegisterViewModel: ViewModel() {
         }
     }
 
-
+    @SuppressLint("SimpleDateFormat")
+    private fun dateFormatter(): String {
+        val sdf = SimpleDateFormat("yyyy.MM.dd")
+        return sdf.format(Date())
+    }
 
     fun setFullname(_fullname: String){
         fullname.value = _fullname

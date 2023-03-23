@@ -16,17 +16,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.monkeychess.R
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 
 class ProfileUI {
 
     @Composable
-    fun ProfileScreen(viewModel: ProfileViewModel) {
+    fun ProfileScreen(viewModel: ProfileViewModel, navController: NavController) {
+        val usernameLiveData by viewModel.getUsername().observeAsState()
+        val fullnameLiveData by viewModel.getFullname().observeAsState()
+        val emailLiveData by viewModel.getEmail().observeAsState()
+        val accCreatedAtLiveData by viewModel.getAccCreatedAt().observeAsState()
+        val context = LocalContext.current
+
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
@@ -42,22 +52,22 @@ class ProfileUI {
                     .clip(CircleShape)
             )
             Text(
-                text="Name",
+                text=usernameLiveData?:"",
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 38.sp)
             )
             Spacer(modifier = Modifier.height(15.dp))
-            Text("Fullname")
+            Text(fullnameLiveData?:"")
             Spacer(modifier = Modifier.height(15.dp))
-            Text("Email")
+            Text(emailLiveData?:"")
             Spacer(modifier = Modifier.height(15.dp))
-            Text("Join date")
+            Text(accCreatedAtLiveData?:"")
             Spacer(modifier = Modifier.weight(1f))
             OutlinedButton(
                 modifier = Modifier
                     .width(150.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    //TODO: IMPLEMENT
+                    navController.navigate("delete_user")
                 },
                 border = BorderStroke(1.dp, Color.Black),
                 shape = RoundedCornerShape(50),

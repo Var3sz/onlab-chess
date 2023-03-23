@@ -28,6 +28,8 @@ import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
 import hu.bme.aut.android.monkeychess.mainMenu.MainMenuViewModel
 import hu.bme.aut.android.monkeychess.profile.ProfileUI
 import hu.bme.aut.android.monkeychess.profile.ProfileViewModel
+import hu.bme.aut.android.monkeychess.profile.deleteUser.DeleteUserUI
+import hu.bme.aut.android.monkeychess.profile.deleteUser.DeleteUserViewModel
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
 
 class MainActivity : ComponentActivity() {
@@ -91,7 +93,11 @@ class MainActivity : ComponentActivity() {
             }
             composable("profile_screen"){
                 val viewModel = ProfileViewModel()
-                TopAppBarWidget(navController = navController, content = { ProfileUI().ProfileScreen(viewModel) }, bottomBar = {})
+                TopAppBarWidget(navController = navController, content = { ProfileUI().ProfileScreen(viewModel, navController = navController) }, bottomBar = {})
+            }
+            composable("delete_user"){
+                val viewModel = DeleteUserViewModel()
+                TopAppBarWidget(navController = navController, content = { DeleteUserUI().DeleteScreen(viewModel, navController) }, bottomBar = {})
             }
 
         }
