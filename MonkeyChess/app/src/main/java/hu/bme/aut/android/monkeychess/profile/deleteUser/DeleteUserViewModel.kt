@@ -22,13 +22,22 @@ class DeleteUserViewModel:ViewModel() {
     private var password: MutableLiveData<String> = MutableLiveData("")
     private var email: MutableLiveData<String> = MutableLiveData("")
 
-    //TODO: Firestore-ból törlés
     private fun deleteAccount(context: Context, navController: NavController){
         val user = auth.currentUser!!
         val credential = EmailAuthProvider.getCredential(email.value.toString(), password.value.toString())
 
         user.reauthenticate(credential).addOnCompleteListener{
             if(it.isSuccessful){
+                userDB.collection("users").get().addOnCompleteListener { task->
+                    if(task.isSuccessful){
+                            for(document in task.result){
+                            if(document.data.getValue("E-mail") == auth.currentUser?.email){
+                               userDB.collection("users").document(document.id).delete()
+                            }
+                        }
+                    }
+                }
+
                user.delete().addOnCompleteListener { task->
                     if(task.isSuccessful){
                         auth.signOut()
