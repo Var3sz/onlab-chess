@@ -30,7 +30,8 @@ class RegisterViewModel: ViewModel() {
 
         auth.createUserWithEmailAndPassword(email.value.toString(), password.value.toString()).addOnCompleteListener {
             if(it.isSuccessful){
-
+                val verifiable = auth.currentUser
+                verifiable?.sendEmailVerification()
 
                 val user = hashMapOf(
                     "Name" to fullname.value.toString(),

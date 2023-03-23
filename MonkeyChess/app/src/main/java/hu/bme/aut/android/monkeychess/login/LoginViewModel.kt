@@ -18,8 +18,17 @@ class LoginViewModel: ViewModel() {
         auth = FirebaseAuth.getInstance()
         auth.signInWithEmailAndPassword(email.value.toString(), password.value.toString()).addOnCompleteListener {
             login -> if(login.isSuccessful){
-                navController.navigate("MainMenu_screen")
-                Toast.makeText(context, "Successful login!", Toast.LENGTH_LONG).show()
+                val user = auth.currentUser
+                if(user != null){
+                    if(user.isEmailVerified){
+                        navController.navigate("MainMenu_screen")
+                        Toast.makeText(context, "Successful login!", Toast.LENGTH_LONG).show()
+                    }
+                    else{
+                        Toast.makeText(context, "E-mail has not been verified!", Toast.LENGTH_LONG).show()
+                        auth.signOut()
+                    }
+                }
             }
             else{
                 Toast.makeText(context, login.exception?.message, Toast.LENGTH_LONG).show()
