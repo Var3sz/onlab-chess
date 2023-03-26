@@ -22,6 +22,8 @@ class ForgottenPassViewModel : ViewModel(){
             }else{
                 Toast.makeText(context, "Unable to send e-mail!", Toast.LENGTH_LONG).show()
             }
+        }.addOnFailureListener{
+            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
         }
     }
 

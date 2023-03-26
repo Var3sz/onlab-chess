@@ -1,19 +1,13 @@
 package hu.bme.aut.android.monkeychess.profile.deleteUser
 
 import android.content.Context
-import android.content.Intent
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 class DeleteUserViewModel:ViewModel() {
@@ -36,6 +30,8 @@ class DeleteUserViewModel:ViewModel() {
                             }
                         }
                     }
+                }.addOnFailureListener{ e->
+                    Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                 }
 
                user.delete().addOnCompleteListener { task->

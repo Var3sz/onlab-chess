@@ -44,8 +44,7 @@ class RegisterViewModel: ViewModel() {
                     .add(user)
                     .addOnSuccessListener{ documentReference->
                         Log.d("FireStore db:", "DocumentSnapshot added with ID: ${documentReference.id}")
-                    }
-                    .addOnFailureListener{ e->
+                    }.addOnFailureListener{ e->
                         Log.d("FireStore db: ", "Error adding document", e)
                     }
                 navController.navigate("login_screen")
@@ -53,6 +52,8 @@ class RegisterViewModel: ViewModel() {
             }else{
                 Toast.makeText(context, it.exception?.message, Toast.LENGTH_LONG).show()
             }
+        }.addOnFailureListener{
+            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
         }
     }
 

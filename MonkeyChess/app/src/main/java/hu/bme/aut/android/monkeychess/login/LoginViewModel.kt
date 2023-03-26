@@ -33,6 +33,8 @@ class LoginViewModel: ViewModel() {
             else{
                 Toast.makeText(context, login.exception?.message, Toast.LENGTH_LONG).show()
             }
+        }.addOnFailureListener{
+            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
         }
     }
 

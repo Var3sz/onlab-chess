@@ -30,6 +30,10 @@ import hu.bme.aut.android.monkeychess.profile.ProfileUI
 import hu.bme.aut.android.monkeychess.profile.ProfileViewModel
 import hu.bme.aut.android.monkeychess.profile.deleteUser.DeleteUserUI
 import hu.bme.aut.android.monkeychess.profile.deleteUser.DeleteUserViewModel
+import hu.bme.aut.android.monkeychess.profile.modify.email.EmailChangeUI
+import hu.bme.aut.android.monkeychess.profile.modify.email.EmailChangeViewModel
+import hu.bme.aut.android.monkeychess.profile.modify.password.PasswordChangeUI
+import hu.bme.aut.android.monkeychess.profile.modify.password.PasswordChangeViewModel
 import hu.bme.aut.android.monkeychess.ui.theme.MonkeChessTheme
 
 class MainActivity : ComponentActivity() {
@@ -94,6 +98,14 @@ class MainActivity : ComponentActivity() {
             composable("profile_screen"){
                 val viewModel = ProfileViewModel()
                 TopAppBarWidget(navController = navController, content = { ProfileUI().ProfileScreen(viewModel, navController = navController) }, bottomBar = {})
+            }
+            composable("change_email"){
+                val viewModel = EmailChangeViewModel()
+                TopAppBarWidget(navController = navController, content = { EmailChangeUI().EmailChangeScreen(navController = navController, viewModel = viewModel)}, bottomBar = {})
+            }
+            composable("change_password"){
+                val viewModel = PasswordChangeViewModel()
+                TopAppBarWidget(navController = navController, content = { PasswordChangeUI().PasswordChangeScreen(navController = navController, viewModel = viewModel)}, bottomBar = {})
             }
             composable("delete_user"){
                 val viewModel = DeleteUserViewModel()

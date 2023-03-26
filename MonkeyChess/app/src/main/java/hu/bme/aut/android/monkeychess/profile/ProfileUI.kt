@@ -1,26 +1,21 @@
 package hu.bme.aut.android.monkeychess.profile
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.OutlinedButton
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.monkeychess.R
-import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -31,11 +26,54 @@ class ProfileUI {
 
     @Composable
     fun ProfileScreen(viewModel: ProfileViewModel, navController: NavController) {
+        var expanded by remember { mutableStateOf(false) }
         val usernameLiveData by viewModel.getUsername().observeAsState()
         val fullnameLiveData by viewModel.getFullname().observeAsState()
         val emailLiveData by viewModel.getEmail().observeAsState()
         val accCreatedAtLiveData by viewModel.getAccCreatedAt().observeAsState()
-        val context = LocalContext.current
+
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(TopEnd))
+        {
+            OutlinedButton(
+                onClick = {
+                   expanded = true
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                border = BorderStroke(0.dp, Color.White),
+                shape = CircleShape
+            ) {
+                Image(painter = painterResource(id = R.drawable.baseline_menu_24), contentDescription = "Profile icon",
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp),
+                )
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                DropdownMenuItem(
+                   onClick = {expanded = false},
+                    modifier = Modifier.wrapContentSize()
+                ){
+                    Text(text = "Change profile")
+                }
+                Divider()
+                DropdownMenuItem(
+                    onClick = {navController.navigate("change_email")},
+                    modifier = Modifier.wrapContentSize()
+                ){
+                    Text(text = "Change e-mail address")
+                }
+                Divider()
+                DropdownMenuItem(
+                    onClick = {navController.navigate("change_password")},
+                    modifier = Modifier.wrapContentSize()
+                ){
+                    Text(text = "Change password")
+                }
+            }
+        }
+
 
         Column(
             modifier = Modifier.fillMaxSize(),
