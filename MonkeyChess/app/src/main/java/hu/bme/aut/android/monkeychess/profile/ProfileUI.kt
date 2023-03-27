@@ -52,7 +52,7 @@ class ProfileUI {
             }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 DropdownMenuItem(
-                   onClick = {expanded = false},
+                   onClick = { navController.navigate("change_profile_data") },
                     modifier = Modifier.wrapContentSize()
                 ){
                     Text(text = "Change profile")
