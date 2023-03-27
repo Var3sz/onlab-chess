@@ -14,7 +14,7 @@ class Rook(
 
     override val name: String = "Rook"
     var hasMoved: Boolean = false
-
+    override val position: Pair<Int, Int> = Pair(i,j)
     override var imageID: Int = 0
 
     init {
@@ -29,20 +29,22 @@ class Rook(
 
     }
 
-    override fun getValidSteps(): List<Pair<Int, Int>>{
-        val steps = mutableListOf <Pair<Int, Int>>()
-        for (col in 0 until 8){
-            if(col!=i)
-                steps.add(Pair(col,j))
+    override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
+        val steps = Array(4) { mutableListOf<Pair<Int, Int>>() }
 
+        for (counter in 0 until 8) {
+            if (i + counter < 8)
+                steps[0].add(Pair(i + counter, j))
+
+            if (i - counter >= 0)
+                steps[1].add(Pair(i - counter, j))
+
+            if (j + counter < 8)
+                steps[2].add(Pair(i, j + counter))
+
+            if (j - counter >= 0)
+                steps[3].add(Pair(i, j - counter))
         }
-
-        for (row in 0 until 8){
-            if(row!=j)
-                steps.add(Pair(i,row))
-        }
-
-
         return steps
     }
 }

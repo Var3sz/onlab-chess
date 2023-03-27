@@ -14,7 +14,7 @@ class Knight(
     override var imageID: Int = 0
     override val name: String = "Knight"
     var hasMoved: Boolean = false
-
+    override val position: Pair<Int, Int> = Pair(i,j)
 
     override fun step(){
 
@@ -28,39 +28,39 @@ class Knight(
         }
     }
 
-    override fun getValidSteps(): List<Pair<Int, Int>>{
-        val steps = mutableListOf <Pair<Int, Int>>()
+    override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
+        val steps = Array(8) { mutableListOf<Pair<Int, Int>>() }
 
         if(i + 2 < 8 && j +1 < 8){
-            steps.add(Pair(i + 2, j +1))
+            steps[0].add(Pair(i + 2, j +1))
         }
 
         if(i + 2 < 8 && j - 1 >= 0){
-            steps.add(Pair(i + 2, j - 1))
+            steps[1].add(Pair(i + 2, j - 1))
         }
 
         if(i + 1 < 8 && j + 2 < 8){
-            steps.add(Pair(i + 1, j + 2))
+            steps[2].add(Pair(i + 1, j + 2))
         }
 
         if(i + 1 < 8 && j - 2 >= 0){
-            steps.add(Pair(i + 1, j - 2))
+            steps[3].add(Pair(i + 1, j - 2))
         }
 
         if(i - 1 >= 0 && j - 2 >= 0){
-            steps.add(Pair(i - 1, j - 2))
+            steps[4].add(Pair(i - 1, j - 2))
         }
 
         if(i - 1 >= 0 && j + 2 < 8){
-            steps.add(Pair(i - 1,  j + 2))
+            steps[5].add(Pair(i - 1,  j + 2))
         }
 
         if(i - 2 >= 0 && j +1 < 8){
-            steps.add(Pair(i - 2, j +1))
+            steps[6].add(Pair(i - 2, j +1))
         }
 
         if(i - 2 >= 0 && j - 1 >= 0){
-            steps.add(Pair(i - 2, j - 1))
+            steps[7].add(Pair(i - 2, j - 1))
         }
 
 

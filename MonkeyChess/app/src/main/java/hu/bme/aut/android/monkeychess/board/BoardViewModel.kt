@@ -1,5 +1,6 @@
 package hu.bme.aut.android.monkeychess.board
 
+import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +20,7 @@ class BoardViewModel:  ViewModel()  {
             for (j in 0 until 8){
                 //stepup board
                 //black Pawns
-                if(i==1){
+                if(i==2){
                     rowList.add(Tile(false,Pawn("Black", i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
@@ -49,9 +50,14 @@ class BoardViewModel:  ViewModel()  {
 
 
 
-                else if((i== 4 && j== 4)){
-                    rowList.add(Tile(false,King("White", i, j)))
+                else if((i== 4 && j== 3)) {
+                    rowList.add(Tile(false, Queen("White", i, j)))
                 }
+
+                else if((i== 2 && j== 6)){
+                    rowList.add(Tile(false,Queen("White", i, j)))
+                }
+
                 else
                 rowList.add(Tile(false,Empty()))
             }
@@ -73,6 +79,58 @@ class BoardViewModel:  ViewModel()  {
             tilesLiveData.value= matrix
         }
 
+    }
+
+    fun getAvilableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
+        val valid = piece.getValidSteps()
+        val final = mutableListOf<Pair <Int,Int>>()
+
+        valid.forEach(){
+            for(i in it.indices){
+                val currentField = it[i]
+                val currentPiece = getPiece(currentField.first, currentField.second)
+                if(i == 0){
+                    Log.d(piece.name, "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece?.name}")
+
+                }
+
+
+                if(currentField != piece.position){
+                    if(currentPiece?.name != "empty"){
+                        if(piece.pieceColor != currentPiece?.pieceColor){
+                            final.add(currentField)
+                        }
+                        break
+                    }
+                    final.add(currentField)
+                }
+
+            }
+        }
+
+        /*
+        valid.forEach() {
+            var addMore= true
+            it.forEach(){
+                    val currentField = it.copy()
+                    val currentPiece = getPiece(currentField.first, currentField.second)
+
+                    if(currentPiece?.name != "Empty"){
+
+                        //todo ne tudjon lépni ha azzal a király sakkba kerül
+                        if(piece.pieceColor != currentPiece?.pieceColor && addMore){
+                            final.add(currentField)
+                        }
+                        addMore= false
+                    }
+                    if(addMore)
+                    final.add(currentField)
+
+            }
+        }
+
+         */
+        return final
     }
 
     fun HideAvibleSteps(){

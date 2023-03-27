@@ -12,6 +12,7 @@ class Pawn(
 
     ) : Piece {
 
+    override val position: Pair<Int, Int> = Pair(i,j)
     override val name: String = "Pawn"
     var hasMoved: Boolean = false
 
@@ -29,14 +30,15 @@ class Pawn(
 
     }
 
-    override fun getValidSteps(): List<Pair<Int, Int>>{
-        val steps = mutableListOf <Pair<Int, Int>>()
+    override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
+        val steps = Array(2) { mutableListOf<Pair<Int, Int>>() }
+
         if(pieceColor == "Black"){
             if(i==1){
-                steps.add(Pair(i+2,j))
+                steps[0].add(Pair(i+2,j))
             }
             if(i < 8 ){
-                steps.add(Pair(i+1,j))
+                steps[1].add(Pair(i+1,j))
             }
 
         }

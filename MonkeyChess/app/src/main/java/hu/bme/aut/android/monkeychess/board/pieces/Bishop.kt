@@ -1,8 +1,10 @@
 package hu.bme.aut.android.monkeychess.board.pieces
 
 import android.util.Log
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.board.Tile
 
 
 class Bishop(
@@ -15,7 +17,7 @@ class Bishop(
     override var imageID: Int = 0
     override val name: String = "Bishop"
     var hasMoved: Boolean = false
-
+    override val position: Pair<Int, Int> = Pair(i,j)
 
 
     init {
@@ -31,27 +33,33 @@ class Bishop(
 
     }
 
-    override fun getValidSteps(): List<Pair<Int, Int>>{
-        val steps = mutableListOf <Pair<Int, Int>>()
+    override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>> {
+        val steps = Array(4) { mutableListOf<Pair<Int, Int>>() }
 
             for (col in 0 until 8){
-                if(col + i != i && col + i < 8  && j+col < 8 )
-                    steps.add(Pair(col + i,j + col))
 
-                if(col + i != i && col + i < 8 && j-col >= 0 )
-                    steps.add(Pair(col + i ,j - col))
+                if(col + i != i && col + i < 8  && j+col < 8 ){
+                    steps[0].add(Pair(col + i,j + col))
 
-
-                if(col + i != i && j + col < 8 && i-col >= 0){
-                    steps.add(Pair(i-col,j+col))
                 }
 
 
-                if(col + i != i && j - col >= 0 && i - col >= 0)
-                    steps.add(Pair(i - col,j - col))
+                if(col + i != i && col + i < 8 && j-col >= 0 ){
+                    steps[1].add(Pair(col + i ,j - col))
+                }
 
+
+
+                if(col + i != i && j + col < 8 && i-col >= 0){
+                    steps[2].add(Pair(i-col,j+col))
+                }
+
+
+                if(col + i != i && j - col >= 0 && i - col >= 0){
+                    steps[3].add(Pair(i - col,j - col))
+
+                }
             }
-
 
         return steps
     }

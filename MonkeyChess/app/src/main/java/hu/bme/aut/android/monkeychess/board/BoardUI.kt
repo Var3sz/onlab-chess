@@ -122,7 +122,7 @@ class BoardUI {
 
                                     if (viewModel.getPiece(i, j)!!.pieceColor != "empty") {
                                         val piece = viewModel.getPiece(i, j)
-                                        val steps = piece!!.getValidSteps()
+                                        val steps = viewModel.getAvilableSteps(piece!!)
 
                                         Log.d(
                                             "BoardStep",
@@ -136,18 +136,19 @@ class BoardUI {
                                                 "i: ${it.first}, j: ${it.second} } "
                                             )
                                         }
-
                                     }
-
                                     //viewModel.matrixLiveData.value
                                 },
                             contentAlignment = Alignment.Center,
 
                         ) {
+                            /*
                             Log.d(
                                 "Board2",
                                 "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.name }"
                             )
+
+                             */
 
                             if(viewModel.getValue(i,j) == true ){
                                 DrawCircle()

@@ -4,10 +4,11 @@ import hu.bme.aut.android.monkeychess.R
 
 interface  Piece {
     fun step()
-    fun getValidSteps(): List<Pair<Int, Int>>
+    fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>
     var pieceColor: String
     val imageID: Int
     val name: String
+    val position: Pair<Int, Int>
 
 
 

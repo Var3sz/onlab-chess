@@ -10,13 +10,13 @@ class Empty(): Piece {
         }
 
     override val name: String = "empty"
-
+    override val position: Pair<Int, Int> = Pair(0,0)
 
     override fun step() {
         TODO("Not yet implemented")
     }
 
-    override fun getValidSteps(): List<Pair<Int, Int>> {
+    override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>> {
         TODO("Not yet implemented")
     }
 
