@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import hu.bme.aut.android.monkeychess.board.pieces.Piece
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 
 class BoardUI {
 
@@ -120,7 +121,7 @@ class BoardUI {
                                         } babu:${viewModel.getPiece(i, j)!!.pieceColor} "
                                     )
 
-                                    if (viewModel.getPiece(i, j)!!.pieceColor != "empty") {
+                                    if (viewModel.getPiece(i, j)!!.pieceColor != PieceColor.EMPTY) {
                                         val piece = viewModel.getPiece(i, j)
                                         val steps = viewModel.getAvilableSteps(piece!!)
 
@@ -155,7 +156,7 @@ class BoardUI {
                             }
 
 
-                            if(viewModel.getPiece(i,j)!!.pieceColor !="empty")
+                            if(viewModel.getPiece(i,j)!!.pieceColor != PieceColor.EMPTY)
                                 DrawPiece(viewModel.getPiece(i,j)?.imageID!!)
                         }
                     }

@@ -4,24 +4,26 @@ import android.util.Log
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
 
 class Rook(
-    override var pieceColor: String,
+    override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
 ) : Piece {
 
-    override val name: String = "Rook"
+    override val name: PieceName = PieceName.ROOK
     var hasMoved: Boolean = false
     override val position: Pair<Int, Int> = Pair(i,j)
     override var imageID: Int = 0
 
     init {
-        if(pieceColor == "Black"){
+        if(pieceColor == PieceColor.BLACK){
             imageID = R.drawable.black_rook
         }
-        if(pieceColor == "White"){
+        if(pieceColor == PieceColor.WHITE){
             imageID = R.drawable.white_rook
         }
     }

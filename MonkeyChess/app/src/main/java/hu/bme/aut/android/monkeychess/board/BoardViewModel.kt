@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.pieces.*
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
 class BoardViewModel:  ViewModel()  {
-    var matrixLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Boolean>>>()
-    var piecesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Piece>>>()
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
 
     init {
@@ -21,41 +21,42 @@ class BoardViewModel:  ViewModel()  {
                 //stepup board
                 //black Pawns
                 if(i==2){
-                    rowList.add(Tile(false,Pawn("Black", i, j)))
+                    rowList.add(Tile(false,Pawn(PieceColor.BLACK, i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Rooks
                 else if((i==0 && j==0)||(i==0 && j==7)){
-                    rowList.add(Tile(false,Rook("Black", i, j)))
+                    rowList.add(Tile(false,Rook(PieceColor.BLACK, i, j)))
                 }
                 //black Bishops
                 else if((i==0 && j==1)||(i==0 && j==6)){
-                    rowList.add(Tile(false,Bishop("Black", i, j)))
+                    rowList.add(Tile(false,Bishop(PieceColor.BLACK, i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Knights
                 else if((i==0 && j==2)||(i==0 && j==5)){
-                    rowList.add(Tile(false,Knight("Black", i, j)))
+                    rowList.add(Tile(false,Knight(PieceColor.BLACK, i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
                 else if((i==0 && j==3)){
-                    rowList.add(Tile(false,Queen("Black", i, j)))
+                    rowList.add(Tile(false,Queen(PieceColor.BLACK, i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 else if((i==0 && j==4)){
-                    rowList.add(Tile(false,King("Black", i, j)))
+                    rowList.add(Tile(false,King(PieceColor.BLACK, i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
 
+                //White Side
 
                 else if((i== 4 && j== 3)) {
-                    rowList.add(Tile(false, Queen("White", i, j)))
+                    rowList.add(Tile(false, Queen(PieceColor.WHITE, i, j)))
                 }
 
                 else if((i== 2 && j== 6)){
-                    rowList.add(Tile(false,Queen("White", i, j)))
+                    rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j)))
                 }
 
                 else
@@ -90,13 +91,13 @@ class BoardViewModel:  ViewModel()  {
                 val currentField = it[i]
                 val currentPiece = getPiece(currentField.first, currentField.second)
                 if(i == 0){
-                    Log.d(piece.name, "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece?.name}")
+                    Log.d(piece.name.toString(), "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece?.name}")
 
                 }
 
 
                 if(currentField != piece.position){
-                    if(currentPiece?.name != "empty"){
+                    if(currentPiece?.name != PieceName.EMPTY){
                         if(piece.pieceColor != currentPiece?.pieceColor){
                             final.add(currentField)
                         }
