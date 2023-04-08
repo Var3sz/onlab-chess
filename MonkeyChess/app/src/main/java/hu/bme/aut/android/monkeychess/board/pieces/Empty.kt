@@ -12,7 +12,7 @@ class Empty(): Piece {
         }
 
     override val name: PieceName = PieceName.EMPTY
-    override val position: Pair<Int, Int> = Pair(0,0)
+    override var position: Pair<Int, Int> = Pair(0,0)
 
     override fun step() {
         TODO("Not yet implemented")

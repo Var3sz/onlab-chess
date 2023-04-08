@@ -10,7 +10,7 @@ interface  Piece {
     var pieceColor: PieceColor
     val imageID: Int
     val name: PieceName
-    val position: Pair<Int, Int>
+    var position: Pair<Int, Int>
 
 
 

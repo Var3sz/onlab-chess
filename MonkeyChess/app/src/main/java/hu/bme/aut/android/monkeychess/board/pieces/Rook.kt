@@ -16,7 +16,7 @@ class Rook(
 
     override val name: PieceName = PieceName.ROOK
     var hasMoved: Boolean = false
-    override val position: Pair<Int, Int> = Pair(i,j)
+    override var position: Pair<Int, Int> = Pair(i,j)
     override var imageID: Int = 0
 
     init {

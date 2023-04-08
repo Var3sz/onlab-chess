@@ -14,7 +14,7 @@ class Pawn(
 
     ) : Piece {
 
-    override val position: Pair<Int, Int> = Pair(i,j)
+    override var position: Pair<Int, Int> = Pair(i,j)
     override val name: PieceName = PieceName.PAWN
     var hasMoved: Boolean = false
 

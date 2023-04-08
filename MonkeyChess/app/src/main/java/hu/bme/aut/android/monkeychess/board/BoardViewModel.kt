@@ -11,6 +11,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
 class BoardViewModel:  ViewModel()  {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
+    var clickedPiece = MutableLiveData<Piece>()
 
     init {
         val tiles = SnapshotStateList<SnapshotStateList<Tile>>()
@@ -108,29 +109,6 @@ class BoardViewModel:  ViewModel()  {
 
             }
         }
-
-        /*
-        valid.forEach() {
-            var addMore= true
-            it.forEach(){
-                    val currentField = it.copy()
-                    val currentPiece = getPiece(currentField.first, currentField.second)
-
-                    if(currentPiece?.name != "Empty"){
-
-                        //todo ne tudjon lépni ha azzal a király sakkba kerül
-                        if(piece.pieceColor != currentPiece?.pieceColor && addMore){
-                            final.add(currentField)
-                        }
-                        addMore= false
-                    }
-                    if(addMore)
-                    final.add(currentField)
-
-            }
-        }
-
-         */
         return final
     }
 
@@ -149,8 +127,43 @@ class BoardViewModel:  ViewModel()  {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)!!.pice
     }
 
+    fun getClickedPiece(): Piece{
+        return clickedPiece.value!!
+    }
+
+    fun setClickedPiece(piece:Piece?){
+        clickedPiece.value = piece
+    }
+
     fun emptyLiveDataMatrix(){
 
+    }
+
+    fun step(piece: Piece, i: Int,j: Int){
+        var matrix = tilesLiveData.value
+        // tilesLiveData.value = matrix
+
+        var newRowList = matrix?.get(piece.i)
+        newRowList?.set(piece.j, Tile(false,Empty()))
+        newRowList?.let {
+            matrix?.set(piece.i, it)
+
+            tilesLiveData.value= matrix
+        }
+
+        matrix = tilesLiveData.value
+        piece.i = i
+        piece.j = j
+        piece.position = Pair(i,j)
+
+        newRowList = matrix?.get(i)
+        newRowList?.set(j, Tile(false,piece))
+        newRowList?.let {
+            matrix?.set(i, it)
+
+            tilesLiveData.value= matrix
+        }
+        clickedPiece.value = null
     }
 
 

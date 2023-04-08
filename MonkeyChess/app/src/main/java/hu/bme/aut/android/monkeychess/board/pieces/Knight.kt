@@ -16,7 +16,7 @@ class Knight(
     override var imageID: Int = 0
     override val name: PieceName = PieceName.KNIGHT
     var hasMoved: Boolean = false
-    override val position: Pair<Int, Int> = Pair(i,j)
+    override var position: Pair<Int, Int> = Pair(i,j)
 
     override fun step(){
 
