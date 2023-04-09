@@ -19,8 +19,9 @@ class Bishop(
 
     override var imageID: Int = 0
     override val name: PieceName = PieceName.BISHOP
-    var hasMoved: Boolean = false
+    override var hasMoved: Boolean = false
     override var position: Pair<Int, Int> = Pair(i,j)
+
 
 
     init {
@@ -36,6 +37,7 @@ class Bishop(
         this.i = i
         this.j = j
         this.position = Pair(i,j)
+        hasMoved = true
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>> {

@@ -18,7 +18,7 @@ class King(
     override val name: PieceName = PieceName.KING
     override var position: Pair<Int, Int> = Pair(i,j)
 
-    var hasMoved: Boolean = false
+    override var hasMoved: Boolean = false
 
 
 
@@ -35,6 +35,7 @@ class King(
         this.i = i
         this.j = j
         this.position = Pair(i,j)
+        hasMoved = true
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
@@ -45,13 +46,18 @@ class King(
 
             if(j - 1 >= 0){
                 steps[1].add(Pair(i + 1, j - 1))
-                steps[2].add(Pair(i, j - 1))
             }
 
             if(j + 1 < 8 ){
-                steps[3].add(Pair(i + 1, j + 1))
-                steps[4].add(Pair(i, j + 1))
+                steps[2].add(Pair(i + 1, j + 1))
             }
+        }
+
+        if(j - 1 >= 0){
+            steps[3].add(Pair(i, j - 1))
+        }
+        if(j + 1 < 8 ){
+            steps[4].add(Pair(i, j + 1))
         }
 
         if(i - 1 >= 0 ){

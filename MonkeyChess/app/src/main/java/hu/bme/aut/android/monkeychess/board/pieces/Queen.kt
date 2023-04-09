@@ -16,7 +16,7 @@ class Queen(
 
     override var imageID: Int = 0
     override val name: PieceName = PieceName.QUEEN
-    var hasMoved: Boolean = false
+    override var hasMoved: Boolean = false
     override var position: Pair<Int, Int> = Pair(i,j)
 
 
@@ -33,6 +33,7 @@ class Queen(
         this.i = i
         this.j = j
         this.position = Pair(i,j)
+        hasMoved = true
     }
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
         val steps = Array(8) { mutableListOf<Pair<Int, Int>>() }

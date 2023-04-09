@@ -115,8 +115,7 @@ class BoardUI {
                                     else{
                                         viewModel.HideAvibleSteps()
                                         viewModel.setClickedPiece(viewModel.getPiece(i, j))
-                                        //viewModel.emptyLiveDataMatrix()
-                                        //viewModel.setValue(i, j, !viewModel.getValue(i,j)!!)
+
                                         Log.d(
                                             "Board1",
                                             "i: ${i}, j: ${j} board value: ${

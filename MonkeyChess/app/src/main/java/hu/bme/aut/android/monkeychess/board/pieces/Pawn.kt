@@ -16,7 +16,7 @@ class Pawn(
 
     override var position: Pair<Int, Int> = Pair(i,j)
     override val name: PieceName = PieceName.PAWN
-    var hasMoved: Boolean = false
+    override var hasMoved: Boolean = false
 
     override var imageID: Int = 0
 
@@ -32,6 +32,7 @@ class Pawn(
         this.i = i
         this.j = j
         this.position = Pair(i,j)
+        hasMoved = true
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{

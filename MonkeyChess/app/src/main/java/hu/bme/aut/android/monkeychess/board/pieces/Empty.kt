@@ -21,6 +21,7 @@ class Empty(): Piece {
         TODO("Not yet implemented")
     }
 
+    override var hasMoved: Boolean = false
     override var pieceColor: PieceColor = PieceColor.EMPTY
     override var i: Int
         get() = TODO("Not yet implemented")

@@ -11,8 +11,7 @@ interface  Piece {
     val imageID: Int
     val name: PieceName
     var position: Pair<Int, Int>
-
-
+    var hasMoved: Boolean
 
     var i: Int
     var j: Int

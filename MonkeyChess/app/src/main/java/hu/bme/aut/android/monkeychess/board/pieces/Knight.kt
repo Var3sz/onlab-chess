@@ -15,13 +15,14 @@ class Knight(
 
     override var imageID: Int = 0
     override val name: PieceName = PieceName.KNIGHT
-    var hasMoved: Boolean = false
+    override var hasMoved: Boolean = false
     override var position: Pair<Int, Int> = Pair(i,j)
 
     override fun step(i: Int, j: Int){
         this.i = i
         this.j = j
         this.position = Pair(i,j)
+        hasMoved = true
     }
     init {
         if(pieceColor == PieceColor.BLACK){
