@@ -109,11 +109,11 @@ class BoardUI {
                                 .background(gridcolor)
                                 .clickable {
                                     if(viewModel.getValue(i,j) == true) {
-                                        viewModel.HideAvibleSteps()
+                                        viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
                                     }
                                     else{
-                                        viewModel.HideAvibleSteps()
+                                        viewModel.HideAvailableSteps()
                                         viewModel.setClickedPiece(viewModel.getPiece(i, j))
 
                                         Log.d(
@@ -128,7 +128,7 @@ class BoardUI {
 
                                         if (viewModel.getPiece(i, j)!!.pieceColor != PieceColor.EMPTY) {
                                             val piece = viewModel.getPiece(i, j)
-                                            val steps = viewModel.getAvilableSteps(piece!!)
+                                            val steps = viewModel.getAvailableSteps(piece!!)
 
                                             Log.d(
                                                 "BoardStep",

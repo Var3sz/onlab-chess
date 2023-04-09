@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
@@ -19,7 +18,7 @@ class BoardViewModel:  ViewModel()  {
             val rowList = SnapshotStateList<Tile>()
 
             for (j in 0 until 8){
-                //stepup board
+                //setup board
                 //black Pawns
                 if(i==1){
                     rowList.add(Tile(false,Pawn(PieceColor.BLACK, i, j)))
@@ -104,7 +103,7 @@ class BoardViewModel:  ViewModel()  {
 
     }
 
-    fun getAvilableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
+    fun getAvailableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
         val valid = piece.getValidSteps()
         val final = mutableListOf<Pair <Int,Int>>()
 
@@ -113,14 +112,14 @@ class BoardViewModel:  ViewModel()  {
                 val currentField = it[i]
                 val currentPiece = getPiece(currentField.first, currentField.second)
                 if(i == 0){
-                    Log.d(piece.name.toString(), "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece?.name}")
+                    Log.d(piece.name.toString(), "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece.name}")
 
                 }
 
 
                 if(currentField != piece.position){
-                    if(currentPiece?.name != PieceName.EMPTY){
-                        if(piece.pieceColor != currentPiece?.pieceColor){
+                    if(currentPiece.name != PieceName.EMPTY){
+                        if(piece.pieceColor != currentPiece.pieceColor){
                             final.add(currentField)
                         }
                         break
@@ -134,71 +133,46 @@ class BoardViewModel:  ViewModel()  {
         //pawn movement
         //Black
         if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.BLACK) {
-            if (piece.i < 7 && piece.j < 7) {
-                if (getPiece(piece.i + 1, piece.j + 1)?.pieceColor == PieceColor.WHITE) {
-                    final.add(Pair(piece.i + 1, piece.j + 1))
-                }
-            }
-            if (piece.i < 7 && piece.j > 0){
-                if (getPiece(piece.i + 1, piece.j - 1)?.pieceColor == PieceColor.WHITE) {
-                    final.add(Pair(piece.i + 1, piece.j - 1))
-                }
-            }
-            if(piece.i < 7) {
-                if (getPiece(piece.i + 1, piece.j)?.pieceColor != PieceColor.EMPTY) {
-                    final.remove(Pair(piece.i + 1, piece.j))
-                    final.remove(Pair(piece.i + 2, piece.j))
-                }
-            }
+            BlackPawnMovement(piece,final)
         }
         //White
         if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.WHITE){
-            if (piece.i > 0 && piece.j < 7) {
-                if (getPiece(piece.i - 1, piece.j + 1)?.pieceColor == PieceColor.BLACK) {
-                    final.add(Pair(piece.i - 1, piece.j + 1))
-                }
-            }
-            if (piece.i > 0 && piece.j > 0) {
-                if (getPiece(piece.i - 1, piece.j - 1)?.pieceColor == PieceColor.BLACK) {
-                    final.add(Pair(piece.i - 1, piece.j - 1))
-                }
-            }
-            if(piece.i > 0) {
-                if (getPiece(piece.i - 1, piece.j)?.pieceColor != PieceColor.EMPTY) {
-                    final.remove(Pair(piece.i - 1, piece.j))
-                    final.remove(Pair(piece.i - 2, piece.j))
-                }
-            }
+            WhitePawnMovement(piece,final)
         }
 
-        //casteling
+        //castling
         if(piece.name == PieceName.KING && !piece.hasMoved){
-            var rook = getPiece(0,0) ?: Empty()
-            if(piece.pieceColor == PieceColor.BLACK){
-                if(CheckGapForCasteling(rook) && rook.name == PieceName.ROOK){
-                    final.add(Pair(0,2))
-                }
-                rook = getPiece(0,7) ?: Empty()
-                if(CheckGapForCasteling(rook) && rook.name == PieceName.ROOK){
-                    final.add(Pair(0,6))
-                }
-            }
-            else{
-                rook = getPiece(7,0) ?: Empty()
-                if(CheckGapForCasteling(rook) && rook.name == PieceName.ROOK){
-                    final.add(Pair(7,1))
-                }
-                rook = getPiece(7,7) ?: Empty()
-                if(CheckGapForCasteling(rook) && rook.name == PieceName.ROOK){
-                    final.add(Pair(7,5))
-                }
-            }
+            GetValidCastling(piece,final)
         }
         return final
     }
 
-    fun CheckGapForCasteling(rook: Piece): Boolean{
-        if(rook.hasMoved == false){
+    fun GetValidCastling(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        if(piece.name == PieceName.KING && !piece.hasMoved) {
+            var rook = getPiece(0, 0)
+            if (piece.pieceColor == PieceColor.BLACK) {
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(0, 2))
+                }
+                rook = getPiece(0, 7)
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(0, 6))
+                }
+            } else {
+                rook = getPiece(7, 0)
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(7, 1))
+                }
+                rook = getPiece(7, 7)
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(7, 5))
+                }
+            }
+        }
+    }
+
+    fun CheckGapForCastling(rook: Piece): Boolean{
+        if(!rook.hasMoved){
             //check if space is empty between king and rook
             var j = rook.j
             while (true) {
@@ -208,10 +182,10 @@ class BoardViewModel:  ViewModel()  {
                 if(rook.j ==7){
                     j--
                 }
-                if(getPiece(rook.i,j)?.name == PieceName.KING){
+                if(getPiece(rook.i,j).name == PieceName.KING){
                     return true
                 }
-                if(getPiece(rook.i,j)?.name != PieceName.EMPTY){
+                if(getPiece(rook.i,j).name != PieceName.EMPTY){
                     return false
                 }
             }
@@ -219,7 +193,7 @@ class BoardViewModel:  ViewModel()  {
         return false
     }
 
-    fun HideAvibleSteps(){
+    fun HideAvailableSteps(){
         for (i in 0 until 8){
             for (j in 0 until 8){
                 setValue(i,j,false)
@@ -230,7 +204,7 @@ class BoardViewModel:  ViewModel()  {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)?.free
     }
 
-    fun getPiece(row: Int, col: Int): Piece? {
+    fun getPiece(row: Int, col: Int): Piece {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)!!.pice
     }
 
@@ -242,58 +216,17 @@ class BoardViewModel:  ViewModel()  {
         clickedPiece.value = piece
     }
 
-    fun emptyLiveDataMatrix(){
-
-    }
 
     fun step(piece: Piece, i: Int,j: Int){
 
-        //king casteling
+        //king castling
         if(piece.name == PieceName.KING && !piece.hasMoved){
-            val rook: Piece
-           if(piece.pieceColor == PieceColor.BLACK){
-               if(i == 0 && j == 2) {
-                   //put king to new place
-                   ChangePiece(piece, i, j)
-                   //get rook
-                   rook = getPiece(0,0)!!
-                   ChangePiece(rook,i,j+1)
-               }
-               else if(i == 0 && j == 6) {
-                   //put king to new place
-                   ChangePiece(piece, i, j)
-                   //get rook
-                   rook = getPiece(0,7)!!
-                   ChangePiece(rook,i,j-1)
-               }
-               else{
-                   ChangePiece(piece, i, j)
-               }
-           }
-           else if(piece.pieceColor == PieceColor.WHITE){
-               if(i == 7 && j == 1) {
-                   //put king to new place
-                   ChangePiece(piece, i, j)
-                   //get rook
-                   rook = getPiece(7,0)!!
-                   ChangePiece(rook,i,j+1)
-               }
-               else if(i == 7 && j == 5) {
-                   //put king to new place
-                   ChangePiece(piece, i, j)
-                   //get rook
-                   rook = getPiece(7,7)!!
-                   ChangePiece(rook,i,j-1)
-               }
-               else{
-                   ChangePiece(piece, i, j)
-               }
-           }
-
+            CastlingStep(piece, i, j)
         }
-       else{
+        //normal
+        else{
         ChangePiece(piece, i, j)
-       }
+        }
     }
 
     fun ChangePiece(piece: Piece, i: Int,j: Int){
@@ -321,4 +254,85 @@ class BoardViewModel:  ViewModel()  {
         }
         clickedPiece.value = null
     }
+
+    fun CastlingStep(piece: Piece, i: Int,j: Int){
+        val rook: Piece
+        if(piece.pieceColor == PieceColor.BLACK){
+            if(i == 0 && j == 2) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(0,0)
+                ChangePiece(rook,i,j+1)
+            }
+            else if(i == 0 && j == 6) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(0,7)
+                ChangePiece(rook,i,j-1)
+            }
+            else{
+                ChangePiece(piece, i, j)
+            }
+        }
+        else if(piece.pieceColor == PieceColor.WHITE){
+            if(i == 7 && j == 1) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(7,0)
+                ChangePiece(rook,i,j+1)
+            }
+            else if(i == 7 && j == 5) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(7,7)
+                ChangePiece(rook,i,j-1)
+            }
+            else{
+                ChangePiece(piece, i, j)
+            }
+        }
+    }
+
+    fun WhitePawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        if (piece.i > 0 && piece.j < 7) {
+            if (getPiece(piece.i - 1, piece.j + 1).pieceColor == PieceColor.BLACK) {
+                final.add(Pair(piece.i - 1, piece.j + 1))
+            }
+        }
+        if (piece.i > 0 && piece.j > 0) {
+            if (getPiece(piece.i - 1, piece.j - 1).pieceColor == PieceColor.BLACK) {
+                final.add(Pair(piece.i - 1, piece.j - 1))
+            }
+        }
+        if(piece.i > 0) {
+            if (getPiece(piece.i - 1, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.remove(Pair(piece.i - 1, piece.j))
+                final.remove(Pair(piece.i - 2, piece.j))
+            }
+        }
+    }
+
+    fun BlackPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        if (piece.i < 7 && piece.j < 7) {
+            if (getPiece(piece.i + 1, piece.j + 1).pieceColor == PieceColor.WHITE) {
+                final.add(Pair(piece.i + 1, piece.j + 1))
+            }
+        }
+        if (piece.i < 7 && piece.j > 0){
+            if (getPiece(piece.i + 1, piece.j - 1).pieceColor == PieceColor.WHITE) {
+                final.add(Pair(piece.i + 1, piece.j - 1))
+            }
+        }
+        if(piece.i < 7) {
+            if (getPiece(piece.i + 1, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.remove(Pair(piece.i + 1, piece.j))
+                final.remove(Pair(piece.i + 2, piece.j))
+            }
+        }
+    }
+
 }
