@@ -18,8 +18,10 @@ class Knight(
     var hasMoved: Boolean = false
     override var position: Pair<Int, Int> = Pair(i,j)
 
-    override fun step(){
-
+    override fun step(i: Int, j: Int){
+        this.i = i
+        this.j = j
+        this.position = Pair(i,j)
     }
     init {
         if(pieceColor == PieceColor.BLACK){

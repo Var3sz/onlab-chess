@@ -27,8 +27,10 @@ class Rook(
             imageID = R.drawable.white_rook
         }
     }
-    override fun step(){
-
+    override fun step(i: Int, j: Int){
+        this.i = i
+        this.j = j
+        this.position = Pair(i,j)
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{

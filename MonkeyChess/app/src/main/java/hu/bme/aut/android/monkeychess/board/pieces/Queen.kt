@@ -29,10 +29,11 @@ class Queen(
         }
     }
 
-    override fun step(){
-
+    override fun step(i: Int, j: Int){
+        this.i = i
+        this.j = j
+        this.position = Pair(i,j)
     }
-
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
         val steps = Array(8) { mutableListOf<Pair<Int, Int>>() }
 

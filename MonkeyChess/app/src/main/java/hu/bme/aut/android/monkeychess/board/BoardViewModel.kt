@@ -52,13 +52,34 @@ class BoardViewModel:  ViewModel()  {
 
                 //White Side
 
-                else if((i== 4 && j== 3)) {
-                    rowList.add(Tile(false, Queen(PieceColor.WHITE, i, j)))
+                else if(i==6){
+                    rowList.add(Tile(false,Pawn(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+                //White Rooks
+                else if((i==7 && j==0)||(i==7 && j==7)){
+                    rowList.add(Tile(false,Rook(PieceColor.WHITE, i, j)))
+                }
+                //White Bishops
+                else if((i==7 && j==1)||(i==7 && j==6)){
+                    rowList.add(Tile(false,Bishop(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+                //White Knights
+                else if((i==7 && j==2)||(i==7 && j==5)){
+                    rowList.add(Tile(false,Knight(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
                 }
 
-                else if((i== 2 && j== 6)){
+                else if((i==7 && j==4)){
                     rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
                 }
+                else if((i==7 && j==3)){
+                    rowList.add(Tile(false,King(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+
 
                 else
                 rowList.add(Tile(false,Empty()))
@@ -109,6 +130,46 @@ class BoardViewModel:  ViewModel()  {
 
             }
         }
+
+        //pawn movement
+        //Black
+        if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.BLACK) {
+            if (piece.i < 7 && piece.j < 7) {
+                if (getPiece(piece.i + 1, piece.j + 1)?.pieceColor == PieceColor.WHITE) {
+                    final.add(Pair(piece.i + 1, piece.j + 1))
+                }
+            }
+            if (piece.i < 7 && piece.j > 0){
+                if (getPiece(piece.i + 1, piece.j - 1)?.pieceColor == PieceColor.WHITE) {
+                    final.add(Pair(piece.i + 1, piece.j - 1))
+                }
+            }
+            if(piece.i < 7) {
+                if (getPiece(piece.i + 1, piece.j)?.pieceColor == PieceColor.WHITE) {
+                    final.remove(Pair(piece.i + 1, piece.j))
+                    final.remove(Pair(piece.i + 2, piece.j))
+                }
+            }
+        }
+        //White
+        if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.WHITE){
+            if (piece.i > 0 && piece.j < 7) {
+                if (getPiece(piece.i - 1, piece.j + 1)?.pieceColor == PieceColor.BLACK) {
+                    final.add(Pair(piece.i - 1, piece.j + 1))
+                }
+            }
+            if (piece.i > 0 && piece.j > 0) {
+                if (getPiece(piece.i - 1, piece.j - 1)?.pieceColor == PieceColor.BLACK) {
+                    final.add(Pair(piece.i - 1, piece.j - 1))
+                }
+            }
+            if(piece.i > 0) {
+                if (getPiece(piece.i - 1, piece.j)?.pieceColor == PieceColor.BLACK) {
+                    final.remove(Pair(piece.i - 1, piece.j))
+                    final.remove(Pair(piece.i - 2, piece.j))
+                }
+            }
+        }
         return final
     }
 
@@ -152,9 +213,8 @@ class BoardViewModel:  ViewModel()  {
         }
 
         matrix = tilesLiveData.value
-        piece.i = i
-        piece.j = j
-        piece.position = Pair(i,j)
+
+        piece.step(i,j)
 
         newRowList = matrix?.get(i)
         newRowList?.set(j, Tile(false,piece))
@@ -165,6 +225,4 @@ class BoardViewModel:  ViewModel()  {
         }
         clickedPiece.value = null
     }
-
-
 }
