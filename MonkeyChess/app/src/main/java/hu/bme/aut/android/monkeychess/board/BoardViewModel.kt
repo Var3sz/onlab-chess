@@ -11,8 +11,11 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 class BoardViewModel:  ViewModel()  {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
     var clickedPiece = MutableLiveData<Piece>()
+    var currentPlayer = MutableLiveData<PieceColor>()
+    var currentcolloer = PieceColor.WHITE
 
     init {
+
         val tiles = SnapshotStateList<SnapshotStateList<Tile>>()
         for (i in 0 until 8){
             val rowList = SnapshotStateList<Tile>()
@@ -86,7 +89,7 @@ class BoardViewModel:  ViewModel()  {
             tiles.add(rowList)
         }
         tilesLiveData.value = tiles
-
+        currentPlayer.value = PieceColor.WHITE
     }
 
     fun setValue(row: Int, col: Int, value: Boolean) {
@@ -106,43 +109,47 @@ class BoardViewModel:  ViewModel()  {
     fun getAvailableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
         val valid = piece.getValidSteps()
         val final = mutableListOf<Pair <Int,Int>>()
+        //if(piece.pieceColor == currentcolloer) {
+            valid.forEach() {
+                for (i in it.indices) {
+                    val currentField = it[i]
+                    val currentPiece = getPiece(currentField.first, currentField.second)
+                    if (i == 0) {
+                        Log.d(
+                            piece.name.toString(),
+                            "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece.name}"
+                        )
 
-        valid.forEach(){
-            for(i in it.indices){
-                val currentField = it[i]
-                val currentPiece = getPiece(currentField.first, currentField.second)
-                if(i == 0){
-                    Log.d(piece.name.toString(), "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece.name}")
-
-                }
-
-
-                if(currentField != piece.position){
-                    if(currentPiece.name != PieceName.EMPTY){
-                        if(piece.pieceColor != currentPiece.pieceColor){
-                            final.add(currentField)
-                        }
-                        break
                     }
-                    final.add(currentField)
+
+
+                    if (currentField != piece.position) {
+                        if (currentPiece.name != PieceName.EMPTY) {
+                            if (piece.pieceColor != currentPiece.pieceColor) {
+                                final.add(currentField)
+                            }
+                            break
+                        }
+                        final.add(currentField)
+                    }
+
                 }
+          //  }
 
+            //pawn movement
+            //Black
+            if (piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.BLACK) {
+                BlackPawnMovement(piece, final)
             }
-        }
+            //White
+            if (piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.WHITE) {
+                WhitePawnMovement(piece, final)
+            }
 
-        //pawn movement
-        //Black
-        if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.BLACK) {
-            BlackPawnMovement(piece,final)
-        }
-        //White
-        if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.WHITE){
-            WhitePawnMovement(piece,final)
-        }
-
-        //castling
-        if(piece.name == PieceName.KING && !piece.hasMoved){
-            GetValidCastling(piece,final)
+            //castling
+            if (piece.name == PieceName.KING && !piece.hasMoved) {
+                GetValidCastling(piece, final)
+            }
         }
         return final
     }
@@ -218,7 +225,8 @@ class BoardViewModel:  ViewModel()  {
 
 
     fun step(piece: Piece, i: Int,j: Int){
-
+        ChangeCurrentPlayer()
+        Log.d("CURR", currentPlayer.value.toString())
         //king castling
         if(piece.name == PieceName.KING && !piece.hasMoved){
             CastlingStep(piece, i, j)
@@ -227,6 +235,7 @@ class BoardViewModel:  ViewModel()  {
         else{
         ChangePiece(piece, i, j)
         }
+
     }
 
     fun ChangePiece(piece: Piece, i: Int,j: Int){
@@ -313,6 +322,11 @@ class BoardViewModel:  ViewModel()  {
                 final.remove(Pair(piece.i - 1, piece.j))
                 final.remove(Pair(piece.i - 2, piece.j))
             }
+
+            if (getPiece(piece.i - 2, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.add(Pair(piece.i - 1, piece.j))
+                final.remove(Pair(piece.i - 2, piece.j))
+            }
         }
     }
 
@@ -333,6 +347,23 @@ class BoardViewModel:  ViewModel()  {
                 final.remove(Pair(piece.i + 2, piece.j))
             }
         }
+
+        if (getPiece(piece.i + 2, piece.j).pieceColor != PieceColor.EMPTY) {
+            final.add(Pair(piece.i + 1, piece.j))
+            final.remove(Pair(piece.i + 2, piece.j))
+        }
     }
 
+    fun ChangeCurrentPlayer(){
+        val black = PieceColor.BLACK
+        val white = PieceColor.WHITE
+        if(currentPlayer.value == PieceColor.WHITE){
+            currentcolloer = black
+            Log.d("CURR2", currentPlayer.value.toString() )
+        }
+        if(currentPlayer.value == PieceColor.BLACK){
+            currentcolloer = white
+        }
+
+    }
 }
