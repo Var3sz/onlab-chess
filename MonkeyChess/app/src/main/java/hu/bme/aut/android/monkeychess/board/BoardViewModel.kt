@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
 class BoardViewModel:  ViewModel()  {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
+    var clickedPiece = MutableLiveData<Piece>()
 
     init {
         val tiles = SnapshotStateList<SnapshotStateList<Tile>>()
@@ -18,9 +18,9 @@ class BoardViewModel:  ViewModel()  {
             val rowList = SnapshotStateList<Tile>()
 
             for (j in 0 until 8){
-                //stepup board
+                //setup board
                 //black Pawns
-                if(i==2){
+                if(i==1){
                     rowList.add(Tile(false,Pawn(PieceColor.BLACK, i, j)))
                     //rowList.add(Tile(false,Empty()))
                 }
@@ -51,13 +51,34 @@ class BoardViewModel:  ViewModel()  {
 
                 //White Side
 
-                else if((i== 4 && j== 3)) {
-                    rowList.add(Tile(false, Queen(PieceColor.WHITE, i, j)))
+                else if(i==6){
+                    rowList.add(Tile(false,Pawn(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+                //White Rooks
+                else if((i==7 && j==0)||(i==7 && j==7)){
+                    rowList.add(Tile(false,Rook(PieceColor.WHITE, i, j)))
+                }
+                //White Bishops
+                else if((i==7 && j==1)||(i==7 && j==6)){
+                    rowList.add(Tile(false,Bishop(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+                //White Knights
+                else if((i==7 && j==2)||(i==7 && j==5)){
+                    rowList.add(Tile(false,Knight(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
                 }
 
-                else if((i== 2 && j== 6)){
+                else if((i==7 && j==4)){
                     rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
                 }
+                else if((i==7 && j==3)){
+                    rowList.add(Tile(false,King(PieceColor.WHITE, i, j)))
+                    //rowList.add(Tile(false,Empty()))
+                }
+
 
                 else
                 rowList.add(Tile(false,Empty()))
@@ -82,7 +103,7 @@ class BoardViewModel:  ViewModel()  {
 
     }
 
-    fun getAvilableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
+    fun getAvailableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
         val valid = piece.getValidSteps()
         val final = mutableListOf<Pair <Int,Int>>()
 
@@ -91,14 +112,14 @@ class BoardViewModel:  ViewModel()  {
                 val currentField = it[i]
                 val currentPiece = getPiece(currentField.first, currentField.second)
                 if(i == 0){
-                    Log.d(piece.name.toString(), "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece?.name}")
+                    Log.d(piece.name.toString(), "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece.name}")
 
                 }
 
 
                 if(currentField != piece.position){
-                    if(currentPiece?.name != PieceName.EMPTY){
-                        if(piece.pieceColor != currentPiece?.pieceColor){
+                    if(currentPiece.name != PieceName.EMPTY){
+                        if(piece.pieceColor != currentPiece.pieceColor){
                             final.add(currentField)
                         }
                         break
@@ -109,32 +130,70 @@ class BoardViewModel:  ViewModel()  {
             }
         }
 
-        /*
-        valid.forEach() {
-            var addMore= true
-            it.forEach(){
-                    val currentField = it.copy()
-                    val currentPiece = getPiece(currentField.first, currentField.second)
-
-                    if(currentPiece?.name != "Empty"){
-
-                        //todo ne tudjon lépni ha azzal a király sakkba kerül
-                        if(piece.pieceColor != currentPiece?.pieceColor && addMore){
-                            final.add(currentField)
-                        }
-                        addMore= false
-                    }
-                    if(addMore)
-                    final.add(currentField)
-
-            }
+        //pawn movement
+        //Black
+        if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.BLACK) {
+            BlackPawnMovement(piece,final)
+        }
+        //White
+        if(piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.WHITE){
+            WhitePawnMovement(piece,final)
         }
 
-         */
+        //castling
+        if(piece.name == PieceName.KING && !piece.hasMoved){
+            GetValidCastling(piece,final)
+        }
         return final
     }
 
-    fun HideAvibleSteps(){
+    fun GetValidCastling(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        if(piece.name == PieceName.KING && !piece.hasMoved) {
+            var rook = getPiece(0, 0)
+            if (piece.pieceColor == PieceColor.BLACK) {
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(0, 2))
+                }
+                rook = getPiece(0, 7)
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(0, 6))
+                }
+            } else {
+                rook = getPiece(7, 0)
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(7, 1))
+                }
+                rook = getPiece(7, 7)
+                if (CheckGapForCastling(rook)) {
+                    final.add(Pair(7, 5))
+                }
+            }
+        }
+    }
+
+    fun CheckGapForCastling(rook: Piece): Boolean{
+        if(!rook.hasMoved){
+            //check if space is empty between king and rook
+            var j = rook.j
+            while (true) {
+                if(rook.j ==0){
+                    j++
+                }
+                if(rook.j ==7){
+                    j--
+                }
+                if(getPiece(rook.i,j).name == PieceName.KING){
+                    return true
+                }
+                if(getPiece(rook.i,j).name != PieceName.EMPTY){
+                    return false
+                }
+            }
+        }
+        return false
+    }
+
+    fun HideAvailableSteps(){
         for (i in 0 until 8){
             for (j in 0 until 8){
                 setValue(i,j,false)
@@ -145,13 +204,135 @@ class BoardViewModel:  ViewModel()  {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)?.free
     }
 
-    fun getPiece(row: Int, col: Int): Piece? {
+    fun getPiece(row: Int, col: Int): Piece {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)!!.pice
     }
 
-    fun emptyLiveDataMatrix(){
-
+    fun getClickedPiece(): Piece{
+        return clickedPiece.value!!
     }
 
+    fun setClickedPiece(piece:Piece?){
+        clickedPiece.value = piece
+    }
+
+
+    fun step(piece: Piece, i: Int,j: Int){
+
+        //king castling
+        if(piece.name == PieceName.KING && !piece.hasMoved){
+            CastlingStep(piece, i, j)
+        }
+        //normal
+        else{
+        ChangePiece(piece, i, j)
+        }
+    }
+
+    fun ChangePiece(piece: Piece, i: Int,j: Int){
+        var matrix = tilesLiveData.value
+        // tilesLiveData.value = matrix
+
+        var newRowList = matrix?.get(piece.i)
+        newRowList?.set(piece.j, Tile(false,Empty()))
+        newRowList?.let {
+            matrix?.set(piece.i, it)
+
+            tilesLiveData.value= matrix
+        }
+
+        matrix = tilesLiveData.value
+
+        piece.step(i,j)
+
+        newRowList = matrix?.get(i)
+        newRowList?.set(j, Tile(false,piece))
+        newRowList?.let {
+            matrix?.set(i, it)
+
+            tilesLiveData.value= matrix
+        }
+        clickedPiece.value = null
+    }
+
+    fun CastlingStep(piece: Piece, i: Int,j: Int){
+        val rook: Piece
+        if(piece.pieceColor == PieceColor.BLACK){
+            if(i == 0 && j == 2) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(0,0)
+                ChangePiece(rook,i,j+1)
+            }
+            else if(i == 0 && j == 6) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(0,7)
+                ChangePiece(rook,i,j-1)
+            }
+            else{
+                ChangePiece(piece, i, j)
+            }
+        }
+        else if(piece.pieceColor == PieceColor.WHITE){
+            if(i == 7 && j == 1) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(7,0)
+                ChangePiece(rook,i,j+1)
+            }
+            else if(i == 7 && j == 5) {
+                //put king to new place
+                ChangePiece(piece, i, j)
+                //get rook
+                rook = getPiece(7,7)
+                ChangePiece(rook,i,j-1)
+            }
+            else{
+                ChangePiece(piece, i, j)
+            }
+        }
+    }
+
+    fun WhitePawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        if (piece.i > 0 && piece.j < 7) {
+            if (getPiece(piece.i - 1, piece.j + 1).pieceColor == PieceColor.BLACK) {
+                final.add(Pair(piece.i - 1, piece.j + 1))
+            }
+        }
+        if (piece.i > 0 && piece.j > 0) {
+            if (getPiece(piece.i - 1, piece.j - 1).pieceColor == PieceColor.BLACK) {
+                final.add(Pair(piece.i - 1, piece.j - 1))
+            }
+        }
+        if(piece.i > 0) {
+            if (getPiece(piece.i - 1, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.remove(Pair(piece.i - 1, piece.j))
+                final.remove(Pair(piece.i - 2, piece.j))
+            }
+        }
+    }
+
+    fun BlackPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        if (piece.i < 7 && piece.j < 7) {
+            if (getPiece(piece.i + 1, piece.j + 1).pieceColor == PieceColor.WHITE) {
+                final.add(Pair(piece.i + 1, piece.j + 1))
+            }
+        }
+        if (piece.i < 7 && piece.j > 0){
+            if (getPiece(piece.i + 1, piece.j - 1).pieceColor == PieceColor.WHITE) {
+                final.add(Pair(piece.i + 1, piece.j - 1))
+            }
+        }
+        if(piece.i < 7) {
+            if (getPiece(piece.i + 1, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.remove(Pair(piece.i + 1, piece.j))
+                final.remove(Pair(piece.i + 2, piece.j))
+            }
+        }
+    }
 
 }

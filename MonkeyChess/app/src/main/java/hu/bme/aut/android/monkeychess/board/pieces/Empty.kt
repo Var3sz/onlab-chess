@@ -12,16 +12,16 @@ class Empty(): Piece {
         }
 
     override val name: PieceName = PieceName.EMPTY
-    override val position: Pair<Int, Int> = Pair(0,0)
+    override var position: Pair<Int, Int> = Pair(0,0)
 
-    override fun step() {
-        TODO("Not yet implemented")
+    override fun step(i: Int, j: Int){
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>> {
         TODO("Not yet implemented")
     }
 
+    override var hasMoved: Boolean = false
     override var pieceColor: PieceColor = PieceColor.EMPTY
     override var i: Int
         get() = TODO("Not yet implemented")

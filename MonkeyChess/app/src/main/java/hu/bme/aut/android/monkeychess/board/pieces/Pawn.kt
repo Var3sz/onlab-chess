@@ -14,9 +14,9 @@ class Pawn(
 
     ) : Piece {
 
-    override val position: Pair<Int, Int> = Pair(i,j)
+    override var position: Pair<Int, Int> = Pair(i,j)
     override val name: PieceName = PieceName.PAWN
-    var hasMoved: Boolean = false
+    override var hasMoved: Boolean = false
 
     override var imageID: Int = 0
 
@@ -28,33 +28,36 @@ class Pawn(
             imageID = R.drawable.white_pawn
         }
     }
-    override fun step(){
-
+    override fun step(i: Int, j: Int){
+        this.i = i
+        this.j = j
+        this.position = Pair(i,j)
+        hasMoved = true
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
-        val steps = Array(2) { mutableListOf<Pair<Int, Int>>() }
+        val steps = Array(1) { mutableListOf<Pair<Int, Int>>() }
 
         if(pieceColor == PieceColor.BLACK){
             if(i==1){
                 steps[0].add(Pair(i+2,j))
             }
-            if(i < 8 ){
-                steps[1].add(Pair(i+1,j))
+            if(i < 7 ){
+                steps[0].add(Pair(i+1,j))
             }
 
         }
-        else{
-            if(pieceColor == PieceColor.BLACK){
-                if(i==6){
-                    steps[0].add(Pair(i-2,j))
-                }
-                if(i >= 0){
-                    steps[1].add(Pair(i-1,j))
-                }
 
+        if(pieceColor == PieceColor.WHITE){
+            if(i==6){
+                steps[0].add(Pair(i-2,j))
             }
+            if(i > 0){
+                steps[0].add(Pair(i-1,j))
+            }
+
         }
+
         return steps
     }
 }

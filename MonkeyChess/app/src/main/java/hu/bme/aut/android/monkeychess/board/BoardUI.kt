@@ -108,34 +108,40 @@ class BoardUI {
                                 .size(45.dp)
                                 .background(gridcolor)
                                 .clickable {
-                                    viewModel.HideAvibleSteps()
-                                    //viewModel.emptyLiveDataMatrix()
-                                    //viewModel.setValue(i, j, !viewModel.getValue(i,j)!!)
-                                    Log.d(
-                                        "Board1",
-                                        "i: ${i}, j: ${j} board value: ${
-                                            viewModel.getValue(
-                                                i,
-                                                j
-                                            )
-                                        } babu:${viewModel.getPiece(i, j)!!.pieceColor} "
-                                    )
-
-                                    if (viewModel.getPiece(i, j)!!.pieceColor != PieceColor.EMPTY) {
-                                        val piece = viewModel.getPiece(i, j)
-                                        val steps = viewModel.getAvilableSteps(piece!!)
+                                    if(viewModel.getValue(i,j) == true) {
+                                        viewModel.HideAvailableSteps()
+                                        viewModel.step(viewModel.getClickedPiece(), i, j)
+                                    }
+                                    else{
+                                        viewModel.HideAvailableSteps()
+                                        viewModel.setClickedPiece(viewModel.getPiece(i, j))
 
                                         Log.d(
-                                            "BoardStep",
-                                            "i: ${piece.i}, j: ${piece.j} "
+                                            "Board1",
+                                            "i: ${i}, j: ${j} board value: ${
+                                                viewModel.getValue(
+                                                    i,
+                                                    j
+                                                )
+                                            } babu:${viewModel.getPiece(i, j).pieceColor} "
                                         )
-                                        steps.forEach() {
-                                            viewModel.setValue(it.first, it.second, true)
-                                            //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true
+
+                                        if (viewModel.getPiece(i, j).pieceColor != PieceColor.EMPTY) {
+                                            val piece = viewModel.getPiece(i, j)
+                                            val steps = viewModel.getAvailableSteps(piece)
+
                                             Log.d(
                                                 "BoardStep",
-                                                "i: ${it.first}, j: ${it.second} } "
+                                                "i: ${piece.i}, j: ${piece.j} "
                                             )
+                                            steps.forEach() {
+                                                viewModel.setValue(it.first, it.second, true)
+                                                //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true
+                                                Log.d(
+                                                    "BoardStep",
+                                                    "i: ${it.first}, j: ${it.second} } "
+                                                )
+                                            }
                                         }
                                     }
                                     //viewModel.matrixLiveData.value
@@ -156,8 +162,8 @@ class BoardUI {
                             }
 
 
-                            if(viewModel.getPiece(i,j)!!.pieceColor != PieceColor.EMPTY)
-                                DrawPiece(viewModel.getPiece(i,j)?.imageID!!)
+                            if(viewModel.getPiece(i,j).pieceColor != PieceColor.EMPTY)
+                                DrawPiece(viewModel.getPiece(i,j).imageID)
                         }
                     }
                 }

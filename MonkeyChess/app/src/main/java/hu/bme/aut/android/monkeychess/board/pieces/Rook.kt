@@ -15,8 +15,8 @@ class Rook(
 ) : Piece {
 
     override val name: PieceName = PieceName.ROOK
-    var hasMoved: Boolean = false
-    override val position: Pair<Int, Int> = Pair(i,j)
+    override var hasMoved: Boolean = false
+    override var position: Pair<Int, Int> = Pair(i,j)
     override var imageID: Int = 0
 
     init {
@@ -27,8 +27,11 @@ class Rook(
             imageID = R.drawable.white_rook
         }
     }
-    override fun step(){
-
+    override fun step(i: Int, j: Int){
+        this.i = i
+        this.j = j
+        this.position = Pair(i,j)
+        hasMoved = true
     }
 
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
