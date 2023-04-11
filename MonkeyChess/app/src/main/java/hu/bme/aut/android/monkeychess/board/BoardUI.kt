@@ -123,12 +123,12 @@ class BoardUI {
                                                     i,
                                                     j
                                                 )
-                                            } babu:${viewModel.getPiece(i, j)!!.pieceColor} "
+                                            } babu:${viewModel.getPiece(i, j).pieceColor} "
                                         )
 
-                                        if (viewModel.getPiece(i, j)!!.pieceColor != PieceColor.EMPTY) {
+                                        if (viewModel.getPiece(i, j).pieceColor != PieceColor.EMPTY) {
                                             val piece = viewModel.getPiece(i, j)
-                                            val steps = viewModel.getAvailableSteps(piece!!)
+                                            val steps = viewModel.getAvailableSteps(piece)
 
                                             Log.d(
                                                 "BoardStep",
@@ -162,8 +162,8 @@ class BoardUI {
                             }
 
 
-                            if(viewModel.getPiece(i,j)!!.pieceColor != PieceColor.EMPTY)
-                                DrawPiece(viewModel.getPiece(i,j)?.imageID!!)
+                            if(viewModel.getPiece(i,j).pieceColor != PieceColor.EMPTY)
+                                DrawPiece(viewModel.getPiece(i,j).imageID)
                         }
                     }
                 }
