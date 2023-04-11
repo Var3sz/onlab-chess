@@ -323,9 +323,11 @@ class BoardViewModel:  ViewModel()  {
                 final.remove(Pair(piece.i - 2, piece.j))
             }
 
-            if (getPiece(piece.i - 2, piece.j).pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(piece.i - 1, piece.j))
-                final.remove(Pair(piece.i - 2, piece.j))
+            if(!piece.hasMoved){
+                if (getPiece(piece.i - 2, piece.j).pieceColor != PieceColor.EMPTY) {
+                    final.add(Pair(piece.i - 1, piece.j))
+                    final.remove(Pair(piece.i - 2, piece.j))
+                }
             }
         }
     }
@@ -347,10 +349,11 @@ class BoardViewModel:  ViewModel()  {
                 final.remove(Pair(piece.i + 2, piece.j))
             }
         }
-
-        if (getPiece(piece.i + 2, piece.j).pieceColor != PieceColor.EMPTY) {
-            final.add(Pair(piece.i + 1, piece.j))
-            final.remove(Pair(piece.i + 2, piece.j))
+        if(!piece.hasMoved) {
+            if (getPiece(piece.i + 2, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.add(Pair(piece.i + 1, piece.j))
+                final.remove(Pair(piece.i + 2, piece.j))
+            }
         }
     }
 
