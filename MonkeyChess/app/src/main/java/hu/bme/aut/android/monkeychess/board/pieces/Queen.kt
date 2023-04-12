@@ -5,13 +5,14 @@ import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
+import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 
 class Queen(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
-
+    override var side: Side
     ) : Piece {
 
     override var imageID: Int = 0

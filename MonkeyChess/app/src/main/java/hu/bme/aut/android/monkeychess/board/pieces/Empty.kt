@@ -3,6 +3,7 @@ package hu.bme.aut.android.monkeychess.board.pieces
 import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
+import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class Empty(): Piece {
 
@@ -13,7 +14,9 @@ class Empty(): Piece {
 
     override val name: PieceName = PieceName.EMPTY
     override var position: Pair<Int, Int> = Pair(0,0)
-
+    override var side: Side
+        get() = TODO("Not yet implemented")
+        set(value) {}
     override fun step(i: Int, j: Int){
     }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
+import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class BoardViewModel:  ViewModel()  {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
@@ -24,30 +25,30 @@ class BoardViewModel:  ViewModel()  {
                 //setup board
                 //black Pawns
                 if(i==1){
-                    rowList.add(Tile(false,Pawn(PieceColor.BLACK, i, j)))
+                    rowList.add(Tile(false,Pawn(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Rooks
                 else if((i==0 && j==0)||(i==0 && j==7)){
-                    rowList.add(Tile(false,Rook(PieceColor.BLACK, i, j)))
+                    rowList.add(Tile(false,Rook(PieceColor.BLACK, i, j, Side.UP)))
                 }
                 //black Bishops
                 else if((i==0 && j==1)||(i==0 && j==6)){
-                    rowList.add(Tile(false,Bishop(PieceColor.BLACK, i, j)))
+                    rowList.add(Tile(false,Bishop(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Knights
                 else if((i==0 && j==2)||(i==0 && j==5)){
-                    rowList.add(Tile(false,Knight(PieceColor.BLACK, i, j)))
+                    rowList.add(Tile(false,Knight(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
                 else if((i==0 && j==3)){
-                    rowList.add(Tile(false,Queen(PieceColor.BLACK, i, j)))
+                    rowList.add(Tile(false,Queen(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 else if((i==0 && j==4)){
-                    rowList.add(Tile(false,King(PieceColor.BLACK, i, j)))
+                    rowList.add(Tile(false,King(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
@@ -55,30 +56,30 @@ class BoardViewModel:  ViewModel()  {
                 //White Side
 
                 else if(i==6){
-                    rowList.add(Tile(false,Pawn(PieceColor.WHITE, i, j)))
+                    rowList.add(Tile(false,Pawn(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //White Rooks
                 else if((i==7 && j==0)||(i==7 && j==7)){
-                    rowList.add(Tile(false,Rook(PieceColor.WHITE, i, j)))
+                    rowList.add(Tile(false,Rook(PieceColor.WHITE, i, j, Side.DOWN)))
                 }
                 //White Bishops
                 else if((i==7 && j==1)||(i==7 && j==6)){
-                    rowList.add(Tile(false,Bishop(PieceColor.WHITE, i, j)))
+                    rowList.add(Tile(false,Bishop(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //White Knights
                 else if((i==7 && j==2)||(i==7 && j==5)){
-                    rowList.add(Tile(false,Knight(PieceColor.WHITE, i, j)))
+                    rowList.add(Tile(false,Knight(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
                 else if((i==7 && j==4)){
-                    rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j)))
+                    rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 else if((i==7 && j==3)){
-                    rowList.add(Tile(false,King(PieceColor.WHITE, i, j)))
+                    rowList.add(Tile(false,King(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
@@ -138,12 +139,12 @@ class BoardViewModel:  ViewModel()  {
 
             //pawn movement
             //Black
-            if (piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.BLACK) {
-                BlackPawnMovement(piece, final)
+            if (piece.name == PieceName.PAWN && piece.side == Side.UP) {
+                UpPawnMovement(piece, final)
             }
             //White
-            if (piece.name == PieceName.PAWN && piece.pieceColor == PieceColor.WHITE) {
-                WhitePawnMovement(piece, final)
+            if (piece.name == PieceName.PAWN && piece.side == Side.DOWN) {
+                DownPawnMovement(piece, final)
             }
 
             //castling
@@ -157,7 +158,7 @@ class BoardViewModel:  ViewModel()  {
     fun GetValidCastling(piece: Piece, final: MutableList<Pair <Int,Int>>){
         if(piece.name == PieceName.KING && !piece.hasMoved) {
             var rook = getPiece(0, 0)
-            if (piece.pieceColor == PieceColor.BLACK) {
+            if (piece.side == Side.UP) {
                 if (CheckGapForCastling(rook)) {
                     final.add(Pair(0, 2))
                 }
@@ -266,7 +267,7 @@ class BoardViewModel:  ViewModel()  {
 
     fun CastlingStep(piece: Piece, i: Int,j: Int){
         val rook: Piece
-        if(piece.pieceColor == PieceColor.BLACK){
+        if(piece.side == Side.UP){
             if(i == 0 && j == 2) {
                 //put king to new place
                 ChangePiece(piece, i, j)
@@ -285,7 +286,7 @@ class BoardViewModel:  ViewModel()  {
                 ChangePiece(piece, i, j)
             }
         }
-        else if(piece.pieceColor == PieceColor.WHITE){
+        else if(piece.side == Side.DOWN){
             if(i == 7 && j == 1) {
                 //put king to new place
                 ChangePiece(piece, i, j)
@@ -306,7 +307,7 @@ class BoardViewModel:  ViewModel()  {
         }
     }
 
-    fun WhitePawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+    fun DownPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
         if (piece.i > 0 && piece.j < 7) {
             if (getPiece(piece.i - 1, piece.j + 1).pieceColor == PieceColor.BLACK) {
                 final.add(Pair(piece.i - 1, piece.j + 1))
@@ -332,7 +333,7 @@ class BoardViewModel:  ViewModel()  {
         }
     }
 
-    fun BlackPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+    fun UpPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
         if (piece.i < 7 && piece.j < 7) {
             if (getPiece(piece.i + 1, piece.j + 1).pieceColor == PieceColor.WHITE) {
                 final.add(Pair(piece.i + 1, piece.j + 1))

@@ -5,13 +5,14 @@ import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
+import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 
 class Pawn(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
-
+    override var side: Side
     ) : Piece {
 
     override var position: Pair<Int, Int> = Pair(i,j)
@@ -38,7 +39,7 @@ class Pawn(
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
         val steps = Array(1) { mutableListOf<Pair<Int, Int>>() }
 
-        if(pieceColor == PieceColor.BLACK){
+        if(side  == Side.UP){
             if(i==1){
                 steps[0].add(Pair(i+2,j))
             }
@@ -48,7 +49,7 @@ class Pawn(
 
         }
 
-        if(pieceColor == PieceColor.WHITE){
+        if(side  == Side.DOWN){
             if(i==6){
                 steps[0].add(Pair(i-2,j))
             }
