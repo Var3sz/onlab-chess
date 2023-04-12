@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import hu.bme.aut.android.monkeychess.board.pieces.Piece
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
+import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class BoardUI {
 
@@ -52,6 +54,9 @@ class BoardUI {
                 //PlayerTwo
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
                     DrawPalyer(playerTwo)
+                }
+                Button(onClick = { viewModel.FlipTheTable() }) {
+                    Text(text = "flipy flopity\nyou are my flipity ")
                 }
             }
         }
@@ -90,8 +95,6 @@ class BoardUI {
 
     @Composable
     fun DrawBoard(viewModel :BoardViewModel) {
-        //val matrixdata by viewModel.matrixLiveData.observeAsState(emptyList<List<Boolean>>())
-        //val piecesLiveData by viewModel.piecesLiveData.observeAsState(emptyList<List<Piece>>())
         val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
         Column(
@@ -100,41 +103,35 @@ class BoardUI {
                 Row {
                     for (j in 0 until 8) {
                         var gridcolor = Color.Gray
+                        if(viewModel.blackSide.value?.second == Side.DOWN)
+                            gridcolor = Color.White
                         if ((i + j) % 2 == 0) {
                             gridcolor = Color.White
+                                if(viewModel.blackSide.value?.second == Side.DOWN)
+                                    gridcolor = Color.Gray
                         }
                         Box(
                             modifier = Modifier
                                 .size(45.dp)
                                 .background(gridcolor)
                                 .clickable {
-                                    if(viewModel.getValue(i,j) == true) {
+
+                                    if (viewModel.getValue(i, j) == true) {
                                         viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
                                         viewModel.ChangeCurrentPlayer()
-                                    }
-                                    else{
+                                    } else {
                                         viewModel.HideAvailableSteps()
                                         viewModel.setClickedPiece(viewModel.getPiece(i, j))
 
-                                        Log.d(
-                                            "Board1",
-                                            "i: ${i}, j: ${j} board value: ${
-                                                viewModel.getValue(
-                                                    i,
-                                                    j
-                                                )
-                                            } babu:${viewModel.getPiece(i, j).pieceColor} "
-                                        )
+                                        Log.d("Board1", "i: ${i}, j: ${j} board value: ${viewModel.getValue(i, j)} babu:${viewModel.getPiece(i, j).pieceColor} ")
 
-                                        if (viewModel.getPiece(i, j).pieceColor != PieceColor.EMPTY) {
+                                        if (viewModel.getPiece(i, j).pieceColor != PieceColor.EMPTY){
                                             val piece = viewModel.getPiece(i, j)
                                             val steps = viewModel.getAvailableSteps(piece)
 
-                                            Log.d(
-                                                "BoardStep",
-                                                "i: ${piece.i}, j: ${piece.j} "
-                                            )
+                                            Log.d("BoardStep", "i: ${piece.i}, j: ${piece.j}")
+
                                             steps.forEach() {
                                                 viewModel.setValue(it.first, it.second, true)
                                                 //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true

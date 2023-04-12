@@ -26,6 +26,21 @@ class Knight(
         this.position = Pair(i,j)
         hasMoved = true
     }
+
+    override fun flip() {
+        i = 7 - i
+        j = 7 - j
+        this.position = Pair(i,j)
+
+        if(side==Side.DOWN) {
+            side = Side.UP
+        }
+
+        else{
+            side=Side.DOWN
+        }
+
+    }
     init {
         if(pieceColor == PieceColor.BLACK){
             imageID = R.drawable.black_knight

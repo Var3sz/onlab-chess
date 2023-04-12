@@ -32,6 +32,8 @@ class Empty(): Piece {
     override var j: Int
         get() = TODO("Not yet implemented")
         set(value) {}
+    override fun flip() {
+    }
 
 
 }

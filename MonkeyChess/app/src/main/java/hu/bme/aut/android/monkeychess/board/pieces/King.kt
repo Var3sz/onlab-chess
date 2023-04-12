@@ -39,6 +39,21 @@ class King(
         hasMoved = true
     }
 
+    override fun flip() {
+        i = 7 - i
+        j = 7 - j
+        this.position = Pair(i,j)
+
+        if(side==Side.DOWN) {
+            side = Side.UP
+        }
+
+        else{
+            side=Side.DOWN
+        }
+
+    }
+
     override fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>{
         val steps = Array(8) { mutableListOf<Pair<Int, Int>>() }
 

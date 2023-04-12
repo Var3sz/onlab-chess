@@ -13,10 +13,10 @@ class BoardViewModel:  ViewModel()  {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
-    var currentcolloer = PieceColor.WHITE
-
+    var currentColor = PieceColor.WHITE
+    var blackSide = MutableLiveData <Pair<PieceColor, Side>> ()
     init {
-
+        blackSide.value= Pair(PieceColor.BLACK, Side.UP)
         val tiles = SnapshotStateList<SnapshotStateList<Tile>>()
         for (i in 0 until 8){
             val rowList = SnapshotStateList<Tile>()
@@ -110,7 +110,7 @@ class BoardViewModel:  ViewModel()  {
     fun getAvailableSteps(piece: Piece): MutableList<Pair<Int, Int>> {
         val valid = piece.getValidSteps()
         val final = mutableListOf<Pair <Int,Int>>()
-        //if(piece.pieceColor == currentcolloer) {
+        //if(piece.pieceColor == ) {
             valid.forEach() {
                 for (i in it.indices) {
                     val currentField = it[i]
@@ -180,21 +180,23 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun CheckGapForCastling(rook: Piece): Boolean{
-        if(!rook.hasMoved){
-            //check if space is empty between king and rook
-            var j = rook.j
-            while (true) {
-                if(rook.j ==0){
-                    j++
-                }
-                if(rook.j ==7){
-                    j--
-                }
-                if(getPiece(rook.i,j).name == PieceName.KING){
-                    return true
-                }
-                if(getPiece(rook.i,j).name != PieceName.EMPTY){
-                    return false
+        if(rook.name == PieceName.ROOK) {
+            if (!rook.hasMoved) {
+                //check if space is empty between king and rook
+                var j = rook.j
+                while (true) {
+                    if (rook.j == 0) {
+                        j++
+                    }
+                    if (rook.j == 7) {
+                        j--
+                    }
+                    if (getPiece(rook.i, j).name == PieceName.KING) {
+                        return true
+                    }
+                    if (getPiece(rook.i, j).name != PieceName.EMPTY) {
+                        return false
+                    }
                 }
             }
         }
@@ -308,13 +310,16 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun DownPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        var tmp: Piece
         if (piece.i > 0 && piece.j < 7) {
-            if (getPiece(piece.i - 1, piece.j + 1).pieceColor == PieceColor.BLACK) {
+            tmp = getPiece(piece.i - 1, piece.j + 1)
+            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
                 final.add(Pair(piece.i - 1, piece.j + 1))
             }
         }
         if (piece.i > 0 && piece.j > 0) {
-            if (getPiece(piece.i - 1, piece.j - 1).pieceColor == PieceColor.BLACK) {
+            tmp = getPiece(piece.i - 1, piece.j - 1)
+            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
                 final.add(Pair(piece.i - 1, piece.j - 1))
             }
         }
@@ -334,13 +339,16 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun UpPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
+        var tmp: Piece
         if (piece.i < 7 && piece.j < 7) {
-            if (getPiece(piece.i + 1, piece.j + 1).pieceColor == PieceColor.WHITE) {
+            tmp = getPiece(piece.i + 1, piece.j + 1)
+            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
                 final.add(Pair(piece.i + 1, piece.j + 1))
             }
         }
         if (piece.i < 7 && piece.j > 0){
-            if (getPiece(piece.i + 1, piece.j - 1).pieceColor == PieceColor.WHITE) {
+            tmp = getPiece(piece.i + 1, piece.j - 1)
+            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
                 final.add(Pair(piece.i + 1, piece.j - 1))
             }
         }
@@ -358,15 +366,70 @@ class BoardViewModel:  ViewModel()  {
         }
     }
 
+    fun getAllPieces(): MutableList<Piece>{
+        val listOfPieces = mutableListOf<Piece>()
+        for (i in 0 until 8) {
+            for (j in 0 until 8) {
+                val currPiece = getPiece(i,j)
+                if(currPiece.name != PieceName.EMPTY) {
+                    listOfPieces.add(currPiece)
+                }
+            }
+        }
+        return  listOfPieces
+    }
+    fun FlipTheTable() {
+        val listOfPieces = getAllPieces()
+        val tiles = tilesLiveData.value
+
+
+
+
+
+        listOfPieces.forEach(){
+            it.flip()
+            //Log.d("FLIP", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+        }
+
+
+        for (i in 0 until 8) {
+            val newRowList = tiles?.get(i)
+            for (j in 0 until 8) {
+                var add = false
+                listOfPieces.forEach() {
+                    if (it.position == Pair(i, j)) {
+                        newRowList?.set(j,Tile(false, it))
+                        //Log.d("FLIP", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+                        add = true
+                    }
+                }
+                if (!add)
+                    newRowList?.set(j,Tile(false, Empty()))
+            }
+            newRowList?.let {
+                tiles.set(i, it)
+
+                tilesLiveData.value= tiles
+            }
+        }
+        var side = blackSide.value
+        if(side?.second == Side.UP){
+            side = Pair(PieceColor.BLACK, Side.DOWN)
+        }
+        else {
+            side = Pair(PieceColor.BLACK, Side.UP)
+        }
+        blackSide.value = side
+    }
     fun ChangeCurrentPlayer(){
         val black = PieceColor.BLACK
         val white = PieceColor.WHITE
         if(currentPlayer.value == PieceColor.WHITE){
-            currentcolloer = black
+            currentColor = black
             Log.d("CURR2", currentPlayer.value.toString() )
         }
         if(currentPlayer.value == PieceColor.BLACK){
-            currentcolloer = white
+            currentColor = white
         }
 
     }
