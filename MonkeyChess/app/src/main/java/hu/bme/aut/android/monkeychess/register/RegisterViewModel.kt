@@ -37,7 +37,8 @@ class RegisterViewModel: ViewModel() {
                     "Name" to fullname.value.toString(),
                     "E-mail" to email.value.toString(),
                     "Username" to username.value.toString(),
-                    "Sign-up date" to dateFormatter()
+                    "Sign-up date" to dateFormatter(),
+                    "ImageURL" to ""
                 )
 
                 userDB.collection("users")
@@ -57,7 +58,6 @@ class RegisterViewModel: ViewModel() {
         }
     }
 
-    // TODO: Megerősítő e-mail a szűréshez
     fun isRegistrationInputValid(context: Context, navController: NavController){
         if(fullname.value.toString().isNotEmpty() && username.value.toString().length >= 5 && password.value.toString().length >= 6 && (email.value.toString().isNotEmpty() || Patterns.EMAIL_ADDRESS.matcher(email.value.toString()).matches()) && confirmPassword.value.toString() == password.value.toString()){
             registerUser(context, navController)

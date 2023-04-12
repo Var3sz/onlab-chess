@@ -28,8 +28,6 @@ import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
 import hu.bme.aut.android.monkeychess.mainMenu.MainMenuViewModel
 import hu.bme.aut.android.monkeychess.profile.ProfileUI
 import hu.bme.aut.android.monkeychess.profile.ProfileViewModel
-import hu.bme.aut.android.monkeychess.profile.deleteUser.DeleteUserUI
-import hu.bme.aut.android.monkeychess.profile.deleteUser.DeleteUserViewModel
 import hu.bme.aut.android.monkeychess.profile.modify.email.EmailChangeUI
 import hu.bme.aut.android.monkeychess.profile.modify.email.EmailChangeViewModel
 import hu.bme.aut.android.monkeychess.profile.modify.password.PasswordChangeUI
@@ -111,10 +109,6 @@ class MainActivity : ComponentActivity() {
             composable("change_password"){
                 val viewModel = PasswordChangeViewModel()
                 TopAppBarWidget(navController = navController, content = { PasswordChangeUI().PasswordChangeScreen(navController = navController, viewModel = viewModel)}, bottomBar = {})
-            }
-            composable("delete_user"){
-                val viewModel = DeleteUserViewModel()
-                TopAppBarWidget(navController = navController, content = { DeleteUserUI().DeleteScreen(viewModel, navController) }, bottomBar = {})
             }
             composable("change_profile_data"){
                 val viewModel = ChangeProfileDataViewModel()
