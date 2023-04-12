@@ -50,8 +50,6 @@ class RegisterViewModel: ViewModel() {
                     }
                 navController.navigate("login_screen")
                 Toast.makeText(context, "Successful Registration", Toast.LENGTH_LONG).show()
-            }else{
-                Toast.makeText(context, it.exception?.message, Toast.LENGTH_LONG).show()
             }
         }.addOnFailureListener{
             Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()

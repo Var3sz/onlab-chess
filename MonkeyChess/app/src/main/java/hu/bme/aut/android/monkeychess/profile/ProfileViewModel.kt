@@ -19,7 +19,6 @@ class ProfileViewModel : ViewModel() {
     private var emailLiveData = MutableLiveData<String>()
     private var accCreatedAtLiveData = MutableLiveData<String>()
 
-
     init{
         showProfileData()
     }
@@ -81,6 +80,30 @@ class ProfileViewModel : ViewModel() {
     }
 
 
+    /** PROFILE PICTURE MODIFICATION SECTION **/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /** DELETE PROFILE SECTION WITH ALERT DIALOG **/
     private var password: MutableLiveData<String> = MutableLiveData("")
@@ -90,34 +113,39 @@ class ProfileViewModel : ViewModel() {
         val user = auth.currentUser!!
         val credential = EmailAuthProvider.getCredential(email.value.toString(), password.value.toString())
 
-        user.reauthenticate(credential).addOnCompleteListener{
-            if(it.isSuccessful){
-                userDB.collection("users").get().addOnCompleteListener { task->
-                    if(task.isSuccessful){
-                        for(document in task.result){
-                            if(document.data.getValue("E-mail") == auth.currentUser?.email){
-                                userDB.collection("users").document(document.id).delete()
+        if(email.value == auth.currentUser?.email){
+            user.reauthenticate(credential).addOnCompleteListener{
+                if(it.isSuccessful){
+                    userDB.collection("users").get().addOnCompleteListener { task->
+                        if(task.isSuccessful){
+                            for(document in task.result){
+                                if(document.data.getValue("E-mail") == auth.currentUser?.email){
+                                    userDB.collection("users").document(document.id).delete()
+                                }
                             }
                         }
+                    }.addOnFailureListener{ e->
+                        Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                     }
-                }.addOnFailureListener{ e->
-                    Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
-                }
 
-                user.delete().addOnCompleteListener { task->
-                    if(task.isSuccessful){
-                        auth.signOut()
-                        navController.navigate("welcome_screen")
-                        Toast.makeText(context, "User deleted", Toast.LENGTH_LONG).show()
-                    }else{
-                        Toast.makeText(context, task.exception?.message, Toast.LENGTH_LONG).show()
+                    user.delete().addOnCompleteListener { task->
+                        if(task.isSuccessful){
+                            auth.signOut()
+                            navController.navigate("welcome_screen")
+                            Toast.makeText(context, "User deleted", Toast.LENGTH_LONG).show()
+                        }else{
+                            Toast.makeText(context, task.exception?.message, Toast.LENGTH_LONG).show()
+                        }
+                    }.addOnFailureListener{e->
+                        Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                     }
-                }.addOnFailureListener{e->
-                    Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
                 }
+            }.addOnFailureListener{
+                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
             }
-        }.addOnFailureListener{
-            Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+        }
+        else{
+            Toast.makeText(context, "The given e-mail address is incorrect!", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -137,5 +165,4 @@ class ProfileViewModel : ViewModel() {
     fun reAuthEmail(_email: String){
         email.value = _email
     }
-
 }

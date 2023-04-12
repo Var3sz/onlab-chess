@@ -56,9 +56,6 @@ class PasswordChangeViewModel : ViewModel() {
         }
     }
 
-
-
-
     fun setPassword(_pass: String){
         password.value = _pass
     }
