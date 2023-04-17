@@ -3,6 +3,7 @@ package hu.bme.aut.android.monkeychess.profile.modify.email
 import android.content.Context
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -21,38 +22,43 @@ class EmailChangeViewModel : ViewModel() {
         val user = auth.currentUser!!
         val credential = EmailAuthProvider.getCredential(email.value.toString(), password.value.toString())
 
-        user.reauthenticate(credential).addOnCompleteListener {
-            if(it.isSuccessful){
-                userDB.collection("users").get().addOnCompleteListener { task ->
-                    if(task.isSuccessful){
-                        for(document in task.result){
-                            if(document.data.getValue("E-mail") == auth.currentUser?.email){
-                                userDB.collection("users").document(document.id).update("E-mail", newEmail.value.toString())
+        if(email.value == auth.currentUser?.email){
+            user.reauthenticate(credential).addOnCompleteListener {
+                if(it.isSuccessful){
+                    userDB.collection("users").get().addOnCompleteListener { task ->
+                        if(task.isSuccessful){
+                            for(document in task.result){
+                                if(document.data.getValue("E-mail") == auth.currentUser?.email){
+                                    userDB.collection("users").document(document.id).update("E-mail", newEmail.value.toString())
+                                }
                             }
                         }
+                    }.addOnFailureListener{
+                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                     }
-                }.addOnFailureListener{
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
-                }
 
 
-                user.updateEmail(newEmail.value.toString()).addOnCompleteListener { task->
-                    if(task.isSuccessful){
-                        val verifiable = auth.currentUser
-                        verifiable?.sendEmailVerification()
-                        auth.signOut()
-                        navController.navigate("login_screen")
-                        Toast.makeText(context, "E-mail address changed, login to continue!", Toast.LENGTH_LONG).show()
+                    user.updateEmail(newEmail.value.toString()).addOnCompleteListener { task->
+                        if(task.isSuccessful){
+                            val verifiable = auth.currentUser
+                            verifiable?.sendEmailVerification()
+                            auth.signOut()
+                            navController.navigate("login_screen")
+                            Toast.makeText(context, "E-mail address changed, login to continue!", Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            Toast.makeText(context, "Unable to change e-mail address!", Toast.LENGTH_LONG).show()
+                        }
+                    }.addOnFailureListener{
+                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                     }
-                    else{
-                        Toast.makeText(context, "Unable to change e-mail address!", Toast.LENGTH_LONG).show()
-                    }
-                }.addOnFailureListener{
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                 }
+            }.addOnFailureListener{
+                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
             }
-        }.addOnFailureListener{
-           Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+        }
+        else{
+            Toast.makeText(context, "The given e-mail address is incorrect!", Toast.LENGTH_LONG).show()
         }
     }
 

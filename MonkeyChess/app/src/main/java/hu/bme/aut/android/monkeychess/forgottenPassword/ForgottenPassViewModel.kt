@@ -19,8 +19,6 @@ class ForgottenPassViewModel : ViewModel(){
             if(it.isSuccessful){
                 navController.navigate("login_screen")
                 Toast.makeText(context, "E-mailt sent!", Toast.LENGTH_LONG).show()
-            }else{
-                Toast.makeText(context, "Unable to send e-mail!", Toast.LENGTH_LONG).show()
             }
         }.addOnFailureListener{
             Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
