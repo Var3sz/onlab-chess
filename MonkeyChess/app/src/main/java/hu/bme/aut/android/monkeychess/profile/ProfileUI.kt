@@ -1,10 +1,10 @@
 package hu.bme.aut.android.monkeychess.profile
 
 import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,8 +19,6 @@ import hu.bme.aut.android.monkeychess.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +29,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 
 
 class ProfileUI {
@@ -44,6 +44,12 @@ class ProfileUI {
         val accCreatedAtLiveData by viewModel.getAccCreatedAt().observeAsState()
         var showDeletePopUp by remember { mutableStateOf(false) }
         val context = LocalContext.current
+        val imageURL by viewModel.getImageUrl().observeAsState()
+        val pickImage = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { uri ->
+            viewModel.uploadPicture(uri, context)
+        }
 
         Box(modifier = Modifier
             .fillMaxSize()
@@ -93,15 +99,27 @@ class ProfileUI {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.baseline_person_24),
-                contentDescription = "My Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .width(300.dp)
-                    .height(300.dp)
-                    .clip(CircleShape)
-            )
+            Spacer(Modifier.height(30.dp))
+            OutlinedButton(
+                onClick = { pickImage.launch("image/*") },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                border = BorderStroke(0.dp, Color.White),
+                shape = CircleShape
+            ) {
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageURL)
+                        .build(),
+                    loading = {
+                        CircularProgressIndicator()
+                    },
+                    contentDescription = "Profile picture",
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(360.dp)
+                )
+            }
+
             Text(
                 text=usernameLiveData?:"",
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 38.sp)
@@ -111,7 +129,7 @@ class ProfileUI {
             Spacer(modifier = Modifier.height(15.dp))
             Text(emailLiveData?:"")
             Spacer(modifier = Modifier.height(15.dp))
-            Text(accCreatedAtLiveData?:"")
+            Text((accCreatedAtLiveData?:""))
             Spacer(modifier = Modifier.weight(1f))
             OutlinedButton(
                 modifier = Modifier
@@ -177,7 +195,9 @@ class ProfileUI {
                                 textAlign = TextAlign.Start,
                             )
                             OutlinedTextField(
-                                modifier = Modifier.fillMaxWidth().wrapContentSize(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(),
                                 value = passwordState.value,
                                 onValueChange = {typed -> passwordState.value = typed
                                     viewModel.reAuthPassword(passwordState.value)},
