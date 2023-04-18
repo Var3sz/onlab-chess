@@ -2,6 +2,7 @@ package hu.bme.aut.android.monkeychess.board
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -94,7 +95,6 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun setValue(row: Int, col: Int, value: Boolean) {
-
         val matrix = tilesLiveData.value
        // tilesLiveData.value = matrix
 
@@ -104,40 +104,15 @@ class BoardViewModel:  ViewModel()  {
             matrix.set(row, it)
             tilesLiveData.value= matrix
         }
-
     }
 
     fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!): MutableList<Pair<Int, Int>> {
-        val valid = piece.getValidSteps()
         val final = mutableListOf<Pair <Int,Int>>()
-        if(piece.pieceColor == color) {
+        //if(piece.pieceColor == color) {
         //debug
-        //if(piece.pieceColor == color || piece.pieceColor == color.oppositeColor())
-            valid.forEach() {
-                for (i in it.indices) {
-                    val currentField = it[i]
-                    val currentPiece = getPiece(currentField.first, currentField.second)
-                    if (i == 0) {
-                        Log.d(
-                            piece.name.toString(),
-                            "i:${currentField.first} j:${currentField.first}+ name: ${currentPiece.name}"
-                        )
+        if(piece.pieceColor == color || piece.pieceColor == color.oppositeColor()){
 
-                    }
-
-                    if (currentField != piece.position) {
-                        if (currentPiece.name != PieceName.EMPTY) {
-                            if (piece.pieceColor != currentPiece.pieceColor) {
-                                final.add(currentField)
-                            }
-                            break
-                        }
-                        final.add(currentField)
-                    }
-
-                }
-            }
-
+            getavalibleStepsInaLine(piece,final)
             //pawn movement
             //Black
             if (piece.name == PieceName.PAWN && piece.side == Side.UP) {
@@ -161,10 +136,81 @@ class BoardViewModel:  ViewModel()  {
         return final
     }
 
+    fun getAvailableHits(piece: Piece, color: PieceColor): MutableList<Pair<Int, Int>> {
+        val final = mutableListOf<Pair <Int,Int>>()
+
+        if(piece.pieceColor == color){
+            getavalibleHitInaLine(piece,final)
+            //pawn movement
+            //Black
+            if(piece.name == PieceName.PAWN){
+                final.clear()
+                if (piece.side == Side.UP) {
+                    if(piece.i < 7){
+                        if(piece.j < 7)
+                            final.add(Pair(piece.i+1, piece.j+1))
+                        if(piece.j > 0)
+                            final.add(Pair(piece.i+1, piece.j-1))
+                    }
+                }
+                //White
+                if (piece.side == Side.DOWN) {
+                    if(piece.i  > 0){
+                        if(piece.j < 7)
+                            final.add(Pair(piece.i-1, piece.j+1))
+                        if(piece.j > 0)
+                            final.add(Pair(piece.i-1, piece.j-1))
+                    }
+                }
+            }
+        }
+        return final
+    }
+
+    fun getavalibleStepsInaLine(piece: Piece, final: MutableList<Pair<Int, Int>> ){
+        val valid = piece.getValidSteps()
+
+        valid.forEach() {
+            for (i in it.indices) {
+                val currentField = it[i]
+                val currentPiece = getPiece(currentField.first, currentField.second)
+
+                if (currentField != piece.position) {
+                    if (currentPiece.name != PieceName.EMPTY) {
+                        if (piece.pieceColor != currentPiece.pieceColor) {
+                            final.add(currentField)
+                        }
+                        break
+                    }
+                    final.add(currentField)
+                }
+
+            }
+        }
+    }
+
+    fun getavalibleHitInaLine(piece: Piece, final: MutableList<Pair<Int, Int>> ){
+        val valid = piece.getValidSteps()
+        valid.forEach() {
+            for (i in it.indices) {
+                val currentField = it[i]
+                val currentPiece = getPiece(currentField.first, currentField.second)
+
+                if (currentField != piece.position) {
+                    if (currentPiece.name != PieceName.EMPTY) {
+                        final.add(currentField)
+                        break
+                    }
+                    final.add(currentField)
+                }
+            }
+        }
+    }
+
     fun BlockedByCheck(piece: Piece, final: MutableList<Pair<Int, Int>>) {
         val oppositSteps = getStepsforColor(piece.pieceColor.oppositeColor())
         oppositSteps.forEach(){
-            Log.d("BLOCK", "kingpos:${piece.position}, opositeavib:")
+            Log.d("BLOCK", "kingpos:${piece.position}, opositeavi:${it}")
             if(final.contains(it)){
               final.remove(it)
             }
@@ -254,7 +300,7 @@ class BoardViewModel:  ViewModel()  {
         ChangePiece(piece, i, j)
         }
 
-        checkForCheck()
+        //checkForCheck()
         ChangeCurrentPlayer()
     }
 
@@ -439,14 +485,13 @@ class BoardViewModel:  ViewModel()  {
         color = color?.oppositeColor()
         currentPlayer.value = color
     }
-    fun getStepsforColor(color: PieceColor = currentPlayer.value!!): List<Pair<Int, Int>>{
+    fun getStepsforColor(color: PieceColor = currentPlayer.value!!): List<Pair<Int,Int>>{
         val board = tilesLiveData.value
         val steps = mutableListOf<Pair<Int,Int>>()
-        board?.forEach() {
-            it.forEach {
-                if(it.pice.pieceColor == color){
-                    steps.addAll(getAvailableSteps(it.pice,color.oppositeColor()))
-                }
+
+        getAllPieces().forEach() {
+            if(it.pieceColor == color){
+                steps.addAll(getAvailableHits(it,color))
             }
         }
         return steps
@@ -467,4 +512,10 @@ class BoardViewModel:  ViewModel()  {
             }
         }
     }
+
+    fun getCurrentPlayer(): PieceColor{
+        return currentPlayer.value ?: PieceColor.EMPTY
+    }
+
+
 }

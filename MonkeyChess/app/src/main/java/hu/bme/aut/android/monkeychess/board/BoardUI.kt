@@ -97,6 +97,7 @@ class BoardUI {
     fun DrawBoard(viewModel :BoardViewModel) {
         val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
+
         Column(
         ) {
             for (i in 0 until 8) {
@@ -166,6 +167,7 @@ class BoardUI {
                     }
                 }
             }
+            DrawPalyer(viewModel.getCurrentPlayer().toString())
         }
     }
 
