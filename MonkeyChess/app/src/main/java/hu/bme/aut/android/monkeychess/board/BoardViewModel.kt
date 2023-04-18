@@ -300,7 +300,7 @@ class BoardViewModel:  ViewModel()  {
         ChangePiece(piece, i, j)
         }
 
-        //checkForCheck()
+        checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
     }
 
@@ -500,7 +500,7 @@ class BoardViewModel:  ViewModel()  {
     fun checkForCheck(color: PieceColor = currentPlayer.value!!){
         val steps = getStepsforColor(color)
         var king : King
-
+        
         getAllPieces().forEach {
             if(it.pieceColor == color.oppositeColor() && it.name == PieceName.KING){
                 king = it as King
