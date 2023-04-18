@@ -119,7 +119,7 @@ class BoardUI {
                                     if (viewModel.getValue(i, j) == true) {
                                         viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
-                                        viewModel.ChangeCurrentPlayer()
+                                       // viewModel.ChangeCurrentPlayer()
                                     } else {
                                         viewModel.HideAvailableSteps()
                                         viewModel.setClickedPiece(viewModel.getPiece(i, j))
