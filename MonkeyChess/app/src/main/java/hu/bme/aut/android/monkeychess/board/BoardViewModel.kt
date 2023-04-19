@@ -16,7 +16,7 @@ class BoardViewModel:  ViewModel()  {
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
     var blackSide = MutableLiveData <Pair<PieceColor, Side>> ()
-    
+
 //////////////////////////////////////////////////////////////////////////////
 // init block
     init {
@@ -148,21 +148,6 @@ class BoardViewModel:  ViewModel()  {
         }
     }
 
-    fun checkStepsforCheck(piece: Piece, color: PieceColor,final: MutableList<Pair<Int, Int>>) {
-        val invalids = mutableListOf<Pair <Int,Int>>()
-
-        val steps = getStepsforColor(color)
-        var king = getPiecebyNameAndColor(PieceName.KING, color)[0]
-
-        final.forEach(){
-            val tmpboard = tilesLiveData.value
-            tmpboard?.get(piece.i)?.set(piece.j, Tile(false, Empty()))
-            tmpboard
-        }
-    }
-
-
-
     fun BlockedByCheck(piece: Piece, final: MutableList<Pair<Int, Int>>) {
         val oppositSteps = getStepsforColor(piece.pieceColor.oppositeColor())
         oppositSteps.forEach(){
@@ -227,7 +212,7 @@ class BoardViewModel:  ViewModel()  {
                 Log.d("MATE","MATE")
             }
         }
-        checkStepsforCheck(piece,piece.pieceColor,final)
+        //checkAvailableStepsforCheck(piece,piece.pieceColor,final)
 
         return final
     }
@@ -251,6 +236,22 @@ class BoardViewModel:  ViewModel()  {
             }
         }
     }
+
+    fun checkAvailableStepsforCheck(piece: Piece, color: PieceColor,final: MutableList<Pair<Int, Int>>) {
+        val invalids = mutableListOf<Pair <Int,Int>>()
+        val tmp = tilesLiveData.value
+
+
+        final.forEach(){
+            ChangePiece(piece,it.first,it.second)
+            if(checkForCheck(piece.pieceColor)){
+                invalids.add(it)
+            }
+        }
+
+        final.removeAll(invalids)
+    }
+
 
     fun DownPawnMovement(piece: Piece, final: MutableList<Pair <Int,Int>>){
         var tmp: Piece
@@ -396,7 +397,19 @@ class BoardViewModel:  ViewModel()  {
 
             tilesLiveData.value= matrix
         }
-        clickedPiece.value = null
+        //clickedPiece.value = null
+    }
+
+    fun addPiece(piece: Piece){
+        var matrix = tilesLiveData.value
+
+        var newRowList = matrix?.get(piece.i)
+        newRowList?.set(piece.j, Tile(false,piece))
+        newRowList?.let {
+            matrix?.set(piece.i, it)
+
+            tilesLiveData.value= matrix
+        }
     }
 
     fun CastlingStep(piece: Piece, i: Int,j: Int){
@@ -475,7 +488,7 @@ class BoardViewModel:  ViewModel()  {
     fun getValue(row: Int, col: Int): Boolean? {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)?.free
     }
-    fun getPiece(row: Int, col: Int,board : SnapshotStateList<SnapshotStateList<Tile>> =  tilesLiveData.value!!): Piece {
+    fun getPiece(row: Int, col: Int): Piece {
         return tilesLiveData.value?.getOrNull(row)?.getOrNull(col)!!.pice
     }
     fun getClickedPiece(): Piece{
