@@ -132,6 +132,7 @@ class BoardViewModel:  ViewModel()  {
 
     fun getavalibleHitInaLine(piece: Piece, final: MutableList<Pair<Int, Int>> ){
         val valid = piece.getValidSteps()
+        val tmp = tilesLiveData.value
         valid.forEach() {
             for (i in it.indices) {
                 val currentField = it[i]
@@ -146,6 +147,7 @@ class BoardViewModel:  ViewModel()  {
                 }
             }
         }
+        tilesLiveData.value = tmp
     }
 
     fun BlockedByCheck(piece: Piece, final: MutableList<Pair<Int, Int>>) {
@@ -212,7 +214,7 @@ class BoardViewModel:  ViewModel()  {
                 Log.d("MATE","MATE")
             }
         }
-        //checkAvailableStepsforCheck(piece,piece.pieceColor,final)
+        checkAvailableStepsforCheck(piece,piece.pieceColor,final)
 
         return final
     }
@@ -239,16 +241,21 @@ class BoardViewModel:  ViewModel()  {
 
     fun checkAvailableStepsforCheck(piece: Piece, color: PieceColor,final: MutableList<Pair<Int, Int>>) {
         val invalids = mutableListOf<Pair <Int,Int>>()
-        val tmp = tilesLiveData.value
+        val tmp = copyBoard()
+        val origpos = Pair(piece.i,piece.j)
 
 
         final.forEach(){
             ChangePiece(piece,it.first,it.second)
-            if(checkForCheck(piece.pieceColor)){
+            if(checkForCheck(piece.pieceColor.oppositeColor())){
                 invalids.add(it)
             }
+            ChangePiece(piece, origpos.first,origpos.second)
         }
 
+        tmp.forEach { Log.d("KURVA", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+            ChangePiece(it, it.i,it.j)
+        }
         final.removeAll(invalids)
     }
 
@@ -572,5 +579,41 @@ class BoardViewModel:  ViewModel()  {
             side = Pair(PieceColor.BLACK, Side.UP)
         }
         blackSide.value = side
+    }
+    ///////////////////////////////////////
+    //copy board
+    fun copyBoard(): MutableList<Piece> {
+        val copied = mutableListOf<Piece>()
+        getAllPieces().forEach {
+            when(it.name){
+                PieceName.PAWN-> {
+                val copiedPiec = it as Pawn
+                copied.add(copiedPiec.copy())
+                }
+                PieceName.BISHOP-> {
+                    val copiedPiec = it as Bishop
+                    copied.add(copiedPiec.copy())
+                }
+                PieceName.KING-> {
+                    val copiedPiec = it as King
+                    copied.add(copiedPiec.copy())
+                }
+                PieceName.KNIGHT-> {
+                    val copiedPiec = it as Knight
+                    copied.add(copiedPiec.copy())
+                }
+                PieceName.QUEEN-> {
+                    val copiedPiec = it as Queen
+                    copied.add(copiedPiec.copy())
+                }
+                PieceName.ROOK-> {
+                    val copiedPiec = it as Rook
+                    copied.add(copiedPiec.copy())
+                }
+
+                else->{}
+            }
+        }
+        return copied
     }
 }

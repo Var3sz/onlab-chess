@@ -8,7 +8,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 
-class King(
+data class King(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
