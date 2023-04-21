@@ -151,7 +151,7 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun BlockedByCheck(piece: Piece, final: MutableList<Pair<Int, Int>>) {
-        val oppositSteps = getStepsforColor(piece.pieceColor.oppositeColor())
+        val oppositSteps = getHitsforColor(piece.pieceColor.oppositeColor())
         oppositSteps.forEach(){
             Log.d("BLOCK", "kingpos:${piece.position}, opositeavi:${it}")
             if(final.contains(it)){
@@ -161,8 +161,8 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun checkForCheck(color: PieceColor = currentPlayer.value!!): Boolean{
-        val steps = getStepsforColor(color)
-        var king = getPiecebyNameAndColor(PieceName.KING, color.oppositeColor())[0]
+        val steps = getHitsforColor(color)
+        val king = getPiecebyNameAndColor(PieceName.KING, color.oppositeColor())[0]
 
         if(steps.contains(king.position)){
             Log.d("CHECK", king.toString())
@@ -183,12 +183,12 @@ class BoardViewModel:  ViewModel()  {
 //////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
 
-    fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!): MutableList<Pair<Int, Int>> {
+    fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!, runChecktest: Boolean = true): MutableList<Pair<Int, Int>> {
         val final = mutableListOf<Pair <Int,Int>>()
-        //if(piece.pieceColor == color) {
+        if(piece.pieceColor == color) {
         //debug
-        if(piece.pieceColor == color || piece.pieceColor == color.oppositeColor()){
-            if(!checkForCheck(piece.pieceColor)) {
+        //if(piece.pieceColor == color || piece.pieceColor == color.oppositeColor()){
+
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
                 //Black
@@ -213,8 +213,11 @@ class BoardViewModel:  ViewModel()  {
             if(final.size == 0){
                 Log.d("MATE","MATE")
             }
+
+        if(runChecktest == true){
+            checkAvailableStepsforCheck(piece,piece.pieceColor,final)
         }
-        checkAvailableStepsforCheck(piece,piece.pieceColor,final)
+
 
         return final
     }
@@ -243,20 +246,38 @@ class BoardViewModel:  ViewModel()  {
         val invalids = mutableListOf<Pair <Int,Int>>()
         val tmp = copyBoard()
         val origpos = Pair(piece.i,piece.j)
+        val origmove = piece.hasMoved
 
 
         final.forEach(){
             ChangePiece(piece,it.first,it.second)
-            if(checkForCheck(piece.pieceColor.oppositeColor())){
+            if(noStepWhenChecked(piece.pieceColor)){
                 invalids.add(it)
             }
             ChangePiece(piece, origpos.first,origpos.second)
+            piece.hasMoved = origmove
+            tmp.forEach { Log.d("SYKE", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+                addPiece(it)
+            }
+
         }
 
-        tmp.forEach { Log.d("KURVA", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
-            ChangePiece(it, it.i,it.j)
+
+        tmp.forEach { Log.d("SYKE", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+            addPiece(it)
         }
         final.removeAll(invalids)
+    }
+    fun noStepWhenChecked(color: PieceColor): Boolean{
+        val enemysteps = getStepsforColor(color.oppositeColor())
+        enemysteps.forEach(){
+            val tmp = getPiece(it.first,it.second)
+            Log.d("ez","${it}")
+            if(tmp.name == PieceName.KING && tmp.pieceColor == color){
+                return true
+            }
+        }
+        return false
     }
 
 
@@ -369,8 +390,10 @@ class BoardViewModel:  ViewModel()  {
     fun step(piece: Piece, i: Int,j: Int){
         Log.d("CURR", currentPlayer.value.toString())
         //king castling
+        Log.d("CAST ${piece.name}", "${piece.hasMoved}")
         if(piece.name == PieceName.KING && !piece.hasMoved){
             CastlingStep(piece, i, j)
+            Log.d("CAST", "${piece.hasMoved}")
         }
         //normal
         else{
@@ -405,18 +428,6 @@ class BoardViewModel:  ViewModel()  {
             tilesLiveData.value= matrix
         }
         //clickedPiece.value = null
-    }
-
-    fun addPiece(piece: Piece){
-        var matrix = tilesLiveData.value
-
-        var newRowList = matrix?.get(piece.i)
-        newRowList?.set(piece.j, Tile(false,piece))
-        newRowList?.let {
-            matrix?.set(piece.i, it)
-
-            tilesLiveData.value= matrix
-        }
     }
 
     fun CastlingStep(piece: Piece, i: Int,j: Int){
@@ -501,13 +512,25 @@ class BoardViewModel:  ViewModel()  {
     fun getClickedPiece(): Piece{
         return clickedPiece.value!!
     }
-    fun getStepsforColor(color: PieceColor = currentPlayer.value!!): List<Pair<Int,Int>>{
+    fun getHitsforColor(color: PieceColor = currentPlayer.value!!): List<Pair<Int,Int>>{
         val board = tilesLiveData.value
         val steps = mutableListOf<Pair<Int,Int>>()
 
         getAllPieces().forEach() {
             if(it.pieceColor == color){
                 steps.addAll(getAvailableHits(it,color))
+            }
+        }
+        return steps
+    }
+
+    fun getStepsforColor(color: PieceColor): List<Pair<Int,Int>>{
+        val board = tilesLiveData.value
+        val steps = mutableListOf<Pair<Int,Int>>()
+
+        getAllPieces().forEach() {
+            if(it.pieceColor == color){
+                steps.addAll(getAvailableSteps(it,color,false))
             }
         }
         return steps
@@ -538,7 +561,17 @@ class BoardViewModel:  ViewModel()  {
         }
     }
 
+    fun addPiece(piece: Piece){
+        val matrix = tilesLiveData.value
 
+        val newRowList = matrix?.get(piece.i)
+        newRowList?.set(piece.j, Tile(false,piece))
+        newRowList?.let {
+            matrix.set(piece.i, it)
+
+            tilesLiveData.value= matrix
+        }
+    }
 //////////////////////////////////////////////////////////////////////////////
 // The logic for table fliping
     fun FlipTheTable() {
