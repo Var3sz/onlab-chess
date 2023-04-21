@@ -37,12 +37,12 @@ class BoardViewModel:  ViewModel()  {
                     rowList.add(Tile(false,Rook(PieceColor.BLACK, i, j, Side.UP)))
                 }
                 //black Bishops
-                else if((i==0 && j==1)||(i==0 && j==6)){
+                else if((i==0 && j==2)||(i==0 && j==5)){
                     rowList.add(Tile(false,Bishop(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //black Knights
-                else if((i==0 && j==2)||(i==0 && j==5)){
+                else if((i==0 && j==1)||(i==0 && j==6)){
                     rowList.add(Tile(false,Knight(PieceColor.BLACK, i, j, Side.UP)))
                     //rowList.add(Tile(false,Empty()))
                 }
@@ -68,21 +68,21 @@ class BoardViewModel:  ViewModel()  {
                     rowList.add(Tile(false,Rook(PieceColor.WHITE, i, j, Side.DOWN)))
                 }
                 //White Bishops
-                else if((i==7 && j==1)||(i==7 && j==6)){
+                else if((i==7 && j==2)||(i==7 && j==5)){
                     rowList.add(Tile(false,Bishop(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
                 //White Knights
-                else if((i==7 && j==2)||(i==7 && j==5)){
+                else if((i==7 && j==1)||(i==7 && j==6)){
                     rowList.add(Tile(false,Knight(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
 
-                else if((i==7 && j==4)){
+                else if((i==7 && j==3)){
                     rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }
-                else if((i==7 && j==3)){
+                else if((i==7 && j==4)){
                     rowList.add(Tile(false,King(PieceColor.WHITE, i, j, Side.DOWN)))
                     //rowList.add(Tile(false,Empty()))
                 }

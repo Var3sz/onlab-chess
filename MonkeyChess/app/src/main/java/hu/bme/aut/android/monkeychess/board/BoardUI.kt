@@ -104,12 +104,8 @@ class BoardUI {
                 Row {
                     for (j in 0 until 8) {
                         var gridcolor = Color.Gray
-                        if(viewModel.blackSide.value?.second == Side.DOWN)
-                            gridcolor = Color.White
                         if ((i + j) % 2 == 0) {
                             gridcolor = Color.White
-                                if(viewModel.blackSide.value?.second == Side.DOWN)
-                                    gridcolor = Color.Gray
                         }
                         Box(
                             modifier = Modifier
