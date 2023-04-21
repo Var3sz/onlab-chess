@@ -97,6 +97,7 @@ class BoardUI {
     fun DrawBoard(viewModel :BoardViewModel) {
         val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
+
         Column(
         ) {
             for (i in 0 until 8) {
@@ -119,7 +120,7 @@ class BoardUI {
                                     if (viewModel.getValue(i, j) == true) {
                                         viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
-                                        viewModel.ChangeCurrentPlayer()
+                                       // viewModel.ChangeCurrentPlayer()
                                     } else {
                                         viewModel.HideAvailableSteps()
                                         viewModel.setClickedPiece(viewModel.getPiece(i, j))
@@ -166,6 +167,7 @@ class BoardUI {
                     }
                 }
             }
+            DrawPalyer(viewModel.getCurrentPlayer().toString())
         }
     }
 
