@@ -98,126 +98,38 @@ class BoardViewModel:  ViewModel()  {
     }
 
 //////////////////////////////////////////////////////////////////////////////
-//  Logic for check and hit detection for check
-    fun getAvailableHits(piece: Piece, color: PieceColor): MutableList<Pair<Int, Int>> {
-        val final = mutableListOf<Pair <Int,Int>>()
-
-        if(piece.pieceColor == color){
-            getavalibleHitInaLine(piece,final)
-            //pawn movement
-            //Black
-            if(piece.name == PieceName.PAWN){
-                final.clear()
-                if (piece.side == Side.UP) {
-                    if(piece.i < 7){
-                        if(piece.j < 7)
-                            final.add(Pair(piece.i+1, piece.j+1))
-                        if(piece.j > 0)
-                            final.add(Pair(piece.i+1, piece.j-1))
-                    }
-                }
-                //White
-                if (piece.side == Side.DOWN) {
-                    if(piece.i  > 0){
-                        if(piece.j < 7)
-                            final.add(Pair(piece.i-1, piece.j+1))
-                        if(piece.j > 0)
-                            final.add(Pair(piece.i-1, piece.j-1))
-                    }
-                }
-            }
-        }
-        return final
-    }
-
-    fun getavalibleHitInaLine(piece: Piece, final: MutableList<Pair<Int, Int>> ){
-        val valid = piece.getValidSteps()
-        val tmp = tilesLiveData.value
-        valid.forEach() {
-            for (i in it.indices) {
-                val currentField = it[i]
-                val currentPiece = getPiece(currentField.first, currentField.second)
-
-                if (currentField != piece.position) {
-                    if (currentPiece.name != PieceName.EMPTY) {
-                        final.add(currentField)
-                        break
-                    }
-                    final.add(currentField)
-                }
-            }
-        }
-        tilesLiveData.value = tmp
-    }
-
-    fun BlockedByCheck(piece: Piece, final: MutableList<Pair<Int, Int>>) {
-        val oppositSteps = getHitsforColor(piece.pieceColor.oppositeColor())
-        oppositSteps.forEach(){
-            Log.d("BLOCK", "kingpos:${piece.position}, opositeavi:${it}")
-            if(final.contains(it)){
-                final.remove(it)
-            }
-        }
-    }
-
-    fun checkForCheck(color: PieceColor = currentPlayer.value!!): Boolean{
-        val steps = getHitsforColor(color)
-        val king = getPiecebyNameAndColor(PieceName.KING, color.oppositeColor())[0]
-
-        if(steps.contains(king.position)){
-            Log.d("CHECK", king.toString())
-            return true
-        }
-        return false
-    }
-
-    fun CheckStep(piece: Piece, final: MutableList<Pair<Int, Int>>){
-        //King
-        if (piece.name == PieceName.KING) {
-            BlockedByCheck(piece, final)
-            Log.d("BLOCKed", "kingpos:${piece.position}, opositeavib:")
-        }
-    }
-
-
-//////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
 
-    fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!, runChecktest: Boolean = true): MutableList<Pair<Int, Int>> {
+    fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!, runspec: Boolean = true): MutableList<Pair<Int, Int>> {
         val final = mutableListOf<Pair <Int,Int>>()
-        if(piece.pieceColor == color) {
+        //if(piece.pieceColor == color) {
         //debug
-        //if(piece.pieceColor == color || piece.pieceColor == color.oppositeColor()){
+        if(piece.pieceColor == color || piece.pieceColor == color.oppositeColor()){
 
-                getavalibleStepsInaLine(piece, final)
-                //pawn movement
-                //Black
-                if (piece.name == PieceName.PAWN && piece.side == Side.UP) {
-                    UpPawnMovement(piece, final)
-                }
-                //White
-                if (piece.name == PieceName.PAWN && piece.side == Side.DOWN) {
-                    DownPawnMovement(piece, final)
-                }
-
-                //castling
-                if (piece.name == PieceName.KING && !piece.hasMoved) {
-                    GetValidCastling(piece, final)
-                }
-
-                if (piece.name == PieceName.KING) {
-                    BlockedByCheck(piece, final)
-                    Log.d("BLOCKed", "kingpos:${piece.position}, opositeavib:")
-                }
+            getavalibleStepsInaLine(piece, final)
+            //pawn movement
+            //Black
+            if (piece.name == PieceName.PAWN && piece.side == Side.UP) {
+                UpPawnMovement(piece, final)
             }
+            //White
+            if (piece.name == PieceName.PAWN && piece.side == Side.DOWN) {
+                DownPawnMovement(piece, final)
+            }
+
             if(final.size == 0){
                 Log.d("MATE","MATE")
             }
 
-        if(runChecktest == true){
-            checkAvailableStepsforCheck(piece,piece.pieceColor,final)
-        }
+            if(runspec == true){
+                checkAvailableStepsforCheck(piece,piece.pieceColor,final)
+                //castling
+                if (piece.name == PieceName.KING && !piece.hasMoved) {
+                    GetValidCastling(piece, final)
+                }
+            }
 
+        }
 
         return final
     }
@@ -362,6 +274,7 @@ class BoardViewModel:  ViewModel()  {
     }
 
     fun CheckGapForCastling(rook: Piece): Boolean{
+        val otherSteps = getStepsforColor(rook.pieceColor.oppositeColor())
         if(rook.name == PieceName.ROOK) {
             if (!rook.hasMoved) {
                 //check if space is empty between king and rook
@@ -373,12 +286,18 @@ class BoardViewModel:  ViewModel()  {
                     if (rook.j == 7) {
                         j--
                     }
-                    if (getPiece(rook.i, j).name == PieceName.KING) {
-                        return true
-                    }
-                    if (getPiece(rook.i, j).name != PieceName.EMPTY) {
+                    if(otherSteps.contains(Pair(rook.i,j))){
                         return false
                     }
+
+                    if (getPiece(rook.i, j).name == PieceName.KING ) {
+                        return true
+                    }
+
+                    if (getPiece(rook.i, j).name != PieceName.EMPTY ) {
+                        return false
+                    }
+
                 }
             }
         }
@@ -400,7 +319,7 @@ class BoardViewModel:  ViewModel()  {
             ChangePiece(piece, i, j)
         }
 
-        checkForCheck(piece.pieceColor)
+        //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
     }
 
@@ -511,17 +430,6 @@ class BoardViewModel:  ViewModel()  {
     }
     fun getClickedPiece(): Piece{
         return clickedPiece.value!!
-    }
-    fun getHitsforColor(color: PieceColor = currentPlayer.value!!): List<Pair<Int,Int>>{
-        val board = tilesLiveData.value
-        val steps = mutableListOf<Pair<Int,Int>>()
-
-        getAllPieces().forEach() {
-            if(it.pieceColor == color){
-                steps.addAll(getAvailableHits(it,color))
-            }
-        }
-        return steps
     }
 
     fun getStepsforColor(color: PieceColor): List<Pair<Int,Int>>{
