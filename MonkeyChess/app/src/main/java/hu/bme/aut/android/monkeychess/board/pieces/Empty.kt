@@ -1,11 +1,13 @@
 package hu.bme.aut.android.monkeychess.board.pieces
 
-import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
-class Empty(): Piece {
+class Empty(
+    override var i: Int,
+    override var j: Int,
+): Piece {
 
     override val imageID: Int
         get() {
@@ -26,12 +28,10 @@ class Empty(): Piece {
 
     override var hasMoved: Boolean = false
     override var pieceColor: PieceColor = PieceColor.EMPTY
-    override var i: Int
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var j: Int
-        get() = TODO("Not yet implemented")
-        set(value) {}
+
+
+
+
     override fun flip() {
     }
 

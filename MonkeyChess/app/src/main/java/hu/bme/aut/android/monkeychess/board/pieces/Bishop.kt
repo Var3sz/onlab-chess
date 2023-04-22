@@ -14,7 +14,7 @@ data class Bishop(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
-    override var side: Side
+    override var side: Side,
 ) : Piece {
 
 

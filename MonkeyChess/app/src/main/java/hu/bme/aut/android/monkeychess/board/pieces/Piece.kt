@@ -5,7 +5,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
-interface  Piece {
+interface  Piece  {
     fun step(i: Int, j: Int)
     fun getValidSteps(): Array<MutableList<Pair<Int, Int>>>
     fun flip()
