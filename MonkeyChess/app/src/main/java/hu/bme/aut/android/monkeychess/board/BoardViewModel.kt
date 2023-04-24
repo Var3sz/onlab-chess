@@ -1,6 +1,7 @@
 package hu.bme.aut.android.monkeychess.board
 
 import android.util.Log
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +15,7 @@ class BoardViewModel:  ViewModel() {
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
     var blackSide = MutableLiveData<Pair<PieceColor, Side>>()
-    var ai = Ai()
+    //var ai = Ai()
 
     //////////////////////////////////////////////////////////////////////////////
 // init block
@@ -111,11 +112,11 @@ class BoardViewModel:  ViewModel() {
             //pawn movement
             //Black
             if (piece.name == PieceName.PAWN && piece.side == Side.UP) {
-                UpPawnMovement(piece, final)
+                pawnMovement(piece, final)
             }
             //White
             if (piece.name == PieceName.PAWN && piece.side == Side.DOWN) {
-                DownPawnMovement(piece, final)
+                pawnMovement(piece, final)
             }
 
             if (final.size == 0) {
@@ -200,59 +201,31 @@ class BoardViewModel:  ViewModel() {
     }
 
 
-    fun DownPawnMovement(piece: Piece, final: MutableList<Pair<Int, Int>>) {
+    fun pawnMovement(piece: Piece, final: MutableList<Pair<Int, Int>>, ) {
         var tmp: Piece
-        if (piece.i > 0 && piece.j < 7) {
-            tmp = getPiece(piece.i - 1, piece.j + 1)
-            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(piece.i - 1, piece.j + 1))
-            }
-        }
-        if (piece.i > 0 && piece.j > 0) {
-            tmp = getPiece(piece.i - 1, piece.j - 1)
-            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(piece.i - 1, piece.j - 1))
-            }
-        }
-        if (piece.i > 0) {
-            if (getPiece(piece.i - 1, piece.j).pieceColor != PieceColor.EMPTY) {
-                final.remove(Pair(piece.i - 1, piece.j))
-                final.remove(Pair(piece.i - 2, piece.j))
-            }
-
-            if (!piece.hasMoved) {
-                if (getPiece(piece.i - 2, piece.j).pieceColor != PieceColor.EMPTY) {
-                    final.add(Pair(piece.i - 1, piece.j))
-                    final.remove(Pair(piece.i - 2, piece.j))
+        val isUp = piece.side == Side.UP
+        val sign = if (isUp) 1 else -1
+        val i = piece.i + sign
+        if (i in 0..7) {
+            if (piece.j > 0) {
+                tmp = getPiece(i, piece.j - 1)
+                if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
+                    final.add(Pair(i, piece.j - 1))
                 }
             }
-        }
-    }
-
-    fun UpPawnMovement(piece: Piece, final: MutableList<Pair<Int, Int>>) {
-        var tmp: Piece
-        if (piece.i < 7 && piece.j < 7) {
-            tmp = getPiece(piece.i + 1, piece.j + 1)
-            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(piece.i + 1, piece.j + 1))
+            if (piece.j < 7) {
+                tmp = getPiece(i, piece.j + 1)
+                if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
+                    final.add(Pair(i, piece.j + 1))
+                }
             }
-        }
-        if (piece.i < 7 && piece.j > 0) {
-            tmp = getPiece(piece.i + 1, piece.j - 1)
-            if (tmp.pieceColor != piece.pieceColor && tmp.pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(piece.i + 1, piece.j - 1))
+            if (getPiece(i, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.remove(Pair(i, piece.j))
+                final.remove(Pair(i + sign, piece.j))
             }
-        }
-        if (piece.i < 7) {
-            if (getPiece(piece.i + 1, piece.j).pieceColor != PieceColor.EMPTY) {
-                final.remove(Pair(piece.i + 1, piece.j))
-                final.remove(Pair(piece.i + 2, piece.j))
-            }
-        }
-        if (!piece.hasMoved) {
-            if (getPiece(piece.i + 2, piece.j).pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(piece.i + 1, piece.j))
-                final.remove(Pair(piece.i + 2, piece.j))
+            if (!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY) {
+                final.add(Pair(i, piece.j))
+                final.remove(Pair(i + sign, piece.j))
             }
         }
     }
@@ -330,9 +303,18 @@ class BoardViewModel:  ViewModel() {
 
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
+        Log.d("FEN" ,printBoard())
 
         if(currentPlayer.value == PieceColor.BLACK && doai){
-            Log.d("MINMAx" ,ai.getTheNextStep(this).toString())
+            val board: Board = Board(copyBoard(), currentPlayer.value!!)
+            val ai = Ai(board)
+            var th= Thread{
+
+               // Log.d("MINMAx" ,ai.getTheNextStep().toString())
+
+
+            }
+           //th.start()
         }
     }
 
@@ -431,13 +413,10 @@ class BoardViewModel:  ViewModel() {
     }
 
     fun getStepsforColor(color: PieceColor): List<Pair<Int, Int>> {
-        val board = tilesLiveData.value
         val steps = mutableListOf<Pair<Int, Int>>()
 
-        getAllPieces().forEach() {
-            if (it.pieceColor == color) {
-                steps.addAll(getAvailableSteps(it, color, false))
-            }
+        getPiecesbyColor(color).forEach() {
+            steps.addAll(getAvailableSteps(it, color, false))
         }
         return steps
     }
@@ -570,6 +549,51 @@ class BoardViewModel:  ViewModel() {
         pieces.forEach(){
             addPiece(it)
         }
+    }
+
+    fun printBoard(): String {
+        var boarfen: String =""
+        tilesLiveData.value?.forEach{
+            it.forEach(){
+                var addedChar: Char ='e'
+                when(it.pice.name){
+                    PieceName.PAWN -> {
+                        addedChar = 'p'
+                    }
+                    PieceName.KNIGHT -> {
+                        addedChar = 'n'
+                    }
+                    PieceName.BISHOP -> {
+                        addedChar = 'b'
+                    }
+                    PieceName.ROOK -> {
+                        addedChar = 'r'
+                    }
+                    PieceName.QUEEN -> {
+                        addedChar = 'q'
+                    }
+                    PieceName.KING -> {
+                        addedChar = 'k'
+                    }
+                    else -> {}
+                }
+
+
+                when(it.pice.pieceColor){
+                    PieceColor.BLACK->{
+                        addedChar.uppercase()
+                    }
+                    PieceColor.WHITE->{}
+                    PieceColor.EMPTY-> {
+                        addedChar = '-'
+                    }
+                }
+                boarfen += addedChar
+
+            }
+            boarfen += "\n"
+        }
+        return boarfen
     }
 }
 
