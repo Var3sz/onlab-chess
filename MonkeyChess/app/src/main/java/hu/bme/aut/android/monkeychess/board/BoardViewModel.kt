@@ -306,19 +306,39 @@ class BoardViewModel:  ViewModel() {
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
         Log.d("FEN" ,printBoard())
-
+        var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         if(currentPlayer.value == PieceColor.BLACK && doai){
             val board: Board = Board(copyBoard(), currentPlayer.value!!)
             val ai = Ai(board)
             var th= Thread{
-
-                Log.d("MINMAx" ,ai.getTheNextStep().toString())
-
-
+                //val step = ai.getTheNextStep()
+               // Log.d("MINMAx" ,step.toString())
+                //Log.d("minmax", "i = ${step.first.i} j = ${step.first.j}")
+                //best = ai.getRandomStep()
             }
-           th.start()
+            th.start()
             th.priority = 9
+            th.join()
+            val meu = Board(copyBoard(), PieceColor.BLACK)
+            loadBoard(meu.copyBoard())
+            Log.d("1FEN1" ,meu.printBoard())
+            rakosgeci(ai.getTheNextStep())
+            //rand()
         }
+    }
+    fun rand(){
+        val steps = mutableListOf<Pair<Piece, Pair<Int, Int>>>()
+        getPiecesbyColor(PieceColor.BLACK).forEach(){
+            val piece = it
+            getAvailableSteps(piece, PieceColor.BLACK, true).forEach(){
+                steps.add(Pair(piece, it))
+            }
+        }
+        rakosgeci(steps[0])
+    }
+    fun rakosgeci(step: Pair<Piece, Pair<Int, Int>>){
+        val bestPiece = getPiece(step.first.i, step.first.j)
+        step(bestPiece, step.second.first, step.second.second)
     }
 
     fun ChangePiece(piece: Piece, i: Int, j: Int) {
@@ -584,7 +604,7 @@ class BoardViewModel:  ViewModel() {
 
                 when(it.pice.pieceColor){
                     PieceColor.BLACK->{
-                        addedChar.uppercase()
+                        addedChar = addedChar.uppercase()[0]
                     }
                     PieceColor.WHITE->{}
                     PieceColor.EMPTY-> {
