@@ -223,9 +223,11 @@ class BoardViewModel:  ViewModel() {
                 final.remove(Pair(i, piece.j))
                 final.remove(Pair(i + sign, piece.j))
             }
-            if (!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(i, piece.j))
-                final.remove(Pair(i + sign, piece.j))
+            if(i + sign in 1..6) {
+                if (!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY) {
+                    final.add(Pair(i, piece.j))
+                    final.remove(Pair(i + sign, piece.j))
+                }
             }
         }
     }
@@ -310,11 +312,12 @@ class BoardViewModel:  ViewModel() {
             val ai = Ai(board)
             var th= Thread{
 
-               // Log.d("MINMAx" ,ai.getTheNextStep().toString())
+                Log.d("MINMAx" ,ai.getTheNextStep().toString())
 
 
             }
-           //th.start()
+           th.start()
+            th.priority = 9
         }
     }
 

@@ -2,9 +2,6 @@ package hu.bme.aut.android.monkeychess.board
 
 
 import android.util.Log
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.res.booleanResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
@@ -55,55 +52,51 @@ class Ai(val board: Board) {
             return 50000
         }
         if (maximizing) {
-            val pieces = board.getPiecesbyColor(aiColor)
-            for (j in 0 until pieces.size) {
-                steps = board.getAvailableSteps(pieces[j], aiColor,runspec = false)
-
-                for (i in 0 until steps.size) {
-                   // Log.d(
-                    //    "AI",
-                     //   "depth ${depth} pieceName: ${pieces[j].name} piece place: ${steps[i]}"
-                    //)
-                    if (depth == originalDepth) {
-                        branch = Pair(pieces[j], Pair(steps.get(i).first, steps.get(i).second))
-                    }
-                    val tmp = Board(board.copyBoard(),aiColor.oppositeColor())
-                    tmp.step(pieces[j], steps[i].first, steps[i].second, false)
-                    Log.d("AI\n", "${tmp.printBoard()} i=${board.board.size} j= i=${board.board[3].size}")
-                    val value = minimax(tmp ,depth - 1, false, alpha, beta)
-                    max = Math.max(value, max)
-                    if (max == value && depth == originalDepth) {
-                        bestChoice = branch
-                    }
-                    alpha = Math.max(alpha, value)
-                    if (beta <= alpha) {
-                        return max
-                    }
+            Log.d("MAX", "\n${board.printBoard()}\n")
+            val steps = board.getStepsforColorWithPieces(aiColor)
+            for (i in 0 until steps.size){
+                //save current branch
+                if(depth == originalDepth){
+                    branch = steps[i]
                 }
+                //init new board
+                val tmp = Board(board.copyBoard(), aiColor.oppositeColor())
+                val tmpPiece = tmp.getPiece(steps[i].first.i, steps[i].first.j)
+                tmp.step(tmpPiece, steps[i].second.first, steps[i].second.second)
+
+                //new board eval
+                val value = minimax(tmp, depth-1, false, alpha, beta)
+                max = Math.max(value, max)
+                if( max == value && depth == originalDepth){
+                    bestChoice = branch
+                }
+
+                alpha = Math.max(alpha, value)
+                if(beta <= alpha){
+                    break
+                }
+
             }
             return max
         } else {
-            val pieces = board.getPiecesbyColor(aiColor.oppositeColor())
+            Log.d("MIN", "\n${board.printBoard()}\n")
+            val steps = board.getStepsforColorWithPieces(aiColor.oppositeColor())
+            for (i in 0 until steps.size){
+                //init new board
+                val tmp = Board(board.copyBoard(), aiColor)
+                val tmpPiece = tmp.getPiece(steps[i].first.i, steps[i].first.j)
+                tmp.step(tmpPiece, steps[i].second.first, steps[i].second.second)
 
-            for (j in 0 until pieces.size) {
-                steps = board.getAvailableSteps(pieces[j], aiColor.oppositeColor(), false)
-                for (i in 0 until steps.size) {
-                    val tmp = Board(board.copyBoard(), aiColor)
-                    tmp.step(pieces[j], steps[i].first, steps[i].second, false)
-
-                    val value = minimax(tmp , depth - 1, true, alpha, beta)
-                    min = Math.min(value, min)
-                    if (min == value && depth == 0) {
-                        bestChoice = branch
-                    }
-                    alpha = Math.min(beta, value)
-                    if (beta <= alpha){
-                        return min
-                    }
+                //new board eval
+                val value = minimax(tmp, depth-1, true, alpha, beta)
+                min=Math.min(value, min)
+                alpha=Math.min(beta, value);
+                if(beta <= alpha){
+                    break
                 }
             }
-            return min
         }
+        return min
     }
 
 
@@ -181,9 +174,9 @@ class Board(pieces: MutableList<Piece>,color: PieceColor){
             runspec: Boolean = true
         ): MutableList<Pair<Int, Int>> {
             val final = mutableListOf<Pair<Int, Int>>()
-            if(piece.pieceColor == color) {
+            //if(piece.pieceColor == color) {
             //debug
-            //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+            if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
@@ -271,7 +264,7 @@ class Board(pieces: MutableList<Piece>,color: PieceColor){
         }
 
 
-        fun pawnMovement(piece: Piece, final: MutableList<Pair<Int, Int>>, ) {
+        fun pawnMovement(piece: Piece, final: MutableList<Pair<Int, Int>>) {
             var tmp: Piece
             val isUp = piece.side == Side.UP
             val sign = if (isUp) 1 else -1
@@ -293,9 +286,17 @@ class Board(pieces: MutableList<Piece>,color: PieceColor){
                     final.remove(Pair(i, piece.j))
                     final.remove(Pair(i + sign, piece.j))
                 }
-                if (!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY) {
-                    final.add(Pair(i, piece.j))
-                    final.remove(Pair(i + sign, piece.j))
+                if(i + sign in 1..6) {
+                    if (i + sign in 1..6) {
+                        if (!piece.hasMoved && getPiece(
+                                i + sign,
+                                piece.j
+                            ).pieceColor != PieceColor.EMPTY
+                        ) {
+                            final.add(Pair(i, piece.j))
+                            final.remove(Pair(i + sign, piece.j))
+                        }
+                    }
                 }
             }
         }
@@ -360,6 +361,18 @@ class Board(pieces: MutableList<Piece>,color: PieceColor){
             return steps
         }
 
+    fun getStepsforColorWithPieces(color: PieceColor): List<Pair<Piece, Pair<Int,Int>>> {
+        val steps = mutableListOf<Pair<Piece, Pair<Int,Int>>>()
+
+        getPiecesbyColor(color).forEach() {
+            val piece = it
+            getAvailableSteps(piece, color, false).forEach(){
+                steps.add(Pair(piece,it ))
+            }
+        }
+        return steps
+    }
+
         //////////////////////////////////////////////////////////////////////////////
 // setters for pieces or bord information
         fun addPiece(piece: Piece) {
@@ -419,9 +432,10 @@ class Board(pieces: MutableList<Piece>,color: PieceColor){
 
     fun printBoard(): String {
         var boarfen: String =""
-        board?.forEach{
+        board.forEach{
             it.forEach(){
                 var addedChar: Char ='e'
+
                 when(it.pice.name){
                     PieceName.PAWN -> {
                         addedChar = 'p'
@@ -447,7 +461,7 @@ class Board(pieces: MutableList<Piece>,color: PieceColor){
 
                 when(it.pice.pieceColor){
                     PieceColor.BLACK->{
-                        addedChar.uppercase()
+                        addedChar = addedChar.uppercase()[0]
                     }
                     PieceColor.WHITE->{}
                     PieceColor.EMPTY-> {
