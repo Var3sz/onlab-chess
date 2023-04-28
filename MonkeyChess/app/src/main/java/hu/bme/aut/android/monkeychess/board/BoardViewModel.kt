@@ -325,9 +325,9 @@ class BoardViewModel:  ViewModel() {
             val nextStep = ai.getTheNextStep()
 
             if(getStepsforColor(PieceColor.BLACK).contains(nextStep.second)){
-                StepforAI(ai.getTheNextStep())
+                StepforAI(nextStep)
             }else{
-                Log.d("RAND" , "${printBoard()}" )
+                Log.d("RAND" , "/n${printBoard()}/n ilegal step ${nextStep.second} piece ${nextStep.first.name} at pos: ${nextStep.first.position}" )
                 rand()
             }
 
