@@ -308,7 +308,7 @@ class BoardViewModel:  ViewModel() {
         if(currentPlayer.value == PieceColor.BLACK && doai){
 
             val board: Board = Board(copyBoard(), currentPlayer.value!!)
-            /*
+
             val ai = Ai(board)
             var th= Thread{
                 //val step = ai.getTheNextStep()
@@ -325,11 +325,12 @@ class BoardViewModel:  ViewModel() {
             val nextStep = ai.getTheNextStep()
 
             if(getStepsforColor(PieceColor.BLACK).contains(nextStep.second)){
-                rakosgeci(ai.getTheNextStep())
+                StepforAI(ai.getTheNextStep())
             }else{
+                Log.d("RAND" , "${printBoard()}" )
                 rand()
             }
-            */
+
 
 
         }
@@ -342,10 +343,10 @@ class BoardViewModel:  ViewModel() {
                 steps.add(Pair(piece, it))
             }
         }
-        rakosgeci(steps.random())
-        Log.d("RAND" , "${printBoard()}" )
+        StepforAI(steps.random())
+
     }
-    fun rakosgeci(step: Pair<Piece, Pair<Int, Int>>){
+    fun StepforAI(step: Pair<Piece, Pair<Int, Int>>){
         val bestPiece = getPiece(step.first.i, step.first.j)
         step(bestPiece, step.second.first, step.second.second)
     }
