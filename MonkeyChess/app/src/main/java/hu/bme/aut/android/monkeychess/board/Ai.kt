@@ -266,7 +266,7 @@ class Ai(val board: Board) {
             } else {
                 when (it.name) {
                     PieceName.PAWN -> {
-                        value -= (pawnValue + enenemyPawnPosition(it.position))
+                        value -= (pawnValue + aiPawnPos(Pair(7 - it.i,7 - it.j)))
                     }
                     PieceName.KNIGHT -> {
                         value -= (knightValue + knightPositionValue(it.position))
@@ -281,7 +281,7 @@ class Ai(val board: Board) {
                         value -= (queenValue + queenpose(it.position))
                     }
                     PieceName.KING -> {
-                        value -= kingposeEnemy(it.position)
+                        value -= kingpose(Pair(7 - it.i,7 - it.j))
                     }
                     else -> {
 
