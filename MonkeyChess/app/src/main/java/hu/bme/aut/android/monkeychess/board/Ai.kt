@@ -68,6 +68,62 @@ fun aiPawnPos( pair: Pair<Int, Int>): Int {
     return pawnposai[pair.first][pair.second]
 }
 
+fun rookpose( pair: Pair<Int, Int>): Int {
+    val rookpose = arrayOf(
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(5, 10, 10, 10, 10, 10, 10, 5),
+        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+        intArrayOf(0, 0, 0, 5, 5, 0, 0, 0)
+    )
+    return rookpose[pair.first][pair.second]
+}
+
+fun queenpose( pair: Pair<Int, Int>): Int {
+    val queenpose = arrayOf(
+        intArrayOf(-20, -10, -10, -5, -5, -10, -10, -20),
+        intArrayOf(-10, 0, 0, 0, 0, 0, 0, -10),
+        intArrayOf(-10, 0, 5, 5, 5, 5, 0, -10),
+        intArrayOf(-5, 0, 5, 5, 5, 5, 0, -5),
+        intArrayOf(0, 0, 5, 5, 5, 5, 0, -5),
+        intArrayOf(-10, 5, 5, 5, 5, 5, 0, -10),
+        intArrayOf(-10, 0, 5, 0, 0, 0, 0, -10),
+        intArrayOf(-20, -10, -10, -5, -5, -10, -10, -20)
+    )
+    return queenpose[pair.first][pair.second]
+}
+
+fun kingpose( pair: Pair<Int, Int>): Int {
+    val kingpose =  arrayOf(
+    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+    intArrayOf(-20, -30, -30, -40, -40, -30, -30, -20),
+    intArrayOf(-10, -20, -20, -20, -20, -20, -20, -10),
+    intArrayOf( 20,  20,   0,   0,   0,   0,  20,  20),
+    intArrayOf( 20,  30,  10,   0,   0,  10,  30,  20)
+    )
+    return kingpose[pair.first][pair.second]
+}
+fun kingposeEnemy( pair: Pair<Int, Int>): Int {
+    val kingpose =  arrayOf(
+        intArrayOf( 20,  30,  10,   0,   0,  10,  30,  20),
+        intArrayOf( 20,  20,   0,   0,   0,   0,  20,  20),
+        intArrayOf(-10, -20, -20, -20, -20, -20, -20, -10),
+        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30)
+    )
+    return kingpose[pair.first][pair.second]
+}
+
+
 fun getNumberOfSteps(board: Board, color: PieceColor): Int {
     return 5 * board.getStepsforColor(color).size
 }
@@ -195,10 +251,13 @@ class Ai(val board: Board) {
                         value += bishopValue + bishopPositionValue(it.position)
                     }
                     PieceName.ROOK -> {
-                        value += rookValue
+                        value += rookValue + rookpose(it.position)
                     }
                     PieceName.QUEEN -> {
-                        value += queenValue
+                        value += queenValue + queenpose(it.position)
+                    }
+                    PieceName.KING -> {
+                        value += kingpose(it.position)
                     }
                     else -> {
 
@@ -216,10 +275,13 @@ class Ai(val board: Board) {
                         value -= (bishopValue + bishopPositionValue(it.position))
                     }
                     PieceName.ROOK -> {
-                        value -= rookValue
+                        value -= (rookValue + rookpose(it.position))
                     }
                     PieceName.QUEEN -> {
-                        value -= queenValue
+                        value -= (queenValue + queenpose(it.position))
+                    }
+                    PieceName.KING -> {
+                        value -= kingposeEnemy(it.position)
                     }
                     else -> {
 
