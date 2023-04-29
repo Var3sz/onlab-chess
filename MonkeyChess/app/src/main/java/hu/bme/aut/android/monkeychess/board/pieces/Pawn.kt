@@ -12,7 +12,7 @@ data class Pawn(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
-    override var side: Side
+    override var side: Side,
     ) : Piece {
 
     override var position: Pair<Int, Int> = Pair(i,j)

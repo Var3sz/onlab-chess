@@ -1,7 +1,6 @@
 package hu.bme.aut.android.monkeychess.board
 
 import android.util.Log
-import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +14,7 @@ class BoardViewModel:  ViewModel() {
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
     var blackSide = MutableLiveData<Pair<PieceColor, Side>>()
+    var previousMove: Pair<Int, Int>? = null
     //var ai = Ai()
 
     //////////////////////////////////////////////////////////////////////////////
@@ -104,9 +104,9 @@ class BoardViewModel:  ViewModel() {
         runspec: Boolean = true
     ): MutableList<Pair<Int, Int>> {
         val final = mutableListOf<Pair<Int, Int>>()
-        //if(piece.pieceColor == color) {
+        if(piece.pieceColor == color) {
         //debug
-        if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+        //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
             getavalibleStepsInaLine(piece, final)
             //pawn movement
@@ -223,9 +223,25 @@ class BoardViewModel:  ViewModel() {
                 final.remove(Pair(i, piece.j))
                 final.remove(Pair(i + sign, piece.j))
             }
-            if (!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY) {
-                final.add(Pair(i, piece.j))
-                final.remove(Pair(i + sign, piece.j))
+            if(i + sign in 1..6){
+                if(!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY){
+                    final.add(Pair(i, piece.j))
+                    final.remove(Pair(i+sign, piece.j))
+                }
+            }
+
+            //Check for En Passant
+            if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
+                val left = getPiece(piece.i, piece.j - 1)
+                if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                    final.add(Pair(i, piece.j - 1))
+                    final.remove(Pair(left.i, left.j))
+                }
+                val right = getPiece(piece.i, piece.j + 1)
+                if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                    final.add(Pair(i, piece.j + 1))
+                    final.remove(Pair(left.i, left.j))
+                }
             }
         }
     }
@@ -295,11 +311,15 @@ class BoardViewModel:  ViewModel() {
             CastlingStep(piece, i, j)
             //Log.d("CAST", "${piece.hasMoved}")
         }
+        else if(piece.name == PieceName.PAWN){
+            ChangePiece(piece, i, j)
+        }
         //normal
         else {
             ChangePiece(piece, i, j)
-
         }
+
+        previousMove = Pair(i, j)
 
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
@@ -307,7 +327,7 @@ class BoardViewModel:  ViewModel() {
 
         if(currentPlayer.value == PieceColor.BLACK && doai){
             val board: Board = Board(copyBoard(), currentPlayer.value!!)
-            val ai = Ai(board)
+            //val ai = Ai(board)
             var th= Thread{
 
                // Log.d("MINMAx" ,ai.getTheNextStep().toString())
@@ -325,6 +345,8 @@ class BoardViewModel:  ViewModel() {
 
         addPiece(piece)
     }
+
+
 
     
 
