@@ -8,6 +8,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+import java.lang.Math.abs
 
 class BoardViewModel:  ViewModel() {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
@@ -15,6 +16,7 @@ class BoardViewModel:  ViewModel() {
     var currentPlayer = MutableLiveData<PieceColor>()
     var blackSide = MutableLiveData<Pair<PieceColor, Side>>()
     var previousMove: Pair<Int, Int>? = null
+    var chanceForEnPassant: Boolean = false
     //var ai = Ai()
 
     //////////////////////////////////////////////////////////////////////////////
@@ -236,11 +238,13 @@ class BoardViewModel:  ViewModel() {
                 if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
                     final.add(Pair(i, piece.j - 1))
                     final.remove(Pair(left.i, left.j))
+                    chanceForEnPassant = true
                 }
                 val right = getPiece(piece.i, piece.j + 1)
                 if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
                     final.add(Pair(i, piece.j + 1))
                     final.remove(Pair(left.i, left.j))
+                    chanceForEnPassant = true
                 }
             }
         }
@@ -311,8 +315,8 @@ class BoardViewModel:  ViewModel() {
             CastlingStep(piece, i, j)
             //Log.d("CAST", "${piece.hasMoved}")
         }
-        else if(piece.name == PieceName.PAWN){
-            ChangePiece(piece, i, j)
+        else if(piece.name == PieceName.PAWN && chanceForEnPassant){
+            EnPassantStep(piece, i, j)
         }
         //normal
         else {
@@ -320,6 +324,7 @@ class BoardViewModel:  ViewModel() {
         }
 
         previousMove = Pair(i, j)
+        chanceForEnPassant = false
 
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
@@ -348,7 +353,18 @@ class BoardViewModel:  ViewModel() {
 
 
 
-    
+    fun EnPassantStep(piece: Piece, i: Int, j: Int){
+        val left = getPiece(piece.i, piece.j - 1)
+        if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+            ChangePiece(piece, i, j)
+            addPiece(Empty(left.i, left.j))
+        }
+        val right = getPiece(piece.i, piece.j + 1)
+        if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+            ChangePiece(piece, i, j)
+            addPiece(Empty(right.i, right.j))
+        }
+    }
 
     fun CastlingStep(piece: Piece, i: Int, j: Int) {
         val rook: Piece
