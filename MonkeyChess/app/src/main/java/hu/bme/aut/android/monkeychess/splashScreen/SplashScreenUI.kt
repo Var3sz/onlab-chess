@@ -19,7 +19,7 @@ class SplashScreenUI{
     @Composable
     fun SplashScreen(navController: NavController){
         LaunchedEffect(key1 = true){
-            delay(2500L)
+            //delay(2500L)
             if(auth.currentUser != null){
                 navController.navigate("MainMenu_screen")
             }

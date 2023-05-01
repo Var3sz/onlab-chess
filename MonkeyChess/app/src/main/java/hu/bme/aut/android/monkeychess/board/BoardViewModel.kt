@@ -8,7 +8,11 @@ import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+
 import java.lang.Math.abs
+import kotlin.random.Random
+
+
 
 class BoardViewModel:  ViewModel() {
     var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
@@ -225,6 +229,7 @@ class BoardViewModel:  ViewModel() {
                 final.remove(Pair(i, piece.j))
                 final.remove(Pair(i + sign, piece.j))
             }
+
             if(i + sign in 1..6){
                 if(!piece.hasMoved && getPiece(i + sign, piece.j).pieceColor != PieceColor.EMPTY){
                     final.add(Pair(i, piece.j))
@@ -245,31 +250,29 @@ class BoardViewModel:  ViewModel() {
                     final.add(Pair(i, piece.j + 1))
                     final.remove(Pair(left.i, left.j))
                     chanceForEnPassant = true
+
                 }
             }
         }
     }
 
     fun GetValidCastling(piece: Piece, final: MutableList<Pair<Int, Int>>) {
-        if (piece.name == PieceName.KING && !piece.hasMoved) {
-            var rook = getPiece(0, 0)
-            if (piece.side == Side.UP) {
-                if (CheckGapForCastling(rook)) {
-                    final.add(Pair(0, 2))
-                }
-                rook = getPiece(0, 7)
-                if (CheckGapForCastling(rook)) {
-                    final.add(Pair(0, 6))
-                }
-            } else {
-                rook = getPiece(7, 0)
-                if (CheckGapForCastling(rook)) {
-                    final.add(Pair(7, 1))
-                }
-                rook = getPiece(7, 7)
-                if (CheckGapForCastling(rook)) {
-                    final.add(Pair(7, 5))
-                }
+        if (piece.name != PieceName.KING || piece.hasMoved) {
+            return
+        }
+
+        val kingRow = if (piece.side == Side.UP) 0 else 7
+        val rookCandidates = listOf(
+            Pair(kingRow, 0),
+            Pair(kingRow, 7)
+        )
+
+        for (rookPos in rookCandidates) {
+            val rook = getPiece(rookPos.first, rookPos.second)
+            if (rook.name == PieceName.ROOK && !rook.hasMoved &&
+                CheckGapForCastling(rook)) {
+                val kingCol = if (rookPos.second == 0) 2 else 6
+                final.add(Pair(kingRow, kingCol))
             }
         }
     }
@@ -329,18 +332,53 @@ class BoardViewModel:  ViewModel() {
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
         Log.d("FEN" ,printBoard())
-
+        var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         if(currentPlayer.value == PieceColor.BLACK && doai){
+
             val board: Board = Board(copyBoard(), currentPlayer.value!!)
-            //val ai = Ai(board)
+
+
+            val ai = Ai(board)
+
             var th= Thread{
-
-               // Log.d("MINMAx" ,ai.getTheNextStep().toString())
-
-
+                //val step = ai.getTheNextStep()
+               // Log.d("MINMAx" ,step.toString())
+                //Log.d("minmax", "i = ${step.first.i} j = ${step.first.j}")
+                //best = ai.getRandomStep()
             }
-           //th.start()
+            th.start()
+            th.priority = 9
+            th.join()
+            val meu = Board(copyBoard(), PieceColor.BLACK)
+            loadBoard(meu.copyBoard())
+            Log.d("1FEN1" ,meu.printBoard())
+            val nextStep = ai.getTheNextStep()
+
+            if(getStepsforColor(PieceColor.BLACK).contains(nextStep.second)){
+                StepforAI(nextStep)
+            }else{
+                Log.d("RAND" , "/n${printBoard()}/n ilegal step ${nextStep.second} piece ${nextStep.first.name} at pos: ${nextStep.first.position}" )
+                rand()
+            }
+
+
+
         }
+    }
+    fun rand(){
+        val steps = mutableListOf<Pair<Piece, Pair<Int, Int>>>()
+        getPiecesbyColor(PieceColor.BLACK).forEach(){
+            val piece = it
+            getAvailableSteps(piece, PieceColor.BLACK, true).forEach(){
+                steps.add(Pair(piece, it))
+            }
+        }
+        StepforAI(steps.random())
+
+    }
+    fun StepforAI(step: Pair<Piece, Pair<Int, Int>>){
+        val bestPiece = getPiece(step.first.i, step.first.j)
+        step(bestPiece, step.second.first, step.second.second)
     }
 
     fun ChangePiece(piece: Piece, i: Int, j: Int) {
@@ -367,40 +405,24 @@ class BoardViewModel:  ViewModel() {
     }
 
     fun CastlingStep(piece: Piece, i: Int, j: Int) {
-        val rook: Piece
-        if (piece.side == Side.UP) {
-            if (i == 0 && j == 2) {
-                //put king to new place
-                ChangePiece(piece, i, j)
-                //get rook
-                rook = getPiece(0, 0)
-                ChangePiece(rook, i, j + 1)
-            } else if (i == 0 && j == 6) {
-                //put king to new place
-                ChangePiece(piece, i, j)
-                //get rook
-                rook = getPiece(0, 7)
-                ChangePiece(rook, i, j - 1)
-            } else {
-                ChangePiece(piece, i, j)
-            }
-        } else if (piece.side == Side.DOWN) {
-            if (i == 7 && j == 1) {
-                //put king to new place
-                ChangePiece(piece, i, j)
-                //get rook
-                rook = getPiece(7, 0)
-                ChangePiece(rook, i, j + 1)
-            } else if (i == 7 && j == 5) {
-                //put king to new place
-                ChangePiece(piece, i, j)
-                //get rook
-                rook = getPiece(7, 7)
-                ChangePiece(rook, i, j - 1)
-            } else {
-                ChangePiece(piece, i, j)
-            }
+        val kingRow = if (piece.side == Side.UP) 0 else 7
+        val rookCandidates = listOf(
+            getPiece(kingRow, 0),
+            getPiece(kingRow, 7)
+        )
+        val rook : Piece
+        val rookJ: Int
+        if(j == 6) {
+            rook = rookCandidates[1]
+            rookJ = 6 - 1
+            ChangePiece(rook, i, rookJ)
         }
+        else if(j == 2){
+            rook = rookCandidates[0]
+            rookJ = 2 + 1
+            ChangePiece(rook, i, rookJ)
+        }
+        ChangePiece(piece, i, j)
     }
 
     fun ChangeCurrentPlayer() {
@@ -619,7 +641,7 @@ class BoardViewModel:  ViewModel() {
 
                 when(it.pice.pieceColor){
                     PieceColor.BLACK->{
-                        addedChar.uppercase()
+                        addedChar = addedChar.uppercase()[0]
                     }
                     PieceColor.WHITE->{}
                     PieceColor.EMPTY-> {
