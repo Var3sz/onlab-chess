@@ -48,7 +48,11 @@ class ProfileUI {
         val pickImage = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent(),
         ) { uri ->
-            viewModel.uploadPicture(uri, context)
+            if(uri == null){
+                return@rememberLauncherForActivityResult
+            }else{
+                viewModel.uploadPicture(uri, context)
+            }
         }
 
         Box(modifier = Modifier
