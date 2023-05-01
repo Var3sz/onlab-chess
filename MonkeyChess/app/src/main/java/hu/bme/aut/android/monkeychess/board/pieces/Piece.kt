@@ -17,5 +17,4 @@ interface  Piece  {
     var side: Side
     var i: Int
     var j: Int
-
 }
