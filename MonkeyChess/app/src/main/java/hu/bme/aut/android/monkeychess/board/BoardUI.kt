@@ -26,7 +26,6 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class BoardUI {
 
-
     @Composable
     fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel) {
         Box(modifier = Modifier.fillMaxSize(),
@@ -43,7 +42,7 @@ class BoardUI {
 
                 //PlayerOne
                 Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawPalyer(playerOne)
+                    DrawPlayer(playerOne)
                 }
 
                 //ChessBoard
@@ -53,7 +52,7 @@ class BoardUI {
 
                 //PlayerTwo
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawPalyer(playerTwo)
+                    DrawPlayer(playerTwo)
                 }
                 Button(onClick = { viewModel.FlipTheTable() }) {
                     Text(text = "flipy flopity\nyou are my flipity ")
@@ -62,9 +61,8 @@ class BoardUI {
         }
     }
 
-
     @Composable
-    fun DrawPalyer(name: String = "PlayerName") {
+    fun DrawPlayer(name: String = "PlayerName") {
         Row(
             modifier = Modifier
                 .padding(all = 8.dp)
@@ -78,12 +76,7 @@ class BoardUI {
                     .size(40.dp)
                     .clip(CircleShape)
             )
-
-
-
-            // Add a horizontal space between the image and the column
             Spacer(modifier = Modifier.width(8.dp))
-
             Text(
                 text = name,
                 fontWeight = FontWeight.Bold,
@@ -92,14 +85,11 @@ class BoardUI {
         }
     }
 
-
     @Composable
     fun DrawBoard(viewModel :BoardViewModel) {
         val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
-
-        Column(
-        ) {
+        Column {
             for (i in 0 until 8) {
                 Row {
                     for (j in 0 until 8) {
@@ -116,14 +106,26 @@ class BoardUI {
                                     if (viewModel.getValue(i, j) == true) {
                                         viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
-                                       // viewModel.ChangeCurrentPlayer()
+                                        // viewModel.ChangeCurrentPlayer()
                                     } else {
                                         viewModel.HideAvailableSteps()
                                         viewModel.setClickedPiece(viewModel.getPiece(i, j))
 
-                                        Log.d("Board1", "i: ${i}, j: ${j} board value: ${viewModel.getValue(i, j)} babu:${viewModel.getPiece(i, j).pieceColor} ")
+                                        Log.d(
+                                            "Board1",
+                                            "i: ${i}, j: ${j} board value: ${
+                                                viewModel.getValue(
+                                                    i,
+                                                    j
+                                                )
+                                            } babu:${viewModel.getPiece(i, j).pieceColor} "
+                                        )
 
-                                        if (viewModel.getPiece(i, j).pieceColor != PieceColor.EMPTY){
+                                        if (viewModel.getPiece(
+                                                i,
+                                                j
+                                            ).pieceColor != PieceColor.EMPTY
+                                        ) {
                                             val piece = viewModel.getPiece(i, j)
                                             val steps = viewModel.getAvailableSteps(piece)
 
@@ -155,15 +157,14 @@ class BoardUI {
                             if(viewModel.getValue(i,j) == true ){
                                 DrawCircle()
                             }
-
-
+                            
                             if(viewModel.getPiece(i,j).pieceColor != PieceColor.EMPTY)
                                 DrawPiece(viewModel.getPiece(i,j).imageID)
                         }
                     }
                 }
             }
-            DrawPalyer(viewModel.getCurrentPlayer().toString())
+            DrawPlayer(viewModel.getCurrentPlayer().toString())
         }
     }
 
@@ -192,6 +193,12 @@ class BoardUI {
                 style = Stroke(10F)
             )
         }
+    }
+
+    @Composable
+    fun ExchangePieceAlert(){
 
     }
+
+
 }
