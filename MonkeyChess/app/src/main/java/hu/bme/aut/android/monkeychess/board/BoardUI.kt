@@ -1,11 +1,13 @@
 package hu.bme.aut.android.monkeychess.board
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +21,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import hu.bme.aut.android.monkeychess.board.pieces.Piece
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
@@ -157,7 +161,7 @@ class BoardUI {
                             if(viewModel.getValue(i,j) == true ){
                                 DrawCircle()
                             }
-                            
+
                             if(viewModel.getPiece(i,j).pieceColor != PieceColor.EMPTY)
                                 DrawPiece(viewModel.getPiece(i,j).imageID)
                         }
@@ -165,6 +169,11 @@ class BoardUI {
                 }
             }
             DrawPlayer(viewModel.getCurrentPlayer().toString())
+            ExchangePieceAlert(
+                viewModel = viewModel,
+                isOpen = true,
+                onDismiss = { }
+            )
         }
     }
 
@@ -196,7 +205,77 @@ class BoardUI {
     }
 
     @Composable
-    fun ExchangePieceAlert(){
+    fun ExchangePieceAlert(viewModel: BoardViewModel, isOpen: Boolean, onDismiss: () -> Unit){
+        if(isOpen){
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                text = {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        color = Color.Black,
+                        text = "Choose a piece!",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                buttons = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(30.dp, 0.dp, 30.dp, 50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row{
+                            Column{
+                                OutlinedButton(
+                                    modifier = Modifier.size(70.dp),
+                                    onClick = { /*TODO: change figure on click*/ },
+                                    border = BorderStroke(1.dp, Color.Black),
+                                    shape = RoundedCornerShape(50),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                                ) {
+                                    Image(painterResource(id = R.drawable.black_queen), contentDescription = "Black queen")
+                                }
+                                Spacer(Modifier.height(50.dp))
+                                OutlinedButton(
+                                    modifier = Modifier.size(70.dp),
+                                    onClick = { /*TODO: change figure on click*/ },
+                                    border = BorderStroke(1.dp, Color.Black),
+                                    shape = RoundedCornerShape(50),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                                ) {
+                                    Image(painterResource(id = R.drawable.black_rook), contentDescription = "Black queen")
+                                }
+                            }
+                            Spacer(Modifier.width(50.dp))
+                            Column{
+                                OutlinedButton(
+                                    modifier = Modifier.size(70.dp),
+                                    onClick = { /*TODO: change figure on click*/ },
+                                    border = BorderStroke(1.dp, Color.Black),
+                                    shape = RoundedCornerShape(50),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                                ) {
+                                    Image(painterResource(id = R.drawable.black_bishop), contentDescription = "Black queen")
+                                }
+                                Spacer(Modifier.height(50.dp))
+                                OutlinedButton(
+                                    modifier = Modifier.size(70.dp),
+                                    onClick = { /*TODO: change figure on click*/ },
+                                    border = BorderStroke(1.dp, Color.Black),
+                                    shape = RoundedCornerShape(50),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                                ) {
+                                    Image(painterResource(id = R.drawable.black_knight), contentDescription = "Black queen")
+                                }
+                            }
+                        }
+                    }
+                }
+
+            )
+        }
+
 
     }
 
