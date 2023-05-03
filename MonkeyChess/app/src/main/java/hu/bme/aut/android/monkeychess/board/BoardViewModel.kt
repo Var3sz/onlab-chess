@@ -23,6 +23,13 @@ class BoardViewModel:  ViewModel() {
     var chanceForEnPassant: Boolean = false
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
+
+    //FEN variables
+    var whiteCastleQueenSide = true
+    var whiteCastleKingSide = true
+    var blackCastleQueenSide = true
+    var blackCastleKingSide = true
+    var numberOfRounds = 0
     //var ai = Ai()
 
     //////////////////////////////////////////////////////////////////////////////
@@ -131,7 +138,7 @@ class BoardViewModel:  ViewModel() {
                 //Log.d("MATE", "MATE")
             }
 
-            if (runspec == true) {
+            if (runspec) {
                 checkAvailableStepsforCheck(piece, piece.pieceColor, final)
                 //castling
                 if (piece.name == PieceName.KING && !piece.hasMoved) {
@@ -277,6 +284,7 @@ class BoardViewModel:  ViewModel() {
                 final.add(Pair(kingRow, kingCol))
             }
         }
+        return
     }
 
     fun CheckGapForCastling(rook: Piece): Boolean {
@@ -342,6 +350,7 @@ class BoardViewModel:  ViewModel() {
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
         Log.d("FEN" ,printBoard())
+        Log.d("FEN" , createFEN())
         var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         if(currentPlayer.value == PieceColor.BLACK && doai){
 
@@ -664,6 +673,114 @@ class BoardViewModel:  ViewModel() {
             boarfen += "\n"
         }
         return boarfen
+    }
+
+    fun createFEN(): String{
+        //Adding piece placement to Fen
+        var emptyTile = 0
+        var boardFEN = ""
+        tilesLiveData.value?.forEach{
+            it.forEach {
+                var addedChar = ' '
+                when(it.pice.name){
+                    PieceName.PAWN -> {
+                        addedChar = 'p'
+                    }
+                    PieceName.KNIGHT -> {
+                        addedChar = 'n'
+                    }
+                    PieceName.BISHOP -> {
+                        addedChar = 'b'
+                    }
+                    PieceName.ROOK -> {
+                        addedChar = 'r'
+                    }
+                    PieceName.QUEEN -> {
+                        addedChar = 'q'
+                    }
+                    PieceName.KING -> {
+                        addedChar = 'k'
+                    }
+                    else -> {}
+                }
+                when(it.pice.pieceColor){
+                    PieceColor.WHITE->{
+                        addedChar = addedChar.uppercase()[0]
+                    }
+                    PieceColor.BLACK->{}
+                    PieceColor.EMPTY-> {
+                        //addedChar = '-'
+                        emptyTile++
+                        return@forEach
+                    }
+                }
+                if (emptyTile > 0) {
+                    boardFEN += emptyTile.toString()
+                    emptyTile = 0
+                }
+                boardFEN += addedChar
+
+                /*if(blackSide.value?.first == PieceColor.BLACK || blackSide.value?.second == Side.UP){
+                    if (it.pice.name == PieceName.KING && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.hasMoved) {
+                            whiteCastleKingSide = false;
+                            whiteCastleQueenSide = false;
+                        }
+                    } else if (it.pice.name == PieceName.ROOK && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.position.first != 7 && it.pice.position.second != 0)  {
+                            whiteCastleQueenSide = false
+                        } else if (it.pice.position.first != 7 && it.pice.position.second != 7) {
+                            whiteCastleKingSide = false;
+                        }
+                    }
+                }
+                else if(blackSide.value?.first == PieceColor.BLACK || blackSide.value?.second == Side.DOWN){
+                    if (it.pice.name == PieceName.KING && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.hasMoved) {
+                            whiteCastleKingSide = false;
+                            whiteCastleQueenSide = false;
+                        }
+                    } else if (it.pice.name == PieceName.ROOK && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.position.first != 0 && it.pice.position.second != 0)  {
+                            whiteCastleQueenSide = false
+                        } else if (it.pice.position.first != 0 && it.pice.position.second != 7) {
+                            whiteCastleKingSide = false;
+                        }
+                    }
+                }*/
+
+            }
+            if (emptyTile > 0) {
+                if (emptyTile > 1) {
+                    boardFEN += emptyTile.toString()
+                }
+                emptyTile = 0
+             }
+            boardFEN += '/'
+        }
+
+
+        //Drop last '/'char
+        boardFEN = boardFEN.dropLast(1)
+
+        //adding the active color to FEN
+        if(getCurrentPlayer() == PieceColor.WHITE){
+            boardFEN+=" w"
+        }
+        else if(getCurrentPlayer() == PieceColor.BLACK){
+            boardFEN+=" b"
+        }
+
+        boardFEN += " -"    // TODO: CASTLING
+        boardFEN += " - "    // TODO: half move clock
+
+        //Fullmove number
+        if(getCurrentPlayer() == PieceColor.BLACK){
+            numberOfRounds++
+        }
+        boardFEN += numberOfRounds.toString()
+
+        return boardFEN
     }
 
     fun exchangePawn(pieceName: PieceName){
