@@ -26,12 +26,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import hu.bme.aut.android.monkeychess.board.pieces.Piece
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+import okhttp3.internal.connection.Exchange
 
 class BoardUI {
-
     @Composable
     fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel) {
+        val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
+        val blackExchange by viewModel.getBlackExchangeState().observeAsState()
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
@@ -62,6 +65,12 @@ class BoardUI {
                     Text(text = "flipy flopity\nyou are my flipity ")
                 }
             }
+            ExchangePieceAlert(
+                viewModel = viewModel,
+                isWhiteExchange = whiteExchange!!,
+                isBlackExchange = blackExchange!!,
+                onDismiss = { }
+            )
         }
     }
 
@@ -169,11 +178,6 @@ class BoardUI {
                 }
             }
             DrawPlayer(viewModel.getCurrentPlayer().toString())
-            ExchangePieceAlert(
-                viewModel = viewModel,
-                isOpen = true,
-                onDismiss = { }
-            )
         }
     }
 
@@ -205,8 +209,8 @@ class BoardUI {
     }
 
     @Composable
-    fun ExchangePieceAlert(viewModel: BoardViewModel, isOpen: Boolean, onDismiss: () -> Unit){
-        if(isOpen){
+    fun ExchangePieceAlert(viewModel: BoardViewModel, isWhiteExchange: Boolean, isBlackExchange: Boolean,onDismiss: () -> Unit){
+        if(isWhiteExchange || isBlackExchange){
             AlertDialog(
                 onDismissRequest = onDismiss,
                 text = {
@@ -222,51 +226,73 @@ class BoardUI {
                 },
                 buttons = {
                     Box(
-                        modifier = Modifier.fillMaxWidth().padding(30.dp, 0.dp, 30.dp, 50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(30.dp, 0.dp, 30.dp, 50.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Row{
                             Column{
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { /*TODO: change figure on click*/ },
+                                    onClick = { viewModel.exchangePawn(PieceName.QUEEN) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
                                 ) {
-                                    Image(painterResource(id = R.drawable.black_queen), contentDescription = "Black queen")
+                                    if(isWhiteExchange){
+                                        Image(painterResource(id = R.drawable.white_queen), contentDescription = "White bishop")
+                                    }
+                                    if(isBlackExchange){
+                                        Image(painterResource(id = R.drawable.black_queen), contentDescription = "Black bishop")
+                                    }
                                 }
                                 Spacer(Modifier.height(50.dp))
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { /*TODO: change figure on click*/ },
+                                    onClick = { viewModel.exchangePawn(PieceName.ROOK) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
                                 ) {
-                                    Image(painterResource(id = R.drawable.black_rook), contentDescription = "Black queen")
+                                    if(isWhiteExchange){
+                                        Image(painterResource(id = R.drawable.white_rook), contentDescription = "White bishop")
+                                    }
+                                    if(isBlackExchange){
+                                        Image(painterResource(id = R.drawable.black_rook), contentDescription = "Black bishop")
+                                    }
                                 }
                             }
                             Spacer(Modifier.width(50.dp))
                             Column{
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { /*TODO: change figure on click*/ },
+                                    onClick = { viewModel.exchangePawn(PieceName.BISHOP) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
                                 ) {
-                                    Image(painterResource(id = R.drawable.black_bishop), contentDescription = "Black queen")
+                                    if(isWhiteExchange){
+                                        Image(painterResource(id = R.drawable.white_bishop), contentDescription = "White bishop")
+                                    }
+                                    if(isBlackExchange){
+                                        Image(painterResource(id = R.drawable.black_bishop), contentDescription = "Black bishop")
+                                    }
                                 }
                                 Spacer(Modifier.height(50.dp))
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { /*TODO: change figure on click*/ },
+                                    onClick = { viewModel.exchangePawn(PieceName.KNIGHT) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
                                 ) {
-                                    Image(painterResource(id = R.drawable.black_knight), contentDescription = "Black queen")
+                                    if(isWhiteExchange){
+                                        Image(painterResource(id = R.drawable.white_knight), contentDescription = "White knight")
+                                    }
+                                    if(isBlackExchange){
+                                        Image(painterResource(id = R.drawable.black_knight), contentDescription = "Black knight")
+                                    }
                                 }
                             }
                         }
@@ -275,9 +301,5 @@ class BoardUI {
 
             )
         }
-
-
     }
-
-
 }

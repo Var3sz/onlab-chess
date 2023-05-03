@@ -21,6 +21,8 @@ class BoardViewModel:  ViewModel() {
     var blackSide = MutableLiveData<Pair<PieceColor, Side>>()
     var previousMove: Pair<Int, Int>? = null
     var chanceForEnPassant: Boolean = false
+    var whiteExchange = MutableLiveData<Boolean>(false)
+    var blackExchange = MutableLiveData<Boolean>(false)
     //var ai = Ai()
 
     //////////////////////////////////////////////////////////////////////////////
@@ -310,7 +312,7 @@ class BoardViewModel:  ViewModel() {
 
     //////////////////////////////////////////////////////////////////////////////
 //  Different steps and step logic
-    fun step(piece: Piece, i: Int, j: Int, doai: Boolean = true) {
+    fun step(piece: Piece, i: Int, j: Int, doai: Boolean = false) {
         //Log.d("CURR", currentPlayer.value.toString())
         //king castling
        // Log.d("CAST ${piece.name}", "${piece.hasMoved}")
@@ -320,6 +322,14 @@ class BoardViewModel:  ViewModel() {
         }
         else if(piece.name == PieceName.PAWN && chanceForEnPassant){
             EnPassantStep(piece, i, j)
+        }
+        else if (piece.name == PieceName.PAWN && (i == 0 || i == 7) && piece.pieceColor == PieceColor.WHITE) {
+            ChangePiece(piece, i, j)
+            setWhiteExchangeState(true)
+        }
+        else if (piece.name == PieceName.PAWN && (i == 0 || i == 7) && piece.pieceColor == PieceColor.BLACK) {
+            ChangePiece(piece, i, j)
+            setBlackExchangeState(true)
         }
         //normal
         else {
@@ -655,6 +665,65 @@ class BoardViewModel:  ViewModel() {
         }
         return boarfen
     }
+
+    fun exchangePawn(pieceName: PieceName){
+        if(getWhiteExchangeState().value == true){
+            if(pieceName == PieceName.QUEEN){
+                ChangePiece(Queen(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.ROOK){
+                ChangePiece(Rook(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.BISHOP){
+                ChangePiece(Bishop(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.KNIGHT){
+                ChangePiece(Knight(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+        }
+        else if(getBlackExchangeState().value == true){
+            if(pieceName == PieceName.QUEEN){
+                ChangePiece(Queen(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.ROOK){
+                ChangePiece(Rook(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.BISHOP){
+                ChangePiece(Bishop(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.KNIGHT){
+                ChangePiece(Knight(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
+
+            }
+        }
+        setWhiteExchangeState(state = false)
+        setBlackExchangeState(state = false)
+    }
+
+
+    /////////Getters and Setter
+    fun setWhiteExchangeState(state: Boolean){
+        this.whiteExchange.value = state
+    }
+
+    fun getWhiteExchangeState(): MutableLiveData<Boolean>{
+        return whiteExchange
+    }
+    fun setBlackExchangeState(state: Boolean){
+        this.blackExchange.value = state
+    }
+
+    fun getBlackExchangeState(): MutableLiveData<Boolean>{
+        return blackExchange
+    }
+
 }
 
 
