@@ -99,6 +99,7 @@ class Board(){
     }
 
 
+
         fun getAvailableSteps(
             piece: Piece,
             color: PieceColor,
@@ -111,18 +112,21 @@ class Board(){
 
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
-                //Black
-                if (piece.name == PieceName.PAWN && piece.side == Side.UP) {
-                    pawnMovement(piece, final)
-                }
-                //White
-                if (piece.name == PieceName.PAWN && piece.side == Side.DOWN) {
+
+                if (piece.name == PieceName.PAWN) {
                     pawnMovement(piece, final)
                 }
 
+                //castling
+
+
                 if (runspec == true) {
                     checkAvailableStepsforCheck(piece, piece.pieceColor, final)
-                    //castling
+
+                    if (piece.name == PieceName.KING && !piece.hasMoved) {
+                        GetValidCastling(piece, final)
+                    }
+
                 }
 
             }
@@ -224,16 +228,95 @@ class Board(){
             }
         }
     }
-        //////////////////////////////////////////////////////////////////////////////
+
+    fun GetValidCastling(piece: Piece, final: MutableList<Pair<Int, Int>>) {
+        if (piece.name != PieceName.KING || piece.hasMoved) {
+            return
+        }
+
+        val kingRow = if (piece.side == Side.UP) 0 else 7
+        val rookCandidates = listOf(
+            Pair(kingRow, 0),
+            Pair(kingRow, 7)
+        )
+
+        for (rookPos in rookCandidates) {
+            val rook = getPiece(rookPos.first, rookPos.second)
+            if (rook.name == PieceName.ROOK && !rook.hasMoved &&
+                CheckGapForCastling(rook)) {
+                val kingCol = if (rookPos.second == 0) 2 else 6
+                final.add(Pair(kingRow, kingCol))
+            }
+        }
+    }
+
+    fun CheckGapForCastling(rook: Piece): Boolean {
+        val otherSteps = getStepsforColor(rook.pieceColor.oppositeColor())
+        if (rook.name == PieceName.ROOK) {
+            if (!rook.hasMoved) {
+                //check if space is empty between king and rook
+                var j = rook.j
+                while (true) {
+                    if (rook.j == 0) {
+                        j++
+                    }
+                    if (rook.j == 7) {
+                        j--
+                    }
+                    if (otherSteps.contains(Pair(rook.i, j))) {
+                        return false
+                    }
+
+                    if (getPiece(rook.i, j).name == PieceName.KING) {
+                        return true
+                    }
+
+                    if (getPiece(rook.i, j).name != PieceName.EMPTY) {
+                        return false
+                    }
+
+                }
+            }
+        }
+        return false
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
 //  Different steps and step logic
         fun step(piece: Piece, step: Pair<Int, Int>, doai: Boolean = true) {
-
+        if (piece.name == PieceName.KING && !piece.hasMoved) {
+            CastlingStep(piece, step.first, step.second)
+            //Log.d("CAST", "${piece.hasMoved}")
+        }
+        else {
             ChangePiece(piece, step.first, step.second)
-
+        }
             ChangeCurrentPlayer()
         }
 
-        fun ChangePiece(piece: Piece, i: Int, j: Int) {
+    fun CastlingStep(piece: Piece, i: Int, j: Int) {
+        val kingRow = if (piece.side == Side.UP) 0 else 7
+        val rookCandidates = listOf(
+            getPiece(kingRow, 0),
+            getPiece(kingRow, 7)
+        )
+        val rook : Piece
+        val rookJ: Int
+        if(j == 6) {
+            rook = rookCandidates[1]
+            rookJ = 6 - 1
+            ChangePiece(rook, i, rookJ)
+        }
+        else if(j == 2){
+            rook = rookCandidates[0]
+            rookJ = 2 + 1
+            ChangePiece(rook, i, rookJ)
+        }
+        ChangePiece(piece, i, j)
+    }
+
+
+    fun ChangePiece(piece: Piece, i: Int, j: Int) {
             addPiece(Empty(piece.i,piece.j))
 
             piece.step(i, j)

@@ -7,127 +7,6 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
-val pawnValue = 100
-val bishopValue = 300
-val knightValue = 300
-val rookValue = 500
-val queenValue = 900
-
-fun bishopPositionValue( pair: Pair<Int, Int>): Int {
-    var bishoppos = arrayOf(
-        intArrayOf(-5, -5, -5, -5, -5, -5, -5, -5),
-        intArrayOf(-5, 10, 5, 8, 8, 5, 10, -5),
-        intArrayOf(-5, 5, 3, 8, 8, 3, 5, -5),
-        intArrayOf(-5, 3, 10, 3, 3, 10, 3, -5),
-        intArrayOf(-5, 3, 10, 3, 3, 10, 3, -5),
-        intArrayOf(-5, 5, 3, 8, 8, 3, 5, -5),
-        intArrayOf(-5, 10, 5, 8, 8, 5, 10, -5),
-        intArrayOf(-5, -5, -5, -5, -5, -5, -5, -5)
-    )
-    return bishoppos[pair.first][pair.second]
-}
-fun knightPositionValue( pair: Pair<Int, Int>): Int {
-    var knightpos = arrayOf(
-    intArrayOf(-10, -5, -5, -5, -5, -5, -5, -10),
-    intArrayOf(-8, 0, 0, 3, 3, 0, 0, -8),
-    intArrayOf(-8, 0, 10, 8, 8, 10, 0, -8),
-    intArrayOf(-8, 0, 8, 10, 10, 8, 0, -8),
-    intArrayOf(-8, 0, 8, 10, 10, 8, 0, -8),
-    intArrayOf(-8, 0, 10, 8, 8, 10, 0, -8),
-    intArrayOf(-8, 0, 0, 3, 3, 0, 0, -8),
-    intArrayOf(-10, -5, -5, -5, -5, -5, -5, -10)
-    )
-    return knightpos[pair.first][pair.second]
-}
-
-fun enenemyPawnPosition( pair: Pair<Int, Int>): Int {
-    val pawnposEnemy = arrayOf(
-        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
-        intArrayOf(5, 10, 15, 20, 20, 15, 10, 5),
-        intArrayOf(4, 8, 12, 16, 16, 12, 8, 4),
-        intArrayOf(0, 6, 9, 10, 10, 9, 6, 0),
-        intArrayOf(0, 4, 6, 10, 10, 6, 4, 0),
-        intArrayOf(0, 2, 3, 4, 4, 3, 2, 0),
-        intArrayOf(0, 0, 0, -5, -5, 0, 0, 0),
-        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
-    )
-    return pawnposEnemy[pair.first][pair.second]
-}
-
-fun aiPawnPos( pair: Pair<Int, Int>): Int {
-    val pawnposai = arrayOf(
-        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
-        intArrayOf(0, 0, 0, -5, -5, 0, 0, 0),
-        intArrayOf(0, 2, 3, 4, 4, 3, 2, 0),
-        intArrayOf(0, 4, 6, 10, 10, 6, 4, 0),
-        intArrayOf(0, 6, 9, 10, 10, 9, 6, 0),
-        intArrayOf(4, 8, 12, 16, 16, 12, 8, 4),
-        intArrayOf(5, 10, 15, 20, 20, 15, 10, 5),
-        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
-    )
-    return pawnposai[pair.first][pair.second]
-}
-
-fun rookpose( pair: Pair<Int, Int>): Int {
-    val rookpose = arrayOf(
-        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
-        intArrayOf(5, 10, 10, 10, 10, 10, 10, 5),
-        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
-        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
-        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
-        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
-        intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
-        intArrayOf(0, 0, 0, 5, 5, 0, 0, 0)
-    )
-    return rookpose[pair.first][pair.second]
-}
-
-fun queenpose( pair: Pair<Int, Int>): Int {
-    val queenpose = arrayOf(
-        intArrayOf(-20, -10, -10, -5, -5, -10, -10, -20),
-        intArrayOf(-10, 0, 0, 0, 0, 0, 0, -10),
-        intArrayOf(-10, 0, 5, 5, 5, 5, 0, -10),
-        intArrayOf(-5, 0, 5, 5, 5, 5, 0, -5),
-        intArrayOf(0, 0, 5, 5, 5, 5, 0, -5),
-        intArrayOf(-10, 5, 5, 5, 5, 5, 0, -10),
-        intArrayOf(-10, 0, 5, 0, 0, 0, 0, -10),
-        intArrayOf(-20, -10, -10, -5, -5, -10, -10, -20)
-    )
-    return queenpose[pair.first][pair.second]
-}
-
-fun kingpose( pair: Pair<Int, Int>): Int {
-    val kingpose =  arrayOf(
-    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-    intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-    intArrayOf(-20, -30, -30, -40, -40, -30, -30, -20),
-    intArrayOf(-10, -20, -20, -20, -20, -20, -20, -10),
-    intArrayOf( 20,  20,   0,   0,   0,   0,  20,  20),
-    intArrayOf( 20,  30,  10,   0,   0,  10,  30,  20)
-    )
-    return kingpose[pair.first][pair.second]
-}
-fun kingposeEnemy( pair: Pair<Int, Int>): Int {
-    val kingpose =  arrayOf(
-        intArrayOf( 20,  30,  10,   0,   0,  10,  30,  20),
-        intArrayOf( 20,  20,   0,   0,   0,   0,  20,  20),
-        intArrayOf(-10, -20, -20, -20, -20, -20, -20, -10),
-        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
-        intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30)
-    )
-    return kingpose[pair.first][pair.second]
-}
-
-
-fun getNumberOfSteps(board: Board, color: PieceColor): Int {
-    return 5 * board.getStepsforColor(color).size
-}
-
 
 
 
@@ -138,6 +17,116 @@ class Ai(val board: Board) {
     var bestChoice: Pair<Piece, Pair<Int, Int>> = Pair(Empty(-1, -1), Pair(-1, -1))
 
     private val aiColor = PieceColor.BLACK
+
+
+    val pawnValue = 100
+    val bishopValue = 300
+    val knightValue = 300
+    val rookValue = 500
+    val queenValue = 900
+
+    fun bishopPositionValue( pair: Pair<Int, Int>): Int {
+        var bishoppos = arrayOf(
+            intArrayOf(-5, -5, -5, -5, -5, -5, -5, -5),
+            intArrayOf(-5, 10, 5, 8, 8, 5, 10, -5),
+            intArrayOf(-5, 5, 3, 8, 8, 3, 5, -5),
+            intArrayOf(-5, 3, 10, 3, 3, 10, 3, -5),
+            intArrayOf(-5, 3, 10, 3, 3, 10, 3, -5),
+            intArrayOf(-5, 5, 3, 8, 8, 3, 5, -5),
+            intArrayOf(-5, 10, 5, 8, 8, 5, 10, -5),
+            intArrayOf(-5, -5, -5, -5, -5, -5, -5, -5)
+        )
+        return bishoppos[pair.first][pair.second]
+    }
+    fun knightPositionValue( pair: Pair<Int, Int>): Int {
+        var knightpos = arrayOf(
+            intArrayOf(-10, -5, -5, -5, -5, -5, -5, -10),
+            intArrayOf(-8, 0, 0, 3, 3, 0, 0, -8),
+            intArrayOf(-8, 0, 10, 8, 8, 10, 0, -8),
+            intArrayOf(-8, 0, 8, 10, 10, 8, 0, -8),
+            intArrayOf(-8, 0, 8, 10, 10, 8, 0, -8),
+            intArrayOf(-8, 0, 10, 8, 8, 10, 0, -8),
+            intArrayOf(-8, 0, 0, 3, 3, 0, 0, -8),
+            intArrayOf(-10, -5, -5, -5, -5, -5, -5, -10)
+        )
+        return knightpos[pair.first][pair.second]
+    }
+
+    fun enenemyPawnPosition( pair: Pair<Int, Int>): Int {
+        val pawnposEnemy = arrayOf(
+            intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+            intArrayOf(5, 10, 15, 20, 20, 15, 10, 5),
+            intArrayOf(4, 8, 12, 16, 16, 12, 8, 4),
+            intArrayOf(0, 6, 9, 10, 10, 9, 6, 0),
+            intArrayOf(0, 4, 6, 10, 10, 6, 4, 0),
+            intArrayOf(0, 2, 3, 4, 4, 3, 2, 0),
+            intArrayOf(0, 0, 0, -5, -5, 0, 0, 0),
+            intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
+        )
+        return pawnposEnemy[pair.first][pair.second]
+    }
+
+    fun aiPawnPos( pair: Pair<Int, Int>): Int {
+        val pawnposai = arrayOf(
+            intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+            intArrayOf(0, 0, 0, -5, -5, 0, 0, 0),
+            intArrayOf(0, 2, 3, 4, 4, 3, 2, 0),
+            intArrayOf(0, 4, 6, 10, 10, 6, 4, 0),
+            intArrayOf(0, 6, 9, 10, 10, 9, 6, 0),
+            intArrayOf(4, 8, 12, 16, 16, 12, 8, 4),
+            intArrayOf(5, 10, 15, 20, 20, 15, 10, 5),
+            intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
+        )
+        return pawnposai[pair.first][pair.second]
+    }
+
+    fun rookpose( pair: Pair<Int, Int>): Int {
+        val rookpose = arrayOf(
+            intArrayOf(0, 0, 0, 0, 0, 0, 0, 0),
+            intArrayOf(5, 10, 10, 10, 10, 10, 10, 5),
+            intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+            intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+            intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+            intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+            intArrayOf(-5, 0, 0, 0, 0, 0, 0, -5),
+            intArrayOf(0, 0, 0, 5, 5, 0, 0, 0)
+        )
+        return rookpose[pair.first][pair.second]
+    }
+
+    fun queenpose( pair: Pair<Int, Int>): Int {
+        val queenpose = arrayOf(
+            intArrayOf(-20, -10, -10, -5, -5, -10, -10, -20),
+            intArrayOf(-10, 0, 0, 0, 0, 0, 0, -10),
+            intArrayOf(-10, 0, 5, 5, 5, 5, 0, -10),
+            intArrayOf(-5, 0, 5, 5, 5, 5, 0, -5),
+            intArrayOf(0, 0, 5, 5, 5, 5, 0, -5),
+            intArrayOf(-10, 5, 5, 5, 5, 5, 0, -10),
+            intArrayOf(-10, 0, 5, 0, 0, 0, 0, -10),
+            intArrayOf(-20, -10, -10, -5, -5, -10, -10, -20)
+        )
+        return queenpose[pair.first][pair.second]
+    }
+
+    fun kingpose( pair: Pair<Int, Int>): Int {
+        val kingpose =  arrayOf(
+            intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+            intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+            intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+            intArrayOf(-30, -40, -40, -50, -50, -40, -40, -30),
+            intArrayOf(-20, -30, -30, -40, -40, -30, -30, -20),
+            intArrayOf(-10, -20, -20, -20, -20, -20, -20, -10),
+            intArrayOf( 20,  20,   0,   0,   0,   0,  20,  20),
+            intArrayOf( 20,  30,  10,   0,   0,  10,  30,  20)
+        )
+        return kingpose[pair.first][pair.second]
+    }
+
+
+
+    fun getNumberOfSteps(board: Board, color: PieceColor): Int {
+        return 5 * board.getStepsforColor(color).size
+    }
 
 
     fun getTheNextStep(): Pair<Piece, Pair<Int, Int>> {
@@ -199,7 +188,7 @@ class Ai(val board: Board) {
                 val tmp = Board(board.copyBoard(), aiColor.oppositeColor())
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
                 tmp.step(tmpPiece,steps[i].second)
-               // Log.d("MAX", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
+                //Log.d("MAX", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
                 //new board eval
                 val value = minimax(tmp, depth-1, false, alpha, beta)
                 max = Math.max(value, max)
@@ -222,7 +211,7 @@ class Ai(val board: Board) {
                 val tmp = Board(board.copyBoard(), aiColor)
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
                 tmp.step(tmpPiece, steps[i].second)
-
+                //Log.d("MIN", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
                 //new board eval
                 val value = minimax(tmp, depth-1, true, alpha, beta)
                 min=Math.min(value, min)
@@ -295,6 +284,7 @@ class Ai(val board: Board) {
     }
 
 }
+
 
 class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
     val board = mutableListOf<MutableList<Tile>>()
@@ -615,17 +605,4 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
         return boarfen
     }
 
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
