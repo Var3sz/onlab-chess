@@ -110,9 +110,9 @@ class BoardViewModel:  ViewModel() {
         runspec: Boolean = true
     ): MutableList<Pair<Int, Int>> {
         val final = mutableListOf<Pair<Int, Int>>()
-        if(piece.pieceColor == color) {
+        //if(piece.pieceColor == color) {
         //debug
-        //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+        if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
             getavalibleStepsInaLine(piece, final)
             //pawn movement
@@ -239,17 +239,22 @@ class BoardViewModel:  ViewModel() {
 
             //Check for En Passant
             if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
-                val left = getPiece(piece.i, piece.j - 1)
-                if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
-                    final.add(Pair(i, piece.j - 1))
-                    final.remove(Pair(left.i, left.j))
-                    chanceForEnPassant = true
+
+                if(piece.j  > 0 ) {
+                    val left = getPiece(piece.i, piece.j - 1)
+                    if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                        final.add(Pair(i, piece.j - 1))
+                        final.remove(Pair(left.i, left.j))
+                        chanceForEnPassant = true
+                    }
                 }
-                val right = getPiece(piece.i, piece.j + 1)
-                if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
-                    final.add(Pair(i, piece.j + 1))
-                    final.remove(Pair(left.i, left.j))
-                    chanceForEnPassant = true
+
+                if(piece.j < 7) {
+                    val right = getPiece(piece.i, piece.j + 1)
+                    if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                        final.add(Pair(i, piece.j + 1))
+                        chanceForEnPassant = true
+                    }
 
                 }
             }
@@ -392,15 +397,19 @@ class BoardViewModel:  ViewModel() {
 
 
     fun EnPassantStep(piece: Piece, i: Int, j: Int){
-        val left = getPiece(piece.i, piece.j - 1)
-        if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
-            ChangePiece(piece, i, j)
-            addPiece(Empty(left.i, left.j))
+        if(piece.j > 0) {
+            val left = getPiece(piece.i, piece.j - 1)
+            if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                ChangePiece(piece, i, j)
+                addPiece(Empty(left.i, left.j))
+            }
         }
-        val right = getPiece(piece.i, piece.j + 1)
-        if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
-            ChangePiece(piece, i, j)
-            addPiece(Empty(right.i, right.j))
+        if(piece.j < 7) {
+            val right = getPiece(piece.i, piece.j + 1)
+            if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                ChangePiece(piece, i, j)
+                addPiece(Empty(right.i, right.j))
+            }
         }
     }
 
