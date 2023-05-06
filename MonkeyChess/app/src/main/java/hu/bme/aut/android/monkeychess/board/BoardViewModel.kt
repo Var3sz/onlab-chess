@@ -357,6 +357,9 @@ class BoardViewModel:  ViewModel() {
         Log.d("FEN" ,printBoard())
         Log.d("FEN" , createFEN())
         var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
+        Log.d("NEW BOARD", Board("").printBoard())
+
+
         if(currentPlayer.value == PieceColor.BLACK && doai){
 
             val board: Board = Board(copyBoard(), currentPlayer.value!!)
@@ -793,42 +796,32 @@ class BoardViewModel:  ViewModel() {
     }
 
     fun exchangePawn(pieceName: PieceName){
-        if(getWhiteExchangeState().value == true){
+        var exchangeColor: PieceColor = PieceColor.EMPTY
+        if(getWhiteExchangeState().value == true) {
+            exchangeColor = PieceColor.WHITE
+        }
+        else if(getBlackExchangeState().value == true) {
+            exchangeColor = PieceColor.BLACK
+        }
+        if(exchangeColor != PieceColor.EMPTY){
             if(pieceName == PieceName.QUEEN){
-                ChangePiece(Queen(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+                ChangePiece(Queen(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
 
             }
             else if(pieceName == PieceName.ROOK){
-                ChangePiece(Rook(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+                ChangePiece(Rook(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
 
             }
             else if(pieceName == PieceName.BISHOP){
-                ChangePiece(Bishop(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+                ChangePiece(Bishop(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
 
             }
             else if(pieceName == PieceName.KNIGHT){
-                ChangePiece(Knight(PieceColor.WHITE, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+                ChangePiece(Knight(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
 
             }
         }
-        else if(getBlackExchangeState().value == true){
-            if(pieceName == PieceName.QUEEN){
-                ChangePiece(Queen(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
 
-            }
-            else if(pieceName == PieceName.ROOK){
-                ChangePiece(Rook(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
-
-            }
-            else if(pieceName == PieceName.BISHOP){
-                ChangePiece(Bishop(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
-
-            }
-            else if(pieceName == PieceName.KNIGHT){
-                ChangePiece(Knight(PieceColor.BLACK, previousMove!!.first, previousMove!!.second, Side.DOWN), previousMove!!.first, previousMove!!.second)
-
-            }
-        }
         setWhiteExchangeState(state = false)
         setBlackExchangeState(state = false)
     }
