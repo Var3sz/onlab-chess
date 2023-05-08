@@ -75,7 +75,8 @@ class MainMenuUI {
                 navController.navigate("board_screen")
             })
             //Multi Player button
-            MainButtons(text = "Multi Player", click =  {Log.d("MainMenu", " Multi Player clicked" )})
+            MainButtons(text = "Multi Player", click =  {Log.d("MainMenu", " Multi Player clicked" )
+                navController.navigate("board_1v1")})
             //Puzzles button
             MainButtons(text = "Puzzles",  click = {Log.d("MainMenu", " Puzzles clicked" )})
             //Friends button

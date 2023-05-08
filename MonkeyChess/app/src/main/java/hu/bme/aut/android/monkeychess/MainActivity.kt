@@ -23,6 +23,7 @@ import hu.bme.aut.android.monkeychess.register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassUI
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
 import hu.bme.aut.android.monkeychess.mainMenu.MainMenuViewModel
@@ -92,9 +93,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable("board_screen"){
-                val viewModel =BoardViewModel()
+                val viewModel =BoardViewModel(true, PieceColor.WHITE)
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
+            composable("board_1v1"){
+                val viewModel =BoardViewModel(false, PieceColor.EMPTY)
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
+            }
+
             composable("profile_screen"){
                 val viewModel = ProfileViewModel()
                 TopAppBarWidget(navController = navController, content = { ProfileUI().ProfileScreen(viewModel, navController = navController) }, bottomBar = {})

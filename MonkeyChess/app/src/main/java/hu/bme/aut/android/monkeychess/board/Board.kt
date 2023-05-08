@@ -1,18 +1,34 @@
 package hu.bme.aut.android.monkeychess.board
 
+import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.MutableLiveData
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class Board(){
-    val board = mutableListOf<MutableList<Tile>>()
-    var currentPlayer: PieceColor = PieceColor.EMPTY
+
+    var board = mutableListOf<MutableList<Tile>>()
+    var currentPlayerBoard: PieceColor = PieceColor.EMPTY
+    var previousMove: Pair<Int, Int>? = null
+
+    var chanceForEnPassant: Boolean = false
+    var whiteExchange = MutableLiveData<Boolean>(false)
+    var blackExchange = MutableLiveData<Boolean>(false)
+
+    //FEN variables
+    var whiteCastleQueenSide = true
+    var whiteCastleKingSide = true
+    var blackCastleQueenSide = true
+    var blackCastleKingSide = true
+    var numberOfRounds = 0
+
 
 
     constructor(pieces: MutableList<Piece>, color: PieceColor) : this() {
-        currentPlayer = color
+        currentPlayerBoard = color
         for (i in 0 until 8) {
             val rowList = mutableListOf<Tile>()
             for (j in 0 until 8) {
@@ -95,6 +111,7 @@ class Board(){
                 }
                 board.add(rowList)
             }
+
         }
     }
 
@@ -106,6 +123,7 @@ class Board(){
             runspec: Boolean = true
         ): MutableList<Pair<Int, Int>> {
             val final = mutableListOf<Pair<Int, Int>>()
+
             //if(piece.pieceColor == color) {
             //debug
             if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
@@ -226,7 +244,35 @@ class Board(){
                     final.remove(Pair(i + sign, piece.j))
                 }
             }
+
+            /*
+            //Check for En Passant
+            if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
+
+                if(piece.j  > 0 ) {
+                    val left = getPiece(piece.i, piece.j - 1)
+                    if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                        final.add(Pair(i, piece.j - 1))
+                        final.remove(Pair(left.i, left.j))
+                        chanceForEnPassant = true
+                    }
+                }
+
+                if(piece.j < 7) {
+                    val right = getPiece(piece.i, piece.j + 1)
+                    if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                        final.add(Pair(i, piece.j + 1))
+                        chanceForEnPassant = true
+                    }
+
+                }
+            }
+
+             */
+
+
         }
+
     }
 
     fun GetValidCastling(piece: Piece, final: MutableList<Pair<Int, Int>>) {
@@ -248,6 +294,7 @@ class Board(){
                 final.add(Pair(kingRow, kingCol))
             }
         }
+        return
     }
 
     fun CheckGapForCastling(rook: Piece): Boolean {
@@ -283,16 +330,87 @@ class Board(){
 
     //////////////////////////////////////////////////////////////////////////////
 //  Different steps and step logic
-        fun step(piece: Piece, step: Pair<Int, Int>, doai: Boolean = true) {
+    fun step(piece: Piece, i: Int, j: Int, doai: Boolean = true) {
+        //Log.d("CURR", currentPlayer.value.toString())
+        //king castling
+        // Log.d("CAST ${piece.name}", "${piece.hasMoved}")
         if (piece.name == PieceName.KING && !piece.hasMoved) {
-            CastlingStep(piece, step.first, step.second)
+            CastlingStep(piece, i, j)
             //Log.d("CAST", "${piece.hasMoved}")
         }
+        else if(piece.name == PieceName.PAWN && chanceForEnPassant){
+            EnPassantStep(piece, i, j)
+        }
+        else if (piece.name == PieceName.PAWN && (i == 0 || i == 7) && piece.pieceColor == PieceColor.WHITE) {
+            ChangePiece(piece, i, j)
+            setWhiteExchangeState(true)
+        }
+        else if (piece.name == PieceName.PAWN && (i == 0 || i == 7) && piece.pieceColor == PieceColor.BLACK) {
+            ChangePiece(piece, i, j)
+            setBlackExchangeState(true)
+        }
+        //normal
         else {
-            ChangePiece(piece, step.first, step.second)
+            ChangePiece(piece, i, j)
         }
-            ChangeCurrentPlayer()
+
+        previousMove = Pair(i, j)
+        chanceForEnPassant = false
+
+        //checkForCheck(piece.pieceColor)
+        ChangeCurrentPlayer()
+        //Log.d("FEN" ,printBoard())
+        //Log.d("FEN" , createFEN())
+        var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
+        //Log.d("NEW BOARD", Board("").printBoard())
+
+    }
+
+     fun doAiStep(aiColor: PieceColor) {
+         val boardForAi: Board = Board(copyBoard(), currentPlayerBoard)
+         val ai = Ai(boardForAi, aiColor)
+         ai.board = boardForAi
+         val nextStep = ai.getTheNextStep()
+
+         if(getStepsforColor(aiColor).contains(nextStep.second)){
+            StepforAI(nextStep)
+         }else{
+            Log.d("RAND" , "/n${printBoard()}/n ilegal step ${nextStep.second} piece ${nextStep.first.name} at pos: ${nextStep.first.position}" )
+            rand()
+         }
+    }
+    fun rand(){
+        val steps = mutableListOf<Pair<Piece, Pair<Int, Int>>>()
+        getPiecesbyColor(PieceColor.BLACK).forEach(){
+            val piece = it
+            getAvailableSteps(piece, PieceColor.BLACK, true).forEach(){
+                steps.add(Pair(piece, it))
+            }
         }
+        StepforAI(steps.random())
+    }
+
+    fun StepforAI(step: Pair<Piece, Pair<Int, Int>>){
+        val bestPiece = getPiece(step.first.i, step.first.j)
+        step(bestPiece, step.second.first, step.second.second)
+    }
+
+    fun EnPassantStep(piece: Piece, i: Int, j: Int){
+        if(piece.j > 0) {
+            val left = getPiece(piece.i, piece.j - 1)
+            if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                ChangePiece(piece, i, j)
+                addPiece(Empty(left.i, left.j))
+            }
+        }
+        if(piece.j < 7) {
+            val right = getPiece(piece.i, piece.j + 1)
+            if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                ChangePiece(piece, i, j)
+                addPiece(Empty(right.i, right.j))
+            }
+        }
+    }
 
     fun CastlingStep(piece: Piece, i: Int, j: Int) {
         val kingRow = if (piece.side == Side.UP) 0 else 7
@@ -325,7 +443,7 @@ class Board(){
         }
 
         fun ChangeCurrentPlayer() {
-            currentPlayer = currentPlayer.oppositeColor()
+            currentPlayerBoard = currentPlayerBoard.oppositeColor()
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -359,7 +477,8 @@ class Board(){
         }
 
         fun getPiece(pos: Pair<Int, Int>): Piece {
-        return board.get(pos.first).get(pos.second).pice
+            val piece = board.get(pos.first).get(pos.second).pice
+            return  piece
         }
 
         fun getStepsforColor(color: PieceColor, runspec: Boolean = false): List<Pair<Int, Int>> {
@@ -383,14 +502,35 @@ class Board(){
         return steps
     }
 
+    fun getValue(row: Int, col: Int): Boolean? {
+        return board.getOrNull(row)?.getOrNull(col)?.free
+    }
+
+
+
         //////////////////////////////////////////////////////////////////////////////
 // setters for pieces or bord information
-        fun addPiece(piece: Piece) {
-            var rowlist = board.get(piece.i)
-            rowlist[piece.j] = Tile(false, piece)
-        }
+    fun addPiece(piece: Piece) {
+        var rowlist = board.get(piece.i)
+        rowlist[piece.j] = Tile(false, piece)
+    }
 
-        ///////////////////////////////////////
+    fun HideAvailableSteps() {
+        for (i in 0 until 8) {
+            for (j in 0 until 8) {
+                setValue(i, j, false)
+            }
+        }
+    }
+
+    fun setValue(row: Int, col: Int, value: Boolean) {
+        board.get(row).get(col).free = value
+    }
+
+
+
+
+    ///////////////////////////////////////
         //copy board
         fun copyBoard(): MutableList<Piece> {
             val copied = mutableListOf<Piece>()
@@ -487,4 +627,194 @@ class Board(){
         return boarfen
     }
 
+    fun createFEN(): String{
+        //Adding piece placement to Fen
+        var emptyTile = 0
+        var boardFEN = ""
+        board.forEach{
+            it.forEach {
+                var addedChar = ' '
+                when(it.pice.name){
+                    PieceName.PAWN -> {
+                        addedChar = 'p'
+                    }
+                    PieceName.KNIGHT -> {
+                        addedChar = 'n'
+                    }
+                    PieceName.BISHOP -> {
+                        addedChar = 'b'
+                    }
+                    PieceName.ROOK -> {
+                        addedChar = 'r'
+                    }
+                    PieceName.QUEEN -> {
+                        addedChar = 'q'
+                    }
+                    PieceName.KING -> {
+                        addedChar = 'k'
+                    }
+                    else -> {}
+                }
+                when(it.pice.pieceColor){
+                    PieceColor.WHITE->{
+                        addedChar = addedChar.uppercase()[0]
+                    }
+                    PieceColor.BLACK->{}
+                    PieceColor.EMPTY-> {
+                        //addedChar = '-'
+                        emptyTile++
+                        return@forEach
+                    }
+                }
+                if (emptyTile > 0) {
+                    boardFEN += emptyTile.toString()
+                    emptyTile = 0
+                }
+                boardFEN += addedChar
+
+                /*if(blackSide.value?.first == PieceColor.BLACK || blackSide.value?.second == Side.UP){
+                    if (it.pice.name == PieceName.KING && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.hasMoved) {
+                            whiteCastleKingSide = false;
+                            whiteCastleQueenSide = false;
+                        }
+                    } else if (it.pice.name == PieceName.ROOK && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.position.first != 7 && it.pice.position.second != 0)  {
+                            whiteCastleQueenSide = false
+                        } else if (it.pice.position.first != 7 && it.pice.position.second != 7) {
+                            whiteCastleKingSide = false;
+                        }
+                    }
+                }
+                else if(blackSide.value?.first == PieceColor.BLACK || blackSide.value?.second == Side.DOWN){
+                    if (it.pice.name == PieceName.KING && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.hasMoved) {
+                            whiteCastleKingSide = false;
+                            whiteCastleQueenSide = false;
+                        }
+                    } else if (it.pice.name == PieceName.ROOK && it.pice.pieceColor == PieceColor.WHITE) {
+                        if (it.pice.position.first != 0 && it.pice.position.second != 0)  {
+                            whiteCastleQueenSide = false
+                        } else if (it.pice.position.first != 0 && it.pice.position.second != 7) {
+                            whiteCastleKingSide = false;
+                        }
+                    }
+                }*/
+
+            }
+            if (emptyTile > 0) {
+                if (emptyTile > 1) {
+                    boardFEN += emptyTile.toString()
+                }
+                emptyTile = 0
+            }
+            boardFEN += '/'
+        }
+
+
+        //Drop last '/'char
+        boardFEN = boardFEN.dropLast(1)
+
+        //adding the active color to FEN
+        if(currentPlayerBoard == PieceColor.WHITE){
+            boardFEN+=" w"
+        }
+        else if(currentPlayerBoard == PieceColor.BLACK){
+            boardFEN+=" b"
+        }
+
+        boardFEN += " -"    // TODO: CASTLING
+        boardFEN += " - "    // TODO: half move clock
+
+        //Fullmove number
+        if(currentPlayerBoard == PieceColor.BLACK){
+            numberOfRounds++
+        }
+        boardFEN += numberOfRounds.toString()
+
+        return boardFEN
     }
+
+    fun exchangePawn(pieceName: PieceName){
+        var exchangeColor: PieceColor = PieceColor.EMPTY
+        if(getWhiteExchangeState().value == true) {
+            exchangeColor = PieceColor.WHITE
+        }
+        else if(getBlackExchangeState().value == true) {
+            exchangeColor = PieceColor.BLACK
+        }
+        if(exchangeColor != PieceColor.EMPTY){
+            if(pieceName == PieceName.QUEEN){
+                ChangePiece(Queen(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.ROOK){
+                ChangePiece(Rook(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.BISHOP){
+                ChangePiece(Bishop(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+            else if(pieceName == PieceName.KNIGHT){
+                ChangePiece(Knight(exchangeColor, previousMove!!.first, previousMove!!.second, Side.UP), previousMove!!.first, previousMove!!.second)
+
+            }
+        }
+
+        setWhiteExchangeState(state = false)
+        setBlackExchangeState(state = false)
+    }
+
+
+    /////////Getters and Setter
+    fun setWhiteExchangeState(state: Boolean){
+        this.whiteExchange.value = state
+    }
+
+    fun getWhiteExchangeState(): MutableLiveData<Boolean>{
+        return whiteExchange
+    }
+    fun setBlackExchangeState(state: Boolean){
+        this.blackExchange.value = state
+    }
+
+    fun getBlackExchangeState(): MutableLiveData<Boolean>{
+        return blackExchange
+    }
+
+    fun FlipTheTable() {
+        val listOfPieces = getAllPieces()
+        val tiles = board
+
+        listOfPieces.forEach() {
+            it.flip()
+            //Log.d("FLIP", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+        }
+
+
+        for (i in 0 until 8) {
+            val newRowList = tiles?.get(i)
+            for (j in 0 until 8) {
+                var add = false
+                listOfPieces.forEach() {
+                    if (it.position == Pair(i, j)) {
+                        newRowList?.set(j, Tile(false, it))
+                        //Log.d("FLIP", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
+                        add = true
+                    }
+                }
+                if (!add)
+                    newRowList?.set(j, Tile(false, Empty(i,j)))
+            }
+            newRowList?.let {
+                tiles.set(i, it)
+
+                board = tiles
+            }
+        }
+    }
+
+
+
+}

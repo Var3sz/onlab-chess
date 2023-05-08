@@ -10,13 +10,13 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 
 
-class Ai(val board: Board) {
+class Ai(var board: Board, color: PieceColor) {
 
     val originalDepth = 3
     var branch: Pair<Piece, Pair<Int, Int>> = Pair(Empty(-1, -1), Pair(-1, -1))
     var bestChoice: Pair<Piece, Pair<Int, Int>> = Pair(Empty(-1, -1), Pair(-1, -1))
 
-    private val aiColor = PieceColor.BLACK
+    private val aiColor = color
 
 
     val pawnValue = 100
@@ -130,25 +130,10 @@ class Ai(val board: Board) {
 
 
     fun getTheNextStep(): Pair<Piece, Pair<Int, Int>> {
-
         minimax(board, originalDepth, true, -6000000, 7000000);
-
 
         return bestChoice
     }
-
-    fun getRandomStep(): Pair<Piece, Pair<Int, Int>> {
-        Log.d("VAAAAAAAAAAAAAAAAAAA", board.printBoard())
-        val steps= mutableListOf<Pair<Piece, Pair<Int, Int>>>()
-        board.getPiecesbyColor(aiColor).forEach(){
-            val piece= it
-            board.getAvailableSteps(piece, aiColor, true).forEach {
-                steps.add(Pair(piece, it))
-            }
-        }
-        return steps[0]
-    }
-
 
 
     fun minimax(
@@ -187,7 +172,7 @@ class Ai(val board: Board) {
                 //init new board
                 val tmp = Board(board.copyBoard(), aiColor.oppositeColor())
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
-                tmp.step(tmpPiece,steps[i].second)
+                tmp.step(tmpPiece,steps[i].second.first, steps[i].second.second)
                 //Log.d("MAX", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
                 //new board eval
                 val value = minimax(tmp, depth-1, false, alpha, beta)
@@ -210,7 +195,7 @@ class Ai(val board: Board) {
                 //init new board
                 val tmp = Board(board.copyBoard(), aiColor)
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
-                tmp.step(tmpPiece, steps[i].second)
+                tmp.step(tmpPiece, steps[i].second.first, steps[i].second.second)
                 //Log.d("MIN", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
                 //new board eval
                 val value = minimax(tmp, depth-1, true, alpha, beta)

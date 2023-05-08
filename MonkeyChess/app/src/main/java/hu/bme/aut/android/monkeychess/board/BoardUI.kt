@@ -30,7 +30,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 import okhttp3.internal.connection.Exchange
 
-class BoardUI {
+class BoardUI() {
     @Composable
     fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel) {
         val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
@@ -61,7 +61,7 @@ class BoardUI {
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
                     DrawPlayer(playerTwo)
                 }
-                Button(onClick = { viewModel.FlipTheTable() }) {
+                Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
                     Text(text = "flipy flopity\nyou are my flipity ")
                 }
             }
@@ -100,7 +100,7 @@ class BoardUI {
 
     @Composable
     fun DrawBoard(viewModel :BoardViewModel) {
-        val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
+        //val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
         Column {
             for (i in 0 until 8) {
@@ -235,7 +235,7 @@ class BoardUI {
                             Column{
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { viewModel.exchangePawn(PieceName.QUEEN) },
+                                    onClick = { viewModel.board.value?.exchangePawn(PieceName.QUEEN) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
@@ -250,7 +250,7 @@ class BoardUI {
                                 Spacer(Modifier.height(50.dp))
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { viewModel.exchangePawn(PieceName.ROOK) },
+                                    onClick = { viewModel.board.value?.exchangePawn(PieceName.ROOK) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
@@ -267,7 +267,7 @@ class BoardUI {
                             Column{
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { viewModel.exchangePawn(PieceName.BISHOP) },
+                                    onClick = { viewModel.board.value?.exchangePawn(PieceName.BISHOP) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
@@ -282,7 +282,7 @@ class BoardUI {
                                 Spacer(Modifier.height(50.dp))
                                 OutlinedButton(
                                     modifier = Modifier.size(70.dp),
-                                    onClick = { viewModel.exchangePawn(PieceName.KNIGHT) },
+                                    onClick = { viewModel.board.value?.exchangePawn(PieceName.KNIGHT) },
                                     border = BorderStroke(1.dp, Color.Black),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
