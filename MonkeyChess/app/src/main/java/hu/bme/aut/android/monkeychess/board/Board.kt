@@ -111,7 +111,6 @@ class Board(){
                 }
                 board.add(rowList)
             }
-
         }
     }
 

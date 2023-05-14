@@ -72,13 +72,13 @@ class MainMenuUI {
         ){
             //Single Player button
             MainButtons(text = "Single Player", click =  {Log.d("MainMenu", " Single Player clicked" )
-                navController.navigate("board_screen")
+                navController.navigate("board_1v1")
             })
-            //Multi Player button
-            MainButtons(text = "Multi Player", click =  {Log.d("MainMenu", " Multi Player clicked" )
-                navController.navigate("board_1v1")})
-            //Puzzles button
-            MainButtons(text = "Puzzles",  click = {Log.d("MainMenu", " Puzzles clicked" )})
+            //Ai button
+            MainButtons(text = "Computer", click =  {Log.d("MainMenu", " Multi Player clicked" )
+                navController.navigate("board_screen")})
+            //Multiplayer button
+            MainButtons(text = "Multi Player", click = { navController.navigate("select_game") })
             //Friends button
             MainButtons(text = "Friends", click =  {Log.d("MainMenu", " Friends clicked" )})
             //Stats button
