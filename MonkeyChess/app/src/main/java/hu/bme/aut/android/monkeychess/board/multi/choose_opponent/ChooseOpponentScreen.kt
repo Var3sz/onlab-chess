@@ -20,6 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import hu.bme.aut.android.monkeychess.R
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun ChooseOpponentScreen(viewModel: ChooseOpponentViewModel){
@@ -43,12 +49,20 @@ fun ChooseOpponentScreen(viewModel: ChooseOpponentViewModel){
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.align(Alignment.Center)
                     ) {
-                        Icon(
-                            painterResource(id = R.drawable.baseline_person_24),
-                            contentDescription = "Person Icon",
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(user.second)
+                                .build(),
+                            loading = {
+                                CircularProgressIndicator()
+                            },
+                            contentDescription = "Profile picture",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(24.dp)
                         )
                         Text(
-                            text = user,
+                            text = user.first,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f),

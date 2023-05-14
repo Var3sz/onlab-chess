@@ -5,13 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 
 class ChooseOpponentViewModel:ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    private var users = mutableListOf<String>()
-    private var userList = MutableLiveData<List<String>>()
+    private var users = mutableListOf<Pair<String, String>>()
+    private var userList = MutableLiveData<List<Pair<String, String>>>()
+
 
     init{
         loadUsers()
@@ -22,15 +25,22 @@ class ChooseOpponentViewModel:ViewModel() {
         collectionRef.get()
             .addOnSuccessListener { querySnapshot ->
                 for (document in querySnapshot) {
-                    val username = document.getString("Username")
+                    val username = document.data.getValue("Username")
+                    val imageUrl = document.data.getValue("ImageURL")
                     val email = document.getString("E-mail")
 
                     if(auth.currentUser?.email == email){
                         continue
                     }else{
-                        username?.let { users.add(it) }
+                    if(imageUrl.toString().isNotEmpty()){
+                        users.add(Pair(username.toString(), imageUrl.toString()))
+                    }
+                    else{
+                        val defaultUrl = "https://firebasestorage.googleapis.com/v0/b/monkeychess-b42f5.appspot.com/o/profile-pictures%2Fprofile-placeholder.png?alt=media&token=95aedef2-d07e-4b68-8045-8f677646fe51"
+                        users.add(Pair(username.toString(), defaultUrl))
                     }
 
+                    }
                     addUsers(users)
                 }
             }
@@ -39,11 +49,11 @@ class ChooseOpponentViewModel:ViewModel() {
             }
     }
 
-    private fun addUsers(users: List<String>){
-        userList.value = users;
+    private fun addUsers(users: List<Pair<String, String>>){
+        userList.value = users
     }
 
-    fun getUsers(): MutableLiveData<List<String>>{
+    fun getUsers(): MutableLiveData<List<Pair<String, String>>>{
         return userList
     }
 }
