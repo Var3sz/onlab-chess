@@ -23,8 +23,9 @@ import hu.bme.aut.android.monkeychess.register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
-import hu.bme.aut.android.monkeychess.board.multi.ChooseOpponentScreen
-import hu.bme.aut.android.monkeychess.board.multi.SelectGameScreen
+import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentScreen
+import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentViewModel
+import hu.bme.aut.android.monkeychess.board.multi.select_game.SelectGameScreen
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassUI
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
@@ -123,11 +124,14 @@ class MainActivity : ComponentActivity() {
                 TopAppBarWidget(navController = navController, content = {ChangeProfileDataUI().ChangeProfileDataScreen(viewModel, navController)}, bottomBar = {})
             }
             composable("select_game"){
-                TopAppBarWidget(navController = navController, content = { SelectGameScreen(navController = navController)}, bottomBar = {})
+                val viewModel = ChooseOpponentViewModel()
+                TopAppBarWidget(navController = navController, content = { SelectGameScreen(navController = navController, viewModel = viewModel) }, bottomBar = {})
             }
             composable("choose_opponent"){
-                TopAppBarWidget(navController = navController, content = { ChooseOpponentScreen() }, bottomBar = {})
+                val viewModel = ChooseOpponentViewModel()
+                TopAppBarWidget(navController = navController, content = { ChooseOpponentScreen(viewModel = viewModel) }, bottomBar = {})
             }
+
         }
     }
 
