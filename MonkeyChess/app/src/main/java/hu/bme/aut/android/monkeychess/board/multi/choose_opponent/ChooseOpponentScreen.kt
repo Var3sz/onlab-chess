@@ -29,8 +29,8 @@ import coil.request.ImageRequest
 
 @Composable
 fun ChooseOpponentScreen(viewModel: ChooseOpponentViewModel){
-    val userData by viewModel.getUsers().observeAsState()
-    val users = userData ?: emptyList()
+    val users: List<Pair<String, String>> by viewModel.users.observeAsState(emptyList())
+
 
     LazyColumn() {
         items(users) { user ->
