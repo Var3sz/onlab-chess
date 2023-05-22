@@ -1,8 +1,14 @@
 package hu.bme.aut.android.monkeychess.board
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
@@ -10,8 +16,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 import kotlin.concurrent.thread
 
-
-class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = false,val  aiColor: PieceColor):  ViewModel() {
+class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = false, val  aiColor: PieceColor):  ViewModel() {
     //var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
 
     var clickedPiece = MutableLiveData<Piece>()
@@ -24,35 +29,42 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
 
     var fen = multiplayer?.fen
 
+    private val _gameID = MutableLiveData<String?>()
+    val gameID: LiveData<String?> get() = _gameID
+
     var board = MutableLiveData<Board>()
     //var ai = Ai()
+
 
 //////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
     init{
-        if (multiplayer?.isNewGame == true) {
-            this.multiplayer.createNewGame(fen!!)
-        }
-        if(fen!!.isEmpty()){
-            board.value = Board("")
-            currentPlayer.value = PieceColor.WHITE
-        }
-        else{
-            board.value = Board(fen!!)
-            val fenParts = fen!!.split(" ")
-            if(fenParts[1] == "w"){
+            if (multiplayer?.isNewGame == true) {
+                multiplayer.createNewGame(fen!!) { id ->
+                    setGameId(id.toString())
+                }
+            }
+
+            if(fen.isNullOrEmpty()){
+                board.value = Board("")
                 currentPlayer.value = PieceColor.WHITE
             }
             else{
-                currentPlayer.value = PieceColor.BLACK
+                board.value = Board(fen!!)
+                val fenParts = fen!!.split(" ")
+                if(fenParts[1] == "w"){
+                    currentPlayer.value = PieceColor.WHITE
+                }
+                else{
+                    currentPlayer.value = PieceColor.BLACK
+                }
             }
-        }
 
-        if(aiColor == PieceColor.WHITE && doAi){
-            board.value?.doAiStep(aiColor)
-            board.value?.ChangeCurrentPlayer()
-            ChangeCurrentPlayer()
-        }
+            if(aiColor == PieceColor.WHITE && doAi){
+                board.value?.doAiStep(aiColor)
+                board.value?.ChangeCurrentPlayer()
+                ChangeCurrentPlayer()
+            }
     }
 
     fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!, runspec: Boolean = true): MutableList<Pair<Int, Int>> {
@@ -71,7 +83,7 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
             Log.d("AI", doAi.toString())
             doAiStep()
         }
-
+        multiplayer?.sendMove(gameID.value.toString(), board.value!!.createFEN())
     }
 
     private fun doAiStep() {
@@ -138,6 +150,10 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
 
     fun getBlackExchangeState(): MutableLiveData<Boolean>{
         return board.value?.getBlackExchangeState()!!
+    }
+
+    fun setGameId(_gameID: String) {
+        this._gameID.value = _gameID
     }
 
 }

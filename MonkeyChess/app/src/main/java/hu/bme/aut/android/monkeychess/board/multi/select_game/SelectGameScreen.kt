@@ -76,7 +76,7 @@ fun SelectGameScreen(navController: NavController, viewModel: SelectGameViewMode
                                 .height(64.dp)
                                 .padding(8.dp)
                                 .clickable {
-                                    navController.navigate("load_multiplayer_game")
+                                    navController.navigate("load_multiplayer_game/${game.first}/${game.second}")
                                 }
                         ) {
                             Row(

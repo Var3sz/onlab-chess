@@ -139,8 +139,7 @@ class MainActivity : ComponentActivity() {
                 TopAppBarWidget(navController = navController, content = { ChooseOpponentScreen(navController = navController, viewModel = viewModel) }, bottomBar = {})
             }
 
-            composable("new_multiplayer_game/{player1}/{player2}"){backStackEntry ->
-
+            composable("new_multiplayer_game/{player1}/{player2}"){ backStackEntry ->
                 val player1 = backStackEntry.arguments?.getString("player1")
                 val player2 = backStackEntry.arguments?.getString("player2")
                 Log.d("Choosen enemy: ", player1.toString())
@@ -150,7 +149,7 @@ class MainActivity : ComponentActivity() {
                         playerOne = player1.toString(),
                         playerTwo = player2.toString(),
                         fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w",
-                        true
+                        isNewGame = true
                     )
                 }
 
@@ -171,14 +170,35 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            /*composable("load_multiplayer_game"){
-                val multiplayer = Multiplayer()
-                val viewModel = BoardViewModel(multiplayer,false, PieceColor.EMPTY)
-                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
+            composable("load_multiplayer_game/{player1}/{player2}"){ backStackEntry ->
+                val player1 = backStackEntry.arguments?.getString("player1")
+                val player2 = backStackEntry.arguments?.getString("player2")
+
+                val multiplayer = remember {
+                    Multiplayer(
+                        playerOne = player1.toString(),
+                        playerTwo = player2.toString(),
+                        fen = "",
+                        isNewGame = false
+                    )
+                }
+
+                val viewModel = remember {
+                    BoardViewModel(multiplayer, false, PieceColor.EMPTY)
+                }
+
+                TopAppBarWidget(
+                    navController = navController,
+                    content = {
+                        BoardUI().GameScreen(viewModel = viewModel)
+                    },
+                    bottomBar = {}
+                )
+
                 BackHandler {
                     navController.navigate("select_game")
                 }
-            }*/
+            }
         }
     }
 

@@ -410,7 +410,7 @@ class Board(){
     }
 
     //////////////////////////////////////////////////////////////////////////////
-//  Different steps and step logic
+    //  Different steps and step logic
     fun step(piece: Piece, i: Int, j: Int, doai: Boolean = true) {
         //Log.d("CURR", currentPlayer.value.toString())
         //king castling
@@ -444,7 +444,6 @@ class Board(){
         Log.d("FEN" , createFEN())
         var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         //Log.d("NEW BOARD", Board("").printBoard())
-
     }
 
      fun doAiStep(aiColor: PieceColor) {
