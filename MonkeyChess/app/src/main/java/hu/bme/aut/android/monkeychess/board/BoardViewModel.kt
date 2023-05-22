@@ -1,21 +1,17 @@
 package hu.bme.aut.android.monkeychess.board
 
 import android.util.Log
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
-import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
-import java.lang.Math.abs
 import kotlin.concurrent.thread
-import kotlin.random.Random
 
 
-
-class BoardViewModel(val doAi: Boolean = false,val  aiColor: PieceColor):  ViewModel() {
+class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = false,val  aiColor: PieceColor):  ViewModel() {
     //var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
 
     var clickedPiece = MutableLiveData<Piece>()
@@ -26,12 +22,7 @@ class BoardViewModel(val doAi: Boolean = false,val  aiColor: PieceColor):  ViewM
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
 
-    //FEN variables
-    var whiteCastleQueenSide = true
-    var whiteCastleKingSide = true
-    var blackCastleQueenSide = true
-    var blackCastleKingSide = true
-    var numberOfRounds = 0
+    var fen = multiplayer?.fen
 
     var board = MutableLiveData<Board>()
     //var ai = Ai()
@@ -39,16 +30,31 @@ class BoardViewModel(val doAi: Boolean = false,val  aiColor: PieceColor):  ViewM
 //////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
     init{
-        board.value = Board("")
-        currentPlayer.value = PieceColor.WHITE
+        if (multiplayer?.isNewGame == true) {
+            this.multiplayer.createNewGame(fen!!)
+        }
+        if(fen!!.isEmpty()){
+            board.value = Board("")
+            currentPlayer.value = PieceColor.WHITE
+        }
+        else{
+            board.value = Board(fen!!)
+            val fenParts = fen!!.split(" ")
+            if(fenParts[1] == "w"){
+                currentPlayer.value = PieceColor.WHITE
+            }
+            else{
+                currentPlayer.value = PieceColor.BLACK
+            }
+        }
 
         if(aiColor == PieceColor.WHITE && doAi){
             board.value?.doAiStep(aiColor)
             board.value?.ChangeCurrentPlayer()
             ChangeCurrentPlayer()
         }
-
     }
+
     fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!, runspec: Boolean = true): MutableList<Pair<Int, Int>> {
         Log.d("COLOR", "view: ${currentPlayer.value} board: ${ board.value?.currentPlayerBoard}")
         board.value?.currentPlayerBoard = currentPlayer.value!!

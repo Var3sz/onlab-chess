@@ -18,13 +18,6 @@ class Board(){
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
 
-    //FEN variables
-    var whiteCastleQueenSide = true
-    var whiteCastleKingSide = true
-    var blackCastleQueenSide = true
-    var blackCastleKingSide = true
-    var numberOfRounds = 0
-
 
 
     constructor(pieces: MutableList<Piece>, color: PieceColor) : this() {
@@ -38,9 +31,45 @@ class Board(){
         }
         loadBoard(pieces)
     }
+
     constructor(fenBoard: String) : this() {
-        //initial
+            if (fenBoard.isNotBlank()) {
+                val fenParts = fenBoard.split(" ")
+                require(fenParts.size == 2) { "Invalid FEN string: $fenBoard" }
+
+                val fenRows = fenParts[0].split("/")
+                require(fenRows.size == 8) { "Invalid FEN string: $fenBoard" }
+
+                val activeColor = fenParts[1]
+                val isWhiteOnTop = fenBoard.endsWith("rnbqkbnr")
+
+                for (i in 0 until 8) {
+                    val fenRow = fenRows[i]
+                    val rowList = SnapshotStateList<Tile>()
+
+                    var j = 0
+                    for (char in fenRow) {
+                        if (char.isDigit()) {
+                            val emptyCount = char.toString().toInt()
+                            for (k in 0 until emptyCount) {
+                                rowList.add(Tile(false, Empty(i, j)))
+                                j++
+                            }
+                        } else {
+                            val pieceColor = if (char.isUpperCase()) PieceColor.WHITE else PieceColor.BLACK
+                            val piece = getPieceFromFENChar(char.toLowerCase(), pieceColor, i, j, isWhiteOnTop)
+                            rowList.add(Tile(false, piece))
+                            j++
+                        }
+                    }
+                    board.add(rowList)
+                }
+
+                currentPlayerBoard = if (activeColor == "w") PieceColor.WHITE else PieceColor.BLACK
+            }
+
         if(fenBoard == ""){
+            currentPlayerBoard = PieceColor.WHITE
             val tiles = mutableListOf<MutableList<Tile>>()
             for (i in 0 until 8) {
                 val rowList = SnapshotStateList<Tile>()
@@ -111,6 +140,65 @@ class Board(){
                 }
                 board.add(rowList)
             }
+        }
+    }
+
+    private fun getPieceFromFENChar(char: Char, color: PieceColor, row: Int, col: Int, isWhiteOnTop: Boolean): Piece {
+        return when (char) {
+            'p', 'P' -> {
+                val side = if (color == PieceColor.WHITE) {
+                    if (isWhiteOnTop) Side.UP else Side.DOWN
+                } else {
+                    if (isWhiteOnTop) Side.DOWN else Side.UP
+                }
+                Pawn(color, row, col, side)
+            }
+            'r', 'R' -> Rook(color, row, col, getRookSide(color, isWhiteOnTop))
+            'n', 'N' -> Knight(color, row, col, getKnightSide(color, isWhiteOnTop))
+            'b', 'B' -> Bishop(color, row, col, getBishopSide(color, isWhiteOnTop))
+            'q', 'Q' -> Queen(color, row, col, getQueenSide(color, isWhiteOnTop))
+            'k', 'K' -> King(color, row, col, getKingSide(color, isWhiteOnTop))
+            else -> throw IllegalArgumentException("Invalid FEN character: $char")
+        }
+    }
+
+    private fun getRookSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
+        return if (color == PieceColor.WHITE) {
+            if (isWhiteOnTop) Side.UP else Side.DOWN
+        } else {
+            if (isWhiteOnTop) Side.DOWN else Side.UP
+        }
+    }
+
+    private fun getKnightSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
+        return if (color == PieceColor.WHITE) {
+            if (isWhiteOnTop) Side.UP else Side.DOWN
+        } else {
+            if (isWhiteOnTop) Side.DOWN else Side.UP
+        }
+    }
+
+    private fun getBishopSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
+        return if (color == PieceColor.WHITE) {
+            if (isWhiteOnTop) Side.UP else Side.DOWN
+        } else {
+            if (isWhiteOnTop) Side.DOWN else Side.UP
+        }
+    }
+
+    private fun getQueenSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
+        return if (color == PieceColor.WHITE) {
+            if (isWhiteOnTop) Side.UP else Side.DOWN
+        } else {
+            if (isWhiteOnTop) Side.DOWN else Side.UP
+        }
+    }
+
+    private fun getKingSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
+        return if (color == PieceColor.WHITE) {
+            if (isWhiteOnTop) Side.UP else Side.DOWN
+        } else {
+            if (isWhiteOnTop) Side.DOWN else Side.UP
         }
     }
 
@@ -244,7 +332,7 @@ class Board(){
                 }
             }
 
-            /*
+
             //Check for En Passant
             if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
 
@@ -263,15 +351,9 @@ class Board(){
                         final.add(Pair(i, piece.j + 1))
                         chanceForEnPassant = true
                     }
-
                 }
             }
-
-             */
-
-
         }
-
     }
 
     fun GetValidCastling(piece: Piece, final: MutableList<Pair<Int, Int>>) {
@@ -359,7 +441,7 @@ class Board(){
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
         //Log.d("FEN" ,printBoard())
-        //Log.d("FEN" , createFEN())
+        Log.d("FEN" , createFEN())
         var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         //Log.d("NEW BOARD", Board("").printBoard())
 
@@ -627,86 +709,44 @@ class Board(){
     }
 
     fun createFEN(): String{
-        //Adding piece placement to Fen
         var emptyTile = 0
         var boardFEN = ""
-        board.forEach{
-            it.forEach {
+        board.forEach { row ->
+            row.forEach { tile ->
                 var addedChar = ' '
-                when(it.pice.name){
-                    PieceName.PAWN -> {
-                        addedChar = 'p'
-                    }
-                    PieceName.KNIGHT -> {
-                        addedChar = 'n'
-                    }
-                    PieceName.BISHOP -> {
-                        addedChar = 'b'
-                    }
-                    PieceName.ROOK -> {
-                        addedChar = 'r'
-                    }
-                    PieceName.QUEEN -> {
-                        addedChar = 'q'
-                    }
-                    PieceName.KING -> {
-                        addedChar = 'k'
-                    }
+
+                when (tile.pice.name) {
+                    PieceName.PAWN -> addedChar = 'p'
+                    PieceName.KNIGHT -> addedChar = 'n'
+                    PieceName.BISHOP -> addedChar = 'b'
+                    PieceName.ROOK -> addedChar = 'r'
+                    PieceName.QUEEN -> addedChar = 'q'
+                    PieceName.KING -> addedChar = 'k'
                     else -> {}
                 }
-                when(it.pice.pieceColor){
-                    PieceColor.WHITE->{
-                        addedChar = addedChar.uppercase()[0]
-                    }
-                    PieceColor.BLACK->{}
-                    PieceColor.EMPTY-> {
-                        //addedChar = '-'
+
+                when (tile.pice.pieceColor) {
+                    PieceColor.WHITE -> addedChar = addedChar.uppercaseChar()
+                    PieceColor.BLACK -> {}
+                    PieceColor.EMPTY -> {
                         emptyTile++
                         return@forEach
                     }
                 }
+
                 if (emptyTile > 0) {
                     boardFEN += emptyTile.toString()
                     emptyTile = 0
                 }
+
                 boardFEN += addedChar
-
-                /*if(blackSide.value?.first == PieceColor.BLACK || blackSide.value?.second == Side.UP){
-                    if (it.pice.name == PieceName.KING && it.pice.pieceColor == PieceColor.WHITE) {
-                        if (it.pice.hasMoved) {
-                            whiteCastleKingSide = false;
-                            whiteCastleQueenSide = false;
-                        }
-                    } else if (it.pice.name == PieceName.ROOK && it.pice.pieceColor == PieceColor.WHITE) {
-                        if (it.pice.position.first != 7 && it.pice.position.second != 0)  {
-                            whiteCastleQueenSide = false
-                        } else if (it.pice.position.first != 7 && it.pice.position.second != 7) {
-                            whiteCastleKingSide = false;
-                        }
-                    }
-                }
-                else if(blackSide.value?.first == PieceColor.BLACK || blackSide.value?.second == Side.DOWN){
-                    if (it.pice.name == PieceName.KING && it.pice.pieceColor == PieceColor.WHITE) {
-                        if (it.pice.hasMoved) {
-                            whiteCastleKingSide = false;
-                            whiteCastleQueenSide = false;
-                        }
-                    } else if (it.pice.name == PieceName.ROOK && it.pice.pieceColor == PieceColor.WHITE) {
-                        if (it.pice.position.first != 0 && it.pice.position.second != 0)  {
-                            whiteCastleQueenSide = false
-                        } else if (it.pice.position.first != 0 && it.pice.position.second != 7) {
-                            whiteCastleKingSide = false;
-                        }
-                    }
-                }*/
-
             }
+
             if (emptyTile > 0) {
-                if (emptyTile > 1) {
-                    boardFEN += emptyTile.toString()
-                }
+                boardFEN += emptyTile.toString()
                 emptyTile = 0
             }
+
             boardFEN += '/'
         }
 
@@ -724,12 +764,6 @@ class Board(){
 
         boardFEN += " -"    // TODO: CASTLING
         boardFEN += " - "    // TODO: half move clock
-
-        //Fullmove number
-        if(currentPlayerBoard == PieceColor.BLACK){
-            numberOfRounds++
-        }
-        boardFEN += numberOfRounds.toString()
 
         return boardFEN
     }

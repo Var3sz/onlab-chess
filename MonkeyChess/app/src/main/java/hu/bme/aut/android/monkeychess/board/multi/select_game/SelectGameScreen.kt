@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,8 +25,8 @@ import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentViewModel
 
 @Composable
-fun SelectGameScreen(navController: NavController, viewModel: ChooseOpponentViewModel){
-    val data = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
+fun SelectGameScreen(navController: NavController, viewModel: SelectGameViewModel){
+    val games: List<Pair<String, String>> by viewModel.games.observeAsState(emptyList())
 
     Column(modifier = Modifier.fillMaxSize()) {
         Surface(
@@ -55,39 +57,48 @@ fun SelectGameScreen(navController: NavController, viewModel: ChooseOpponentView
                     fontWeight = FontWeight.Bold)
             }
         }
-
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(data) { item ->
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.LightGray)
-                            .border(1.dp, Color.Gray)
-                            .height(64.dp)
-                            .padding(8.dp)
-                            .clickable { /* Handle click here */ }
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.align(Alignment.Center)
+        if(games.isNullOrEmpty()){
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "No games available!",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }else{
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(games) { game ->
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.LightGray)
+                                .border(1.dp, Color.Gray)
+                                .height(64.dp)
+                                .padding(8.dp)
+                                .clickable {
+                                    navController.navigate("load_multiplayer_game")
+                                }
                         ) {
-                            Icon(
-                                painterResource(id = R.drawable.black_queen),
-                                contentDescription = "Game Icon",
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = item,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                style = TextStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.align(Alignment.Center)
+                            ) {
+                                Icon(
+                                    painterResource(id = R.drawable.black_queen),
+                                    contentDescription = "Game Icon",
+                                    modifier = Modifier.size(24.dp)
                                 )
-                            )
+                                Text(
+                                    text = "${game.first} vs ${game.second}",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                            }
                         }
                     }
                 }
