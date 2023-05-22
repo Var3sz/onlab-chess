@@ -761,9 +761,6 @@ class Board(){
             boardFEN+=" b"
         }
 
-        boardFEN += " -"    // TODO: CASTLING
-        boardFEN += " - "    // TODO: half move clock
-
         return boardFEN
     }
 

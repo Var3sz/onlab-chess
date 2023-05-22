@@ -8,11 +8,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 import java.util.concurrent.CountDownLatch
 
-class Multiplayer(val playerOne: String, val playerTwo: String, var fen: String, val isNewGame: Boolean){
+class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: String, var fen: String, val isNewGame: Boolean){
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
 
-    private var gameID: String? = null
+    private var gameID: String? = gameId
 
     fun createNewGame(fen: String, callback: (String?) -> Unit){
         val userCollection = db.collection("users")
@@ -54,10 +54,6 @@ class Multiplayer(val playerOne: String, val playerTwo: String, var fen: String,
         }
     }
 
-    fun loadGame(fen: String){
-
-    }
-
     fun sendMove(gameId: String, fen: String){
         val userCollection = db.collection("users")
         Log.d("Game ID: ", gameId)
@@ -89,7 +85,6 @@ class Multiplayer(val playerOne: String, val playerTwo: String, var fen: String,
             e.printStackTrace()
         }
     }
-
 
     fun receiveMove(){
 

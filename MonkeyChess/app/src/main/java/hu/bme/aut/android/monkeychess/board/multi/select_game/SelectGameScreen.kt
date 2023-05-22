@@ -1,5 +1,6 @@
 package hu.bme.aut.android.monkeychess.board.multi.select_game
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,11 +23,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import hu.bme.aut.android.monkeychess.R
+import hu.bme.aut.android.monkeychess.board.multi.Games
 import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentViewModel
 
 @Composable
 fun SelectGameScreen(navController: NavController, viewModel: SelectGameViewModel){
-    val games: List<Pair<String, String>> by viewModel.games.observeAsState(emptyList())
+    val games: List<Games> by viewModel.games.observeAsState(emptyList())
 
     Column(modifier = Modifier.fillMaxSize()) {
         Surface(
@@ -76,7 +78,7 @@ fun SelectGameScreen(navController: NavController, viewModel: SelectGameViewMode
                                 .height(64.dp)
                                 .padding(8.dp)
                                 .clickable {
-                                    navController.navigate("load_multiplayer_game/${game.first}/${game.second}")
+                                    navController.navigate("load_multiplayer_game/${game.playerOne}/${game.playerTwo}/${game.gameID}/${Uri.encode(game.fen)}")
                                 }
                         ) {
                             Row(
@@ -89,7 +91,7 @@ fun SelectGameScreen(navController: NavController, viewModel: SelectGameViewMode
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
-                                    text = "${game.first} vs ${game.second}",
+                                    text = "${game.playerOne} vs ${game.playerTwo}",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f),

@@ -44,6 +44,10 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
                     setGameId(id.toString())
                 }
             }
+            else if(multiplayer?.isNewGame == false){
+                multiplayer.loadGame(fen!!)
+                setGameId(multiplayer.gameId)
+            }
 
             if(fen.isNullOrEmpty()){
                 board.value = Board("")

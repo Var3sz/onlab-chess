@@ -1,6 +1,7 @@
 package hu.bme.aut.android.monkeychess
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,9 +14,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import hu.bme.aut.android.monkeychess.welcomeScreen.WelcomeUI
 import hu.bme.aut.android.monkeychess.login.LoginUI
 import hu.bme.aut.android.monkeychess.login.LoginViewModel
@@ -142,13 +145,13 @@ class MainActivity : ComponentActivity() {
             composable("new_multiplayer_game/{player1}/{player2}"){ backStackEntry ->
                 val player1 = backStackEntry.arguments?.getString("player1")
                 val player2 = backStackEntry.arguments?.getString("player2")
-                Log.d("Choosen enemy: ", player1.toString())
 
                 val multiplayer = remember {
                     Multiplayer(
                         playerOne = player1.toString(),
                         playerTwo = player2.toString(),
                         fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w",
+                        gameId = "",
                         isNewGame = true
                     )
                 }
@@ -170,15 +173,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            composable("load_multiplayer_game/{player1}/{player2}"){ backStackEntry ->
-                val player1 = backStackEntry.arguments?.getString("player1")
-                val player2 = backStackEntry.arguments?.getString("player2")
+            composable("load_multiplayer_game/{playerOne}/{playerTwo}/{gameID}/{fen}") { backStackEntry ->
+                val player1 = backStackEntry.arguments?.getString("playerOne")
+                val player2 = backStackEntry.arguments?.getString("playerTwo")
+                val gameID = backStackEntry.arguments?.getString("gameID")
+                val fen = Uri.decode(backStackEntry.arguments?.getString("fen"))
 
                 val multiplayer = remember {
                     Multiplayer(
                         playerOne = player1.toString(),
                         playerTwo = player2.toString(),
-                        fen = "",
+                        gameId = gameID.toString(),
+                        fen = fen.toString(),
                         isNewGame = false
                     )
                 }
@@ -187,17 +193,8 @@ class MainActivity : ComponentActivity() {
                     BoardViewModel(multiplayer, false, PieceColor.EMPTY)
                 }
 
-                TopAppBarWidget(
-                    navController = navController,
-                    content = {
-                        BoardUI().GameScreen(viewModel = viewModel)
-                    },
-                    bottomBar = {}
-                )
-
-                BackHandler {
-                    navController.navigate("select_game")
-                }
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel) }, bottomBar = {})
+                BackHandler { navController.navigate("select_game") }
             }
         }
     }

@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import hu.bme.aut.android.monkeychess.board.multi.Games
 
 class SelectGameViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    private val _games = MutableLiveData<List<Pair<String, String>>>()
-    val games: LiveData<List<Pair<String, String>>> get() = _games
+    private val _games = MutableLiveData<List<Games>>()
+    val games: LiveData<List<Games>> get() = _games
 
     init{
         loadGames()
@@ -25,7 +26,7 @@ class SelectGameViewModel : ViewModel() {
                 return@addSnapshotListener
             }
 
-            val updateGames = mutableListOf<Pair<String, String>>()
+            val updateGames = mutableListOf<Games>()
 
             for (document in value!!) {
                 val userId = document.id
@@ -39,8 +40,10 @@ class SelectGameViewModel : ViewModel() {
 
                             val player1 = gameData["Player One"]?.toString() ?: ""
                             val player2 = gameData["Player Two"]?.toString() ?: ""
+                            val gameID = gameData["Game ID"]?.toString() ?: ""
+                            val fen = gameData["FEN"]?.toString() ?: ""
 
-                            updateGames.add(Pair(player1, player2))
+                            updateGames.add(Games(player1, player2,gameID, fen))
                         }
                         _games.value = updateGames
                     }
