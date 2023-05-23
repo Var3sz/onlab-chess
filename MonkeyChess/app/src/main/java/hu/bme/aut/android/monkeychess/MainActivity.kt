@@ -1,19 +1,24 @@
 package hu.bme.aut.android.monkeychess
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import hu.bme.aut.android.monkeychess.welcomeScreen.WelcomeUI
 import hu.bme.aut.android.monkeychess.login.LoginUI
 import hu.bme.aut.android.monkeychess.login.LoginViewModel
@@ -23,6 +28,11 @@ import hu.bme.aut.android.monkeychess.register.RegisterViewModel
 import hu.bme.aut.android.monkeychess.splashScreen.SplashScreenUI
 import hu.bme.aut.android.monkeychess.board.BoardUI
 import hu.bme.aut.android.monkeychess.board.BoardViewModel
+import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
+import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentScreen
+import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentViewModel
+import hu.bme.aut.android.monkeychess.board.multi.select_game.SelectGameScreen
+import hu.bme.aut.android.monkeychess.board.multi.select_game.SelectGameViewModel
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassUI
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
@@ -93,11 +103,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable("board_screen"){
-                val viewModel =BoardViewModel(true, PieceColor.WHITE)
+                val viewModel =BoardViewModel(null,true, PieceColor.WHITE)
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
             composable("board_1v1"){
-                val viewModel =BoardViewModel(false, PieceColor.EMPTY)
+                val viewModel =BoardViewModel(null, false, PieceColor.EMPTY)
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
 
@@ -120,7 +130,72 @@ class MainActivity : ComponentActivity() {
                 val viewModel = ChangeProfileDataViewModel()
                 TopAppBarWidget(navController = navController, content = {ChangeProfileDataUI().ChangeProfileDataScreen(viewModel, navController)}, bottomBar = {})
             }
+            composable("select_game"){
+                val viewModel = SelectGameViewModel()
+                TopAppBarWidget(navController = navController, content = { SelectGameScreen(navController = navController, viewModel = viewModel) }, bottomBar = {})
+                BackHandler {
+                    navController.navigate("MainMenu_screen")
+                }
+            }
+            composable("choose_opponent"){
+                val viewModel = ChooseOpponentViewModel()
+                TopAppBarWidget(navController = navController, content = { ChooseOpponentScreen(navController = navController, viewModel = viewModel) }, bottomBar = {})
+            }
 
+            composable("new_multiplayer_game/{player1}/{player2}"){ backStackEntry ->
+                val player1 = backStackEntry.arguments?.getString("player1")
+                val player2 = backStackEntry.arguments?.getString("player2")
+
+                val multiplayer = remember {
+                    Multiplayer(
+                        playerOne = player1.toString(),
+                        playerTwo = player2.toString(),
+                        fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w",
+                        gameId = "",
+                        isNewGame = true
+                    )
+                }
+
+                val viewModel = remember {
+                    BoardViewModel(multiplayer, false, PieceColor.EMPTY)
+                }
+
+                TopAppBarWidget(
+                    navController = navController,
+                    content = {
+                        BoardUI().GameScreen(viewModel = viewModel)
+                    },
+                    bottomBar = {}
+                )
+
+                BackHandler {
+                    navController.navigate("select_game")
+                }
+            }
+
+            composable("load_multiplayer_game/{playerOne}/{playerTwo}/{gameID}/{fen}") { backStackEntry ->
+                val player1 = backStackEntry.arguments?.getString("playerOne")
+                val player2 = backStackEntry.arguments?.getString("playerTwo")
+                val gameID = backStackEntry.arguments?.getString("gameID")
+                val fen = Uri.decode(backStackEntry.arguments?.getString("fen"))
+
+                val multiplayer = remember {
+                    Multiplayer(
+                        playerOne = player1.toString(),
+                        playerTwo = player2.toString(),
+                        gameId = gameID.toString(),
+                        fen = fen.toString(),
+                        isNewGame = false
+                    )
+                }
+
+                val viewModel = remember {
+                    BoardViewModel(multiplayer, false, PieceColor.EMPTY)
+                }
+
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel) }, bottomBar = {})
+                BackHandler { navController.navigate("select_game") }
+            }
         }
     }
 
