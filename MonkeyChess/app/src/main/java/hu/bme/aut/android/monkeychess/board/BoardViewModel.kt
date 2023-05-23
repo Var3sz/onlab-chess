@@ -45,7 +45,6 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
                 }
             }
             else if(multiplayer?.isNewGame == false){
-                multiplayer.loadGame(fen!!)
                 setGameId(multiplayer.gameId)
             }
 
@@ -61,6 +60,14 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
                 }
                 else{
                     currentPlayer.value = PieceColor.BLACK
+                }
+            }
+
+            multiplayer?.receiveMove(gameID.toString()) { receivedFen ->
+                if (receivedFen != null) {
+                    fen = receivedFen
+                } else {
+
                 }
             }
 

@@ -1,12 +1,9 @@
 package hu.bme.aut.android.monkeychess.board.multi
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
-import java.util.concurrent.CountDownLatch
 
 class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: String, var fen: String, val isNewGame: Boolean){
     val auth = FirebaseAuth.getInstance()
@@ -86,8 +83,34 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
         }
     }
 
-    fun receiveMove(){
+    fun receiveMove(gameId: String, callback: (String?) -> Unit) {
+        val userCollection = db.collection("users")
 
+        userCollection.get().addOnSuccessListener { users ->
+            for (user in users) {
+                val gamesCollection = userCollection.document(user.id).collection("games")
+                val gameQuery = gamesCollection.whereEqualTo("Game ID", gameId)
+
+                gameQuery.addSnapshotListener { snapshots, error ->
+                    if (error != null) {
+                        error.printStackTrace()
+                        callback(null)
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshots != null && !snapshots.isEmpty) {
+                        val gameDoc = snapshots.documents[0]
+                        val fen = gameDoc.getString("FEN")
+                        callback(fen)
+                    } else {
+                        callback(null)
+                    }
+                }
+            }
+        }.addOnFailureListener { e ->
+            e.printStackTrace()
+            callback(null)
+        }
     }
 
     fun generateRandomId(length: Int): String {
