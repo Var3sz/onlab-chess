@@ -35,6 +35,9 @@ class BoardUI() {
     fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel) {
         val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
         val blackExchange by viewModel.getBlackExchangeState().observeAsState()
+        val boardState by viewModel.board.observeAsState()
+
+
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
@@ -54,7 +57,9 @@ class BoardUI() {
 
                 //ChessBoard
                 Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawBoard(viewModel)
+                    boardState?.let { board ->
+                        DrawBoard(board, viewModel)
+                    }
                 }
 
                 //PlayerTwo
@@ -99,7 +104,7 @@ class BoardUI() {
     }
 
     @Composable
-    fun DrawBoard(viewModel :BoardViewModel) {
+    fun DrawBoard(board: Board, viewModel :BoardViewModel) {
         //val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
 
         Column {
@@ -116,13 +121,13 @@ class BoardUI() {
                                 .background(gridcolor)
                                 .clickable {
 
-                                    if (viewModel.getValue(i, j) == true) {
+                                    if (board.getValue(i, j) == true) {
                                         viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
-                                        // viewModel.ChangeCurrentPlayer()
+                                        //viewModel.ChangeCurrentPlayer()
                                     } else {
                                         viewModel.HideAvailableSteps()
-                                        viewModel.setClickedPiece(viewModel.getPiece(i, j))
+                                        viewModel.setClickedPiece(board.getPiece(i, j))
 
                                         Log.d(
                                             "Board1",
@@ -134,12 +139,12 @@ class BoardUI() {
                                             } babu:${viewModel.getPiece(i, j).pieceColor} "
                                         )
 
-                                        if (viewModel.getPiece(
+                                        if (board.getPiece(
                                                 i,
                                                 j
                                             ).pieceColor != PieceColor.EMPTY
                                         ) {
-                                            val piece = viewModel.getPiece(i, j)
+                                            val piece = board.getPiece(i, j)
                                             val steps = viewModel.getAvailableSteps(piece)
 
                                             Log.d("BoardStep", "i: ${piece.i}, j: ${piece.j}")
@@ -171,8 +176,8 @@ class BoardUI() {
                                 DrawCircle()
                             }
 
-                            if(viewModel.getPiece(i,j).pieceColor != PieceColor.EMPTY)
-                                DrawPiece(viewModel.getPiece(i,j).imageID)
+                            if(board.getPiece(i,j).pieceColor != PieceColor.EMPTY)
+                                DrawPiece(board.getPiece(i,j).imageID)
                         }
                     }
                 }
