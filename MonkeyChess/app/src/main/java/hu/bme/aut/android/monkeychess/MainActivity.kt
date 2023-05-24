@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable("board_screen"){
-                val viewModel =BoardViewModel(null,true, PieceColor.WHITE)
+                val viewModel =BoardViewModel(null,true, PieceColor.BLACK)
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
             composable("board_1v1"){

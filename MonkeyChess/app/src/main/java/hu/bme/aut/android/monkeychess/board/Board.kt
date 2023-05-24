@@ -7,8 +7,9 @@ import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+import kotlinx.coroutines.runBlocking
 
-class Board(){
+class Board(val aiBoard: Boolean= false){
 
     var board = mutableListOf<MutableList<Tile>>()
     var currentPlayerBoard: PieceColor = PieceColor.EMPTY
@@ -20,7 +21,7 @@ class Board(){
 
 
 
-    constructor(pieces: MutableList<Piece>, color: PieceColor) : this() {
+    constructor(pieces: MutableList<Piece>, color: PieceColor, aiBoard: Boolean = false) : this() {
         currentPlayerBoard = color
         for (i in 0 until 8) {
             val rowList = mutableListOf<Tile>()
@@ -211,9 +212,9 @@ class Board(){
         ): MutableList<Pair<Int, Int>> {
             val final = mutableListOf<Pair<Int, Int>>()
 
-            //if(piece.pieceColor == color) {
+            if(piece.pieceColor == color) {
             //debug
-            if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+            //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
@@ -333,23 +334,25 @@ class Board(){
             }
 
 
-            //Check for En Passant
-            if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
+            if(!aiBoard) {
+                //Check for En Passant
+                if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
 
-                if(piece.j  > 0 ) {
-                    val left = getPiece(piece.i, piece.j - 1)
-                    if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
-                        final.add(Pair(i, piece.j - 1))
-                        final.remove(Pair(left.i, left.j))
-                        chanceForEnPassant = true
+                    if (piece.j > 0) {
+                        val left = getPiece(piece.i, piece.j - 1)
+                        if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                            final.add(Pair(i, piece.j - 1))
+                            final.remove(Pair(left.i, left.j))
+                            chanceForEnPassant = true
+                        }
                     }
-                }
 
-                if(piece.j < 7) {
-                    val right = getPiece(piece.i, piece.j + 1)
-                    if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
-                        final.add(Pair(i, piece.j + 1))
-                        chanceForEnPassant = true
+                    if (piece.j < 7) {
+                        val right = getPiece(piece.i, piece.j + 1)
+                        if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                            final.add(Pair(i, piece.j + 1))
+                            chanceForEnPassant = true
+                        }
                     }
                 }
             }
@@ -441,13 +444,13 @@ class Board(){
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
         //Log.d("FEN" ,printBoard())
-        Log.d("FEN" , createFEN())
+        //Log.d("FEN" , createFEN())
         var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         //Log.d("NEW BOARD", Board("").printBoard())
     }
 
      fun doAiStep(aiColor: PieceColor) {
-         val boardForAi: Board = Board(copyBoard(), currentPlayerBoard)
+         val boardForAi: Board = Board(copyBoard(), currentPlayerBoard, true)
          val ai = Ai(boardForAi, aiColor)
          ai.board = boardForAi
          val nextStep = ai.getTheNextStep()
@@ -523,7 +526,9 @@ class Board(){
         }
 
         fun ChangeCurrentPlayer() {
-            currentPlayerBoard = currentPlayerBoard.oppositeColor()
+
+                currentPlayerBoard = currentPlayerBoard.oppositeColor()
+
         }
 
         //////////////////////////////////////////////////////////////////////////////

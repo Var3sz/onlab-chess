@@ -130,7 +130,7 @@ class Ai(var board: Board, color: PieceColor) {
 
 
     fun getTheNextStep(): Pair<Piece, Pair<Int, Int>> {
-        minimax(board, originalDepth, true, -6000000, 7000000);
+        minimax(board, originalDepth, true, -6000000, 7000000)
 
         return bestChoice
     }
@@ -170,7 +170,7 @@ class Ai(var board: Board, color: PieceColor) {
                     branch = steps[i]
                 }
                 //init new board
-                val tmp = Board(board.copyBoard(), aiColor.oppositeColor())
+                val tmp = Board(board.copyBoard(), aiColor.oppositeColor(),true)
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
                 tmp.step(tmpPiece,steps[i].second.first, steps[i].second.second)
                 //Log.d("MAX", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
@@ -193,14 +193,14 @@ class Ai(var board: Board, color: PieceColor) {
             val steps = board.getStepsforColorWithPieces(aiColor.oppositeColor(), true)
             for (i in 0 until steps.size){
                 //init new board
-                val tmp = Board(board.copyBoard(), aiColor)
+                val tmp = Board(board.copyBoard(), aiColor, true)
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
                 tmp.step(tmpPiece, steps[i].second.first, steps[i].second.second)
                 //Log.d("MIN", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
                 //new board eval
                 val value = minimax(tmp, depth-1, true, alpha, beta)
                 min=Math.min(value, min)
-                alpha=Math.min(beta, value);
+                alpha=Math.min(beta, value)
                 if(beta <= alpha){
                     break
                 }
@@ -212,7 +212,7 @@ class Ai(var board: Board, color: PieceColor) {
 
     private fun boardEvaluator(board: Board): Int {
         var value = 0
-        board.getAllPieces().forEach() {
+        board.getAllPieces().forEach {
             if (it.pieceColor == aiColor) {
                 when (it.name) {
                     PieceName.PAWN -> {
@@ -319,7 +319,7 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
         fun getavalibleStepsInaLine(piece: Piece, final: MutableList<Pair<Int, Int>>) {
             val valid = piece.getValidSteps()
 
-            valid.forEach() {
+            valid.forEach {
                 for (i in it.indices) {
                     val currentField = it[i]
                     val currentPiece = getPiece(currentField.first, currentField.second)
@@ -348,7 +348,7 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
         val origmove = piece.hasMoved
 
 
-        final.forEach() {
+        final.forEach {
             ChangePiece(piece, it.first, it.second)
             if (noStepWhenChecked(piece.pieceColor)) {
                 invalids.add(it)
@@ -369,7 +369,7 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
     }
     fun noStepWhenChecked(color: PieceColor): Boolean {
         val enemysteps = getStepsforColor(color.oppositeColor())
-        enemysteps.forEach() {
+        enemysteps.forEach {
             val tmp = getPiece(it.first, it.second)
             //Log.d("ez", "${it}")
             if (tmp.name == PieceName.KING && tmp.pieceColor == color) {
@@ -468,7 +468,7 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
         fun getStepsforColor(color: PieceColor, runspec: Boolean = false): List<Pair<Int, Int>> {
             val steps = mutableListOf<Pair<Int, Int>>()
 
-            getPiecesbyColor(color).forEach() {
+            getPiecesbyColor(color).forEach {
                 steps.addAll(getAvailableSteps(it, color, runspec))
             }
             return steps
@@ -477,9 +477,9 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
     fun getStepsforColorWithPieces(color: PieceColor,runspec: Boolean = false ): List<Pair<Piece, Pair<Int,Int>>> {
         val steps = mutableListOf<Pair<Piece, Pair<Int,Int>>>()
 
-        getPiecesbyColor(color).forEach() {
+        getPiecesbyColor(color).forEach {
             val piece = it
-            getAvailableSteps(piece, color, runspec).forEach(){
+            getAvailableSteps(piece, color, runspec).forEach {
                 steps.add(Pair(piece,it ))
             }
         }
@@ -539,7 +539,7 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
         }
         fun loadBoard(pieces: List<Piece>){
             ClenaBoard()
-            pieces.forEach(){
+            pieces.forEach {
                 addPiece(it)
             }
         }
@@ -547,7 +547,7 @@ class BoardOLD(pieces: MutableList<Piece>,color: PieceColor){
     fun printBoard(): String {
         var boarfen: String =""
         board.forEach{
-            it.forEach(){
+            it.forEach {
                 var addedChar: Char ='e'
 
                 when(it.pice.name){

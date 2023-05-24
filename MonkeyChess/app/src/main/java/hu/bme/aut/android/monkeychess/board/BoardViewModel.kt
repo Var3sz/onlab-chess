@@ -14,6 +14,8 @@ import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 import kotlin.concurrent.thread
@@ -114,15 +116,19 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
         ChangeCurrentPlayer()
         if(doAi){
             Log.d("AI", doAi.toString())
-            doAiStep()
+            val myScope = CoroutineScope(Dispatchers.IO)
+            myScope.launch {
+                doAiStep()
+            }
+
+
         }
         multiplayer?.sendMove(gameID.value.toString(), board.value!!.createFEN())
     }
 
-    private fun doAiStep() {
-        val th = thread {
-            board.value?.doAiStep(aiColor)
-        }
+    private suspend fun doAiStep() {
+        board.value?.doAiStep(aiColor)
+
         board.value?.ChangeCurrentPlayer()
         ChangeCurrentPlayer()
     }
@@ -131,7 +137,7 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
     fun ChangeCurrentPlayer() {
         var color = currentPlayer.value
         color = color?.oppositeColor()
-        currentPlayer.value = color
+        currentPlayer.postValue(color)
     }
 
     //////////////////////////////////////////////////////////////////////////////
