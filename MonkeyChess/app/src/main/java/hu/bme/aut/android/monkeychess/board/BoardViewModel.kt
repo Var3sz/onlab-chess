@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+import kotlinx.coroutines.launch
 
 import kotlin.concurrent.thread
 
@@ -32,7 +34,10 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
     private val _gameID = MutableLiveData<String?>()
     val gameID: LiveData<String?> get() = _gameID
 
-    var board = MutableLiveData<Board>()
+
+    private val _board = MutableLiveData<Board>()
+    val board: LiveData<Board> get() = _board
+
     //var ai = Ai()
 
 
@@ -42,19 +47,43 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
             if (multiplayer?.isNewGame == true) {
                 multiplayer.createNewGame(fen!!) { id ->
                     setGameId(id.toString())
+                    viewModelScope.launch {
+                        multiplayer.receiveMove(gameID) { receivedFen ->
+                            if (receivedFen != null) {
+                                fen = receivedFen
+                                val updatedBoard = Board(fen.toString())
+                                updateBoard(updatedBoard)
+                                Log.d("Received FEN: ", fen.toString())
+                            } else {
+
+                            }
+                        }
+                    }
                 }
             }
             else if(multiplayer?.isNewGame == false){
-                multiplayer.loadGame(fen!!)
                 setGameId(multiplayer.gameId)
             }
 
+            viewModelScope.launch {
+                multiplayer?.receiveMove(gameID) { receivedFen ->
+                    if (receivedFen != null) {
+                        fen = receivedFen
+                        val updatedBoard = Board(fen.toString())
+                        updateBoard(updatedBoard)
+                        Log.d("Received FEN: ", fen.toString())
+                    } else {
+
+                    }
+                }
+            }
+
             if(fen.isNullOrEmpty()){
-                board.value = Board("")
+                _board.value = Board("")
                 currentPlayer.value = PieceColor.WHITE
             }
             else{
-                board.value = Board(fen!!)
+                _board.value = Board(fen!!)
                 val fenParts = fen!!.split(" ")
                 if(fenParts[1] == "w"){
                     currentPlayer.value = PieceColor.WHITE
@@ -160,6 +189,9 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
         this._gameID.value = _gameID
     }
 
+    fun updateBoard(newBoard: Board){
+        _board.value = newBoard
+    }
 }
 
 
