@@ -475,19 +475,28 @@ class Board(){
         step(bestPiece, step.second.first, step.second.second)
     }
 
-    fun EnPassantStep(piece: Piece, i: Int, j: Int){
-        if(piece.j > 0) {
-            val left = getPiece(piece.i, piece.j - 1)
-            if (left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
-                ChangePiece(piece, i, j)
-                addPiece(Empty(left.i, left.j))
+    fun EnPassantStep(piece: Piece, i: Int, j: Int) {
+        if (piece.name == PieceName.PAWN) {
+            if (piece.j > 0) {
+                val left = getPiece(piece.i, piece.j - 1)
+                if (j == piece.j - 1 && left.name == PieceName.PAWN && left.side != piece.side && left.hasMoved && left.i == previousMove?.first && left.j == previousMove?.second) {
+                    ChangePiece(piece, i, j)
+                    addPiece(Empty(left.i, left.j))
+                    return
+                }
             }
-        }
-        if(piece.j < 7) {
-            val right = getPiece(piece.i, piece.j + 1)
-            if (right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+
+            if (piece.j < 7) {
+                val right = getPiece(piece.i, piece.j + 1)
+                if (j == piece.j + 1 && right.name == PieceName.PAWN && right.side != piece.side && right.hasMoved && right.i == previousMove?.first && right.j == previousMove?.second) {
+                    ChangePiece(piece, i, j)
+                    addPiece(Empty(right.i, right.j))
+                    return
+                }
+            }
+
+            if (j == piece.j) {
                 ChangePiece(piece, i, j)
-                addPiece(Empty(right.i, right.j))
             }
         }
     }
