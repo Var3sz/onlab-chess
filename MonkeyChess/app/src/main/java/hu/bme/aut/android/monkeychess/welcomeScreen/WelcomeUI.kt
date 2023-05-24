@@ -13,20 +13,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.ui.platform.LocalContext
 import hu.bme.aut.android.monkeychess.R
 
 class WelcomeUI : ComponentActivity() {
 
     @Composable
     fun WelcomeScreenContent(navController: NavController){
-        val mContext = LocalContext.current
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement =  Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
 
             Box(contentAlignment = Alignment.Center){
                 Image(painter = painterResource(id = R.drawable.splash_screen), contentDescription = "Logo",
                 modifier = Modifier.height(400.dp).width(400.dp))
-                //Text("demo")
             }
 
             Row(
@@ -38,11 +35,12 @@ class WelcomeUI : ComponentActivity() {
             ) {}
         }
     }
+
     @Composable
     fun WelcomeScreenButtons(navController: NavController){
         Row {
             Spacer(modifier = Modifier.width(48.dp))
-            //Login button
+
             OutlinedButton(
                 modifier = Modifier.width(100.dp),
                 onClick = {navController.navigate("login_screen")},
@@ -53,10 +51,8 @@ class WelcomeUI : ComponentActivity() {
                 Text("Login")
             }
 
-            //Két gomb között legyen kis hely
             Spacer(modifier = Modifier.weight(1f))
 
-            //Register button
             OutlinedButton(
                 modifier = Modifier.width(100.dp),
                 onClick = { navController.navigate("register_screen")
@@ -71,8 +67,5 @@ class WelcomeUI : ComponentActivity() {
 
             Spacer(modifier = Modifier.width(48.dp))
         }
-
     }
-
-
 }

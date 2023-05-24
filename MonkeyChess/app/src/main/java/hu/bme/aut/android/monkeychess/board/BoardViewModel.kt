@@ -20,7 +20,6 @@ import kotlin.concurrent.thread
 
 class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = false, val  aiColor: PieceColor):  ViewModel() {
     //var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
-
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
     var blackSide = MutableLiveData<Pair<PieceColor, Side>>()

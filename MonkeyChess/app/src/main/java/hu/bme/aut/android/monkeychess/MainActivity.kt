@@ -226,7 +226,5 @@ class MainActivity : ComponentActivity() {
             contentColor = MaterialTheme.colors.background
         )
     }
-
-
 }
 
