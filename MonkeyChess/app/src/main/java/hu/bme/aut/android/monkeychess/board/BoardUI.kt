@@ -30,7 +30,9 @@ class BoardUI() {
         val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
         val blackExchange by viewModel.getBlackExchangeState().observeAsState()
         val boardState by viewModel.board.observeAsState()
-
+        val playerOneMulti by viewModel.playerOne.observeAsState()
+        val playerTwoMulti by viewModel.playerTwo.observeAsState()
+        val playerOneSingle by viewModel.currentUser.observeAsState()
 
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -44,9 +46,18 @@ class BoardUI() {
 
             ) {
 
-                //PlayerOne
-                Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawPlayer(playerOne)
+
+                //PlayerTwo
+                Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
+                    if(viewModel.isMulti){
+                        DrawPlayer(playerTwoMulti.toString())
+                    }
+                    else if (viewModel.doAi){
+                        DrawPlayer("Robot")
+                    }
+                    else{
+                        DrawPlayer("Player two")
+                    }
                 }
 
                 //ChessBoard
@@ -56,10 +67,20 @@ class BoardUI() {
                     }
                 }
 
-                //PlayerTwo
-                Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawPlayer(playerTwo)
+                //PlayerOne
+                Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
+                    if(viewModel.isMulti){
+                        DrawPlayer(playerOneMulti.toString())
+                    }
+                    else if(viewModel.doAi){
+                        DrawPlayer(playerOneSingle.toString())
+                    }
+                    else{
+                       DrawPlayer(playerOneSingle.toString())
+                    }
                 }
+
+
                 Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
                     Text(text = "flipy flopity\nyou are my flipity ")
                 }
@@ -80,9 +101,8 @@ class BoardUI() {
                 .padding(all = 8.dp)
                 .fillMaxWidth()
         ) {
-
             Image(
-                painter = painterResource(id = R.drawable.narkos),
+                painter = painterResource(id = R.drawable.baseline_person_24),
                 contentDescription = "profile picture",
                 modifier = Modifier
                     .size(40.dp)
@@ -158,7 +178,7 @@ class BoardUI() {
                     }
                 }
             }
-            DrawPlayer(viewModel.getCurrentPlayer().toString())
+            DrawPlayer(viewModel.getCurrentPlayer().toString(),)
         }
     }
 

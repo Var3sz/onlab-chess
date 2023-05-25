@@ -13,9 +13,7 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
 
-    private var gameID: String? = gameId
-
-    fun createNewGame(fen: String, callback: (String?) -> Unit){
+    fun createNewGame(fen: String, callback: (String?, String?, String?) -> Unit){
             val userCollection = db.collection("users")
             userCollection.get().addOnSuccessListener { users ->
                 val gameID = generateRandomId(8)
@@ -40,18 +38,17 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
                     )
                     userCollection.document(userID).collection("games").add(gameData).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            callback(gameID)
+                            callback(gameID, playerOne, playerTwo)
                         } else {
-                            callback(null)
+                            callback(null, null, null)
                         }
-                        callback(gameID)
+                        callback(gameID, playerOne, playerTwo)
                     }
                 }
             }
         }.addOnFailureListener { e->
             e.printStackTrace()
-            gameID = null
-            callback(gameID)
+            callback(null ,null, null)
         }
     }
 
