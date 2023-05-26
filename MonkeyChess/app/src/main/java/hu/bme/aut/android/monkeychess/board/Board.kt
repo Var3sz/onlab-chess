@@ -23,6 +23,7 @@ class Board(val aiBoard: Boolean= false){
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
 
+    var whiteSide = Side.DOWN
 
 
     constructor(pieces: MutableList<Piece>, color: PieceColor, aiBoard: Boolean = false) : this() {
@@ -238,9 +239,9 @@ class Board(val aiBoard: Boolean= false){
         ): MutableList<Pair<Int, Int>> {
             val final = mutableListOf<Pair<Int, Int>>()
 
-            if(piece.pieceColor == color) {
+            //if(piece.pieceColor == color) {
             //debug
-            //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+            if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
@@ -401,7 +402,14 @@ class Board(val aiBoard: Boolean= false){
             val rook = getPiece(rookPos.first, rookPos.second)
             if (rook.name == PieceName.ROOK && !rook.hasMoved &&
                 CheckGapForCastling(rook)) {
-                val kingCol = if (rookPos.second == 0) 2 else 6
+                var kingCol:Int
+
+                if(whiteSide == Side.DOWN) {
+                     kingCol = if (rookPos.second == 0) 2 else 6
+                }
+                else{
+                     kingCol = if (rookPos.second == 0) 1 else 5
+                }
                 final.add(Pair(kingRow, kingCol))
             }
         }
@@ -496,7 +504,11 @@ class Board(val aiBoard: Boolean= false){
                 steps.add(Pair(piece, it))
             }
         }
-        StepforAI(steps.random())
+        if(steps.isNotEmpty()){
+            StepforAI(steps.random())
+        }else{
+            return
+        }
     }
 
     fun StepforAI(step: Pair<Piece, Pair<Int, Int>>){
@@ -531,6 +543,7 @@ class Board(val aiBoard: Boolean= false){
     }
 
     fun CastlingStep(piece: Piece, i: Int, j: Int) {
+
         val kingRow = if (piece.side == Side.UP) 0 else 7
         val rookCandidates = listOf(
             getPiece(kingRow, 0),
@@ -538,15 +551,29 @@ class Board(val aiBoard: Boolean= false){
         )
         val rook : Piece
         val rookJ: Int
-        if(j == 6) {
-            rook = rookCandidates[1]
-            rookJ = 6 - 1
-            ChangePiece(rook, i, rookJ)
+        if(whiteSide == Side.DOWN){
+            if(j == 6) {
+                rook = rookCandidates[1]
+                rookJ = 6 - 1
+                ChangePiece(rook, i, rookJ)
+            }
+            else if(j == 2){
+                rook = rookCandidates[0]
+                rookJ = 2 + 1
+                ChangePiece(rook, i, rookJ)
+            }
         }
-        else if(j == 2){
-            rook = rookCandidates[0]
-            rookJ = 2 + 1
-            ChangePiece(rook, i, rookJ)
+        else{
+            if(j == 5) {
+                rook = rookCandidates[1]
+                rookJ = 5 - 1
+                ChangePiece(rook, i, rookJ)
+            }
+            else if(j == 1){
+                rook = rookCandidates[0]
+                rookJ = 1 + 1
+                ChangePiece(rook, i, rookJ)
+            }
         }
         ChangePiece(piece, i, j)
     }
@@ -853,10 +880,10 @@ class Board(val aiBoard: Boolean= false){
     fun FlipTheTable() {
         val listOfPieces = getAllPieces()
         val tiles = board
+        whiteSide = whiteSide.oppositeSide()
 
         listOfPieces.forEach() {
             it.flip()
-            //Log.d("FLIP", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
         }
 
 

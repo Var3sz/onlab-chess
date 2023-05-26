@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,13 +30,16 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
 
-    /** Single player user related stuff **/
+
     private var _currentUser = MutableLiveData<String>(singlePlayer?.currentUserLiveData?.value)
     val currentUser: LiveData<String?> get() = _currentUser
     private var _currentUserProfilePicture = MutableLiveData<String>(singlePlayer?.imageUrlLiveData?.value)
     val currentUserProfilePicture: LiveData<String?> get() = _currentUserProfilePicture
 
-    /** Multiplayer and multiplayer user related stuff **/
+
+    var whiteDefeated = MutableLiveData<Boolean>(false)
+    var blackDefeated = MutableLiveData<Boolean>(false)
+
     var fen = multiplayer?.fen
 
     private val _playerOne = MutableLiveData<String>()
@@ -140,7 +144,11 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     fun step(piece: Piece, i: Int, j: Int, doai: Boolean = false) {
         board.value?.step(piece,i,j,doai)
         ChangeCurrentPlayer()
-        if(doAi){
+
+       // Log.d("MateCheck","Number of steps for ${currentPlayer.value ?: PieceColor.EMPTY}: ${board.value?.getStepsforColor(currentPlayer.value ?: PieceColor.EMPTY, true)?.size.toString()} ")
+
+
+        if(doAi && whiteDefeated.value == false && blackDefeated.value == false){
             Log.d("AI", doAi.toString())
             val myScope = CoroutineScope(Dispatchers.IO)
             myScope.launch {
@@ -161,6 +169,15 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
 
 
     fun ChangeCurrentPlayer() {
+        if(board.value?.getStepsforColor(currentPlayer.value ?: PieceColor.EMPTY, true)?.isEmpty() == true){
+            Log.d("MATE", "${currentPlayer.value} is defeated")
+            if(currentPlayer.value == PieceColor.WHITE){
+                whiteDefeated.postValue(true)
+            }
+            else if(currentPlayer.value == PieceColor.BLACK){
+                blackDefeated.postValue(true)
+            }
+        }
         var color = currentPlayer.value
         color = color?.oppositeColor()
         currentPlayer.postValue(color)
