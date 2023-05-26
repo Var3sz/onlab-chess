@@ -40,6 +40,7 @@ class BoardUI() {
         val singlePlayerProfilePicture by viewModel.currentUserProfilePicture.observeAsState()
         val multiPlayerProfilePicturePlayerOne by viewModel.playerOneImage.observeAsState()
         val multiPlayerProfilePicturePlayerTwo by viewModel.playerTwoImage.observeAsState()
+        val multiplayerCurrentUser by viewModel.multiplayerCurrentUser.observeAsState()
         val whiteDefeated by viewModel.getWhiteDefeated().observeAsState()
         val blackDefeated by viewModel.getBlackDefeated().observeAsState()
 
@@ -59,8 +60,14 @@ class BoardUI() {
                 //PlayerTwo
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
                     //DrawPlayer(viewModel.currentPlayer.value.toString(),R.drawable.white_pawn, null)
-                    if(viewModel.isMulti){
-                        DrawPlayer(playerTwoMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerTwo)
+                    if (viewModel.isMulti) {
+                        val isCurrentUserPlayerOne = multiplayerCurrentUser == playerOneMulti
+                        val profilePicture = if (isCurrentUserPlayerOne) {
+                            multiPlayerProfilePicturePlayerTwo
+                        } else {
+                            multiPlayerProfilePicturePlayerOne
+                        }
+                        DrawPlayer(if (isCurrentUserPlayerOne) playerTwoMulti.toString() else playerOneMulti.toString(), R.drawable.baseline_person_24, profilePicture)
                     }
                     else if (viewModel.doAi){
                         DrawPlayer("Robot", R.drawable.robot, null)
@@ -79,8 +86,14 @@ class BoardUI() {
 
                 //PlayerOne
                 Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    if(viewModel.isMulti){
-                        DrawPlayer(playerOneMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerOne)
+                    if (viewModel.isMulti) {
+                        val isCurrentUserPlayerOne = multiplayerCurrentUser == playerOneMulti
+                        val profilePicture = if (isCurrentUserPlayerOne) {
+                            multiPlayerProfilePicturePlayerOne
+                        } else {
+                            multiPlayerProfilePicturePlayerTwo
+                        }
+                        DrawPlayer(multiplayerCurrentUser.toString(), R.drawable.baseline_person_24, profilePicture)
                     }
                     else if(viewModel.doAi){
                         DrawPlayer(playerOneSingle.toString(), R.drawable.baseline_person_24, singlePlayerProfilePicture)
@@ -160,7 +173,7 @@ class BoardUI() {
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
                                         //viewModel.ChangeCurrentPlayer()
                                     } else {
-                                        if(board.getPiece(i, j).name != PieceName.EMPTY){
+                                        if (board.getPiece(i, j).name != PieceName.EMPTY) {
                                             viewModel.setClickedPiece(board.getPiece(i, j))
                                             viewModel.HideAvailableSteps()
                                         }
