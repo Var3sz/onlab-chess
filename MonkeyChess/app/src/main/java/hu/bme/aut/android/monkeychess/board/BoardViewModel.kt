@@ -66,8 +66,6 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     var isMulti: Boolean = false
     //var ai = Ai()
 
-    var whiteDefeated = MutableLiveData<Boolean>(false)
-    var blackDefeated = MutableLiveData<Boolean>(false)
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -224,9 +222,7 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     }
 
     fun HideAvailableSteps() {
-        val tmp= Board(board.value?.copyBoard()!!, currentPlayer.value!!)
-        tmp.HideAvailableSteps()
-        updateBoard(tmp)
+        board.value?.HideAvailableSteps()
     }
 
     /////////Getters and Setter

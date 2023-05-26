@@ -152,8 +152,11 @@ class BoardUI() {
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
                                         //viewModel.ChangeCurrentPlayer()
                                     } else {
-                                        viewModel.HideAvailableSteps()
-                                        viewModel.setClickedPiece(board.getPiece(i, j))
+                                        if(board.getPiece(i, j).name != PieceName.EMPTY){
+                                            viewModel.setClickedPiece(board.getPiece(i, j))
+                                            viewModel.HideAvailableSteps()
+                                        }
+
 
                                         Log.d(
                                             "Board1",
