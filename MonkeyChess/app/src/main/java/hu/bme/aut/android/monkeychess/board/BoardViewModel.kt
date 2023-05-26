@@ -38,8 +38,8 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     val currentUserProfilePicture: LiveData<String?> get() = _currentUserProfilePicture
 
 
-    var whiteDefeated = MutableLiveData<Boolean>(false)
-    var blackDefeated = MutableLiveData<Boolean>(false)
+    private var whiteDefeated = MutableLiveData<Boolean>(false)
+    private var blackDefeated = MutableLiveData<Boolean>(false)
 
     var fen = multiplayer?.fen
 
@@ -144,6 +144,10 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     //////////////////////////////////////////////////////////////////////////////
     //  Different steps and step logic
     fun step(piece: Piece, i: Int, j: Int, doai: Boolean = false) {
+
+
+        Log.d("CURRENT PLAYER", board.value?.currentPlayerBoard.toString())
+        Log.d("PLAYER ON VIEWMODEL", currentPlayer.value.toString())
         board.value?.step(piece,i,j,doai)
         ChangeCurrentPlayer()
 
@@ -165,30 +169,31 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     private suspend fun doAiStep() {
         board.value?.doAiStep(aiColor)
 
-        board.value?.ChangeCurrentPlayer()
-        ChangeCurrentPlayer()
+        //board.value?.ChangeCurrentPlayer()
+        ChangeCurrentPlayer(true)
     }
 
 
-    fun ChangeCurrentPlayer() {
-        /*
-        if(board.value?.getStepsforColor(currentPlayer.value ?: PieceColor.EMPTY, true)?.isEmpty() == true){
-            Log.d("MATE", "${currentPlayer.value} is defeated")
-            if(currentPlayer.value == PieceColor.WHITE){
-                //whiteDefeated.postValue(true)
+    fun ChangeCurrentPlayer(ai: Boolean = false) {
+        val tmp = Board(board.value?.copyBoard()!!, currentPlayer.value!!)
+        tmp.getStepsforColor(PieceColor.BLACK,true)
+
+        if(tmp.getStepsforColor(currentPlayer.value!!.oppositeColor(), true).isEmpty() == true){
+            Log.d("MATE", "${currentPlayer.value!!.oppositeColor()} is defeated by ${currentPlayer.value.toString()}")
+            if(currentPlayer.value == PieceColor.BLACK){
+                whiteDefeated.postValue(true)
+
             }
-            else if(currentPlayer.value == PieceColor.BLACK){
-                //blackDefeated.postValue(true)
+            else if(currentPlayer.value == PieceColor.WHITE){
+                blackDefeated.postValue(true)
             }
         }
 
+            var color = currentPlayer.value
+            color = color?.oppositeColor()
+            currentPlayer.postValue(color)
 
-         */
 
-
-        var color = currentPlayer.value
-        color = color?.oppositeColor()
-        currentPlayer.postValue(color)
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -257,11 +262,12 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     fun updateBoard(newBoard: Board){
         _board.value = newBoard
     }
+
+    fun getBlackDefeated(): MutableLiveData<Boolean> {
+        return blackDefeated
+    }
+    fun getWhiteDefeated(): MutableLiveData<Boolean> {
+        return  whiteDefeated
+    }
 }
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////

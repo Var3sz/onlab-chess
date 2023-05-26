@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
@@ -29,7 +30,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
 class BoardUI() {
     @Composable
-    fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel) {
+    fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel, navController: NavController) {
         val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
         val blackExchange by viewModel.getBlackExchangeState().observeAsState()
         val boardState by viewModel.board.observeAsState()
@@ -39,6 +40,8 @@ class BoardUI() {
         val singlePlayerProfilePicture by viewModel.currentUserProfilePicture.observeAsState()
         val multiPlayerProfilePicturePlayerOne by viewModel.playerOneImage.observeAsState()
         val multiPlayerProfilePicturePlayerTwo by viewModel.playerTwoImage.observeAsState()
+        val whiteDefeated by viewModel.getWhiteDefeated().observeAsState()
+        val blackDefeated by viewModel.getBlackDefeated().observeAsState()
 
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -55,6 +58,7 @@ class BoardUI() {
 
                 //PlayerTwo
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
+                    //DrawPlayer(viewModel.currentPlayer.value.toString(),R.drawable.white_pawn, null)
                     if(viewModel.isMulti){
                         DrawPlayer(playerTwoMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerTwo)
                     }
@@ -100,6 +104,14 @@ class BoardUI() {
                 isBlackExchange = blackExchange!!,
                 onDismiss = { }
             )
+            Matt(
+                viewModel = viewModel,
+                isWhiteExchange = whiteDefeated!!,
+                isBlackExchange = blackDefeated!!,
+                onDismiss = { },
+                navController = navController
+            )
+
         }
     }
 
@@ -156,7 +168,6 @@ class BoardUI() {
                                             viewModel.setClickedPiece(board.getPiece(i, j))
                                             viewModel.HideAvailableSteps()
                                         }
-
 
                                         Log.d(
                                             "Board1",
@@ -314,6 +325,58 @@ class BoardUI() {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+            )
+        }
+    }
+
+    @Composable
+    fun Matt(viewModel: BoardViewModel, isWhiteExchange: Boolean, isBlackExchange: Boolean,onDismiss: () -> Unit, navController: NavController){
+        if( isWhiteExchange || isBlackExchange){
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                text = {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        color = Color.Black,
+                        text = if(viewModel.currentPlayer.value == PieceColor.BLACK)
+                            "Black is defeated by White"
+                            else
+                            "White is defeated by Black"
+                        ,
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                buttons = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(30.dp, 0.dp, 30.dp, 50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        OutlinedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {navController.navigate("MainMenu_screen")},
+                            border = BorderStroke(1.dp, Color.Black),
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                color = Color.Black,
+                                text = "Return to Main Menu",
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
                         }
                     }
                 }
