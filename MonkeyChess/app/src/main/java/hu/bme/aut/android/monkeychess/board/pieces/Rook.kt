@@ -13,11 +13,11 @@ data class Rook(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
-    override var side: Side
+    override var side: Side,
+    override var hasMoved: Boolean = false
 ) : Piece {
 
     override val name: PieceName = PieceName.ROOK
-    override var hasMoved: Boolean = false
     override var position: Pair<Int, Int> = Pair(i,j)
     override var imageID: Int = 0
 

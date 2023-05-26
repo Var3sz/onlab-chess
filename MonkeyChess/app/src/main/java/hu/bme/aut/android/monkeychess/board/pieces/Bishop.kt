@@ -15,12 +15,12 @@ data class Bishop(
     override var i: Int,
     override var j: Int,
     override var side: Side,
+    override var hasMoved: Boolean = false
 ) : Piece {
 
 
     override var imageID: Int = 0
     override val name: PieceName = PieceName.BISHOP
-    override var hasMoved: Boolean = false
     override var position: Pair<Int, Int> = Pair(i,j)
 
 
