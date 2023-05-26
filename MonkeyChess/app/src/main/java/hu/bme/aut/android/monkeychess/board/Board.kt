@@ -40,42 +40,62 @@ class Board(var aiBoard: Boolean= false){
     }
 
     constructor(fenBoard: String) : this() {
-            if (fenBoard.isNotBlank()) {
-                val fenParts = fenBoard.split(" ")
-                require(fenParts.size == 3) { "Invalid FEN string: $fenBoard" }
+        if (fenBoard.isNotBlank()) {
+            val fenParts = fenBoard.split(" ")
+            require(fenParts.size == 3) { "Invalid FEN string: $fenBoard" }
 
-                val fenRows = fenParts[0].split("/")
-                require(fenRows.size == 8) { "Invalid FEN string: $fenBoard" }
+            val fenRows = fenParts[0].split("/")
+            require(fenRows.size == 8) { "Invalid FEN string: $fenBoard" }
 
-                val activeColor = fenParts[1]
-                val isWhiteOnTop = fenBoard.endsWith("rnbqkbnr")
-                val castlingRights = fenParts[2]
-                parseCastlingRights(castlingRights)
+            val activeColor = fenParts[1]
+            val isWhiteOnTop = fenBoard.endsWith("rnbqkbnr")
 
-                for (i in 0 until 8) {
-                    val fenRow = fenRows[i]
-                    val rowList = SnapshotStateList<Tile>()
+            val castlingRights = fenParts[2]
+            val hasWhiteKingMoved = !castlingRights.contains("KQ")
+            val hasBlackKingMoved = !castlingRights.contains("kq")
+            val hasWhiteRookQueenSideMoved = !castlingRights.contains("Q")
+            val hasWhiteRookKingSideMoved = !castlingRights.contains("K")
+            val hasBlackRookQueenSideMoved = !castlingRights.contains("q")
+            val hasBlackRookKingSideMoved = !castlingRights.contains("k")
 
-                    var j = 0
-                    for (char in fenRow) {
-                        if (char.isDigit()) {
-                            val emptyCount = char.toString().toInt()
-                            for (k in 0 until emptyCount) {
-                                rowList.add(Tile(false, Empty(i, j)))
-                                j++
-                            }
-                        } else {
-                            val pieceColor = if (char.isUpperCase()) PieceColor.WHITE else PieceColor.BLACK
-                            val piece = getPieceFromFENChar(char.toLowerCase(), pieceColor, i, j, isWhiteOnTop)
-                            rowList.add(Tile(false, piece))
+            for (i in 0 until 8) {
+                val fenRow = fenRows[i]
+                val rowList = SnapshotStateList<Tile>()
+
+                var j = 0
+                for (char in fenRow) {
+                    if (char.isDigit()) {
+                        val emptyCount = char.toString().toInt()
+                        for (k in 0 until emptyCount) {
+                            rowList.add(Tile(false, Empty(i, j)))
                             j++
                         }
+                    } else {
+                        val pieceColor = if (char.isUpperCase()) PieceColor.WHITE else PieceColor.BLACK
+                        val piece = getPieceFromFENChar(
+                            char.toLowerCase(),
+                            pieceColor,
+                            i,
+                            j,
+                            isWhiteOnTop,
+                            when {
+                                pieceColor == PieceColor.WHITE && i == 7 && j == 4 -> hasWhiteKingMoved
+                                pieceColor == PieceColor.WHITE && i == 7 && j == 0 -> hasWhiteRookQueenSideMoved
+                                pieceColor == PieceColor.WHITE && i == 7 && j == 7 -> hasWhiteRookKingSideMoved
+                                pieceColor == PieceColor.BLACK && i == 0 && j == 4 -> hasBlackKingMoved
+                                pieceColor == PieceColor.BLACK && i == 0 && j == 0 -> hasBlackRookQueenSideMoved
+                                pieceColor == PieceColor.BLACK && i == 0 && j == 7 -> hasBlackRookKingSideMoved
+                                else -> true
+                            }
+                        )
+                        rowList.add(Tile(false, piece))
+                        j++
                     }
-                    board.add(rowList)
                 }
-
-                currentPlayerBoard = if (activeColor == "w") PieceColor.WHITE else PieceColor.BLACK
+                board.add(rowList)
             }
+            currentPlayerBoard = if (activeColor == "w") PieceColor.WHITE else PieceColor.BLACK
+        }
 
         if(fenBoard == ""){
             currentPlayerBoard = PieceColor.WHITE
@@ -172,7 +192,14 @@ class Board(var aiBoard: Boolean= false){
         blackCanCastleQueenSide = false
     }
 
-    private fun getPieceFromFENChar(char: Char, color: PieceColor, row: Int, col: Int, isWhiteOnTop: Boolean): Piece {
+    private fun getPieceFromFENChar(
+        char: Char,
+        color: PieceColor,
+        row: Int,
+        col: Int,
+        isWhiteOnTop: Boolean,
+        hasMoved: Boolean
+    ): Piece {
         return when (char) {
             'p', 'P' -> {
                 val side = if (color == PieceColor.WHITE) {
@@ -182,11 +209,11 @@ class Board(var aiBoard: Boolean= false){
                 }
                 Pawn(color, row, col, side)
             }
-            'r', 'R' -> Rook(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
-            'n', 'N' -> Knight(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
-            'b', 'B' -> Bishop(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
-            'q', 'Q' -> Queen(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
-            'k', 'K' -> King(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'r', 'R' -> Rook(color, row, col, if (color == PieceColor.WHITE) Side.DOWN else Side.UP, hasMoved)
+            'n', 'N' -> Knight(color, row, col, if (color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'b', 'B' -> Bishop(color, row, col, if (color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'q', 'Q' -> Queen(color, row, col, if (color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'k', 'K' -> King(color, row, col, if (color == PieceColor.WHITE) Side.DOWN else Side.UP, hasMoved)
             else -> throw IllegalArgumentException("Invalid FEN character: $char")
         }
     }
@@ -441,7 +468,7 @@ class Board(var aiBoard: Boolean= false){
         //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
         //Log.d("FEN" ,printBoard())
-        //Log.d("FEN" , createFEN())
+        Log.d("FEN" , createFEN())
         var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
         //Log.d("NEW BOARD", Board("").printBoard())
     }
@@ -735,27 +762,39 @@ class Board(var aiBoard: Boolean= false){
     fun createFEN(): String{
         var emptyTile = 0
         var boardFEN = ""
-        board.forEach { row ->
-            row.forEach { tile ->
-                var addedChar = ' '
 
-                when (tile.pice.name) {
-                    PieceName.PAWN -> addedChar = 'p'
-                    PieceName.KNIGHT -> addedChar = 'n'
-                    PieceName.BISHOP -> addedChar = 'b'
-                    PieceName.ROOK -> addedChar = 'r'
-                    PieceName.QUEEN -> addedChar = 'q'
-                    PieceName.KING -> addedChar = 'k'
-                    else -> {}
-                }
+        val flipBoard = (this.whiteSide == Side.UP)
 
-                when (tile.pice.pieceColor) {
-                    PieceColor.WHITE -> addedChar = addedChar.uppercaseChar()
-                    PieceColor.BLACK -> {}
-                    PieceColor.EMPTY -> {
-                        emptyTile++
-                        return@forEach
+        if(flipBoard){
+            board.reversed().forEach { row ->
+                row.reversed().forEach { tile ->
+                    var addedChar = ' '
+
+                    when (tile.pice.name) {
+                        PieceName.PAWN -> addedChar = 'p'
+                        PieceName.KNIGHT -> addedChar = 'n'
+                        PieceName.BISHOP -> addedChar = 'b'
+                        PieceName.ROOK -> addedChar = 'r'
+                        PieceName.QUEEN -> addedChar = 'q'
+                        PieceName.KING -> addedChar = 'k'
+                        else -> {}
                     }
+
+                    when (tile.pice.pieceColor) {
+                        PieceColor.WHITE -> addedChar = addedChar.uppercaseChar()
+                        PieceColor.BLACK -> {}
+                        PieceColor.EMPTY -> {
+                            emptyTile++
+                            return@forEach
+                        }
+                    }
+
+                    if (emptyTile > 0) {
+                        boardFEN += emptyTile.toString()
+                        emptyTile = 0
+                    }
+
+                    boardFEN += addedChar
                 }
 
                 if (emptyTile > 0) {
@@ -763,29 +802,76 @@ class Board(var aiBoard: Boolean= false){
                     emptyTile = 0
                 }
 
-                boardFEN += addedChar
+                boardFEN += '/'
             }
 
-            if (emptyTile > 0) {
-                boardFEN += emptyTile.toString()
-                emptyTile = 0
+            boardFEN = boardFEN.dropLast(1)
+
+            if(currentPlayerBoard == PieceColor.WHITE){
+                boardFEN+=" w "
+            }
+            else if(currentPlayerBoard == PieceColor.BLACK){
+                boardFEN+=" b "
             }
 
-            boardFEN += '/'
+            boardFEN += generateCastlingFen(this, true)
+
+            return boardFEN
         }
 
-        boardFEN = boardFEN.dropLast(1)
+        else{
+            board.forEach { row ->
+                row.forEach { tile ->
+                    var addedChar = ' '
 
-        if(currentPlayerBoard == PieceColor.WHITE){
-            boardFEN+=" w "
+                    when (tile.pice.name) {
+                        PieceName.PAWN -> addedChar = 'p'
+                        PieceName.KNIGHT -> addedChar = 'n'
+                        PieceName.BISHOP -> addedChar = 'b'
+                        PieceName.ROOK -> addedChar = 'r'
+                        PieceName.QUEEN -> addedChar = 'q'
+                        PieceName.KING -> addedChar = 'k'
+                        else -> {}
+                    }
+
+                    when (tile.pice.pieceColor) {
+                        PieceColor.WHITE -> addedChar = addedChar.uppercaseChar()
+                        PieceColor.BLACK -> {}
+                        PieceColor.EMPTY -> {
+                            emptyTile++
+                            return@forEach
+                        }
+                    }
+
+                    if (emptyTile > 0) {
+                        boardFEN += emptyTile.toString()
+                        emptyTile = 0
+                    }
+
+                    boardFEN += addedChar
+                }
+
+                if (emptyTile > 0) {
+                    boardFEN += emptyTile.toString()
+                    emptyTile = 0
+                }
+
+                boardFEN += '/'
+            }
+
+            boardFEN = boardFEN.dropLast(1)
+
+            if(currentPlayerBoard == PieceColor.WHITE){
+                boardFEN+=" w "
+            }
+            else if(currentPlayerBoard == PieceColor.BLACK){
+                boardFEN+=" b "
+            }
+
+            boardFEN += generateCastlingFen(this, false)
+
+            return boardFEN
         }
-        else if(currentPlayerBoard == PieceColor.BLACK){
-            boardFEN+=" b "
-        }
-
-        boardFEN += generateCastlingFen(this)
-
-        return boardFEN
     }
 
     fun exchangePawn(pieceName: PieceName){
@@ -867,24 +953,44 @@ class Board(var aiBoard: Boolean= false){
         }
     }
 
-    fun generateCastlingFen(board: Board): String {
+    fun generateCastlingFen(board: Board, isWhiteOnTop: Boolean): String {
         var castlingFen = ""
 
-        if (board.getPiece(7, 4) is King && board.getPiece(7, 4)?.pieceColor == PieceColor.WHITE) {
-            if (board.getPiece(7, 7) is Rook && board.getPiece(7, 7)?.pieceColor == PieceColor.WHITE) {
-                castlingFen += "K"
+        if (isWhiteOnTop) {
+            if (board.getPiece(0, 3) is King && board.getPiece(0, 3)?.pieceColor == PieceColor.WHITE) {
+                if (board.getPiece(0, 0) is Rook && board.getPiece(0, 0)?.pieceColor == PieceColor.WHITE) {
+                    castlingFen += "K"
+                }
+                if (board.getPiece(0, 7) is Rook && board.getPiece(0, 7)?.pieceColor == PieceColor.WHITE) {
+                    castlingFen += "Q"
+                }
             }
-            if (board.getPiece(7, 0) is Rook && board.getPiece(7, 0)?.pieceColor == PieceColor.WHITE) {
-                castlingFen += "Q"
-            }
-        }
 
-        if (board.getPiece(0, 4) is King && board.getPiece(0, 4)?.pieceColor == PieceColor.BLACK) {
-            if (board.getPiece(0, 7) is Rook && board.getPiece(0, 7)?.pieceColor == PieceColor.BLACK) {
-                castlingFen += "k"
+            if (board.getPiece(7, 3) is King && board.getPiece(7, 3)?.pieceColor == PieceColor.BLACK) {
+                if (board.getPiece(7, 0) is Rook && board.getPiece(7, 0)?.pieceColor == PieceColor.BLACK) {
+                    castlingFen += "k"
+                }
+                if (board.getPiece(7, 7) is Rook && board.getPiece(7, 7)?.pieceColor == PieceColor.BLACK) {
+                    castlingFen += "q"
+                }
             }
-            if (board.getPiece(0, 0) is Rook && board.getPiece(0, 0)?.pieceColor == PieceColor.BLACK) {
-                castlingFen += "q"
+        } else {
+            if (board.getPiece(7, 4) is King && board.getPiece(7, 4)?.pieceColor == PieceColor.WHITE) {
+                if (board.getPiece(7, 7) is Rook && board.getPiece(7, 7)?.pieceColor == PieceColor.WHITE) {
+                    castlingFen += "K"
+                }
+                if (board.getPiece(7, 0) is Rook && board.getPiece(7, 0)?.pieceColor == PieceColor.WHITE) {
+                    castlingFen += "Q"
+                }
+            }
+
+            if (board.getPiece(0, 4) is King && board.getPiece(0, 4)?.pieceColor == PieceColor.BLACK) {
+                if (board.getPiece(0, 7) is Rook && board.getPiece(0, 7)?.pieceColor == PieceColor.BLACK) {
+                    castlingFen += "k"
+                }
+                if (board.getPiece(0, 0) is Rook && board.getPiece(0, 0)?.pieceColor == PieceColor.BLACK) {
+                    castlingFen += "q"
+                }
             }
         }
 

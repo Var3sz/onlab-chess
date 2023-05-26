@@ -13,11 +13,11 @@ data class Pawn(
     override var i: Int,
     override var j: Int,
     override var side: Side,
-    ) : Piece {
+    override var hasMoved: Boolean = false
+) : Piece {
 
     override var position: Pair<Int, Int> = Pair(i,j)
     override val name: PieceName = PieceName.PAWN
-    override var hasMoved: Boolean = false
 
     override var imageID: Int = 0
 

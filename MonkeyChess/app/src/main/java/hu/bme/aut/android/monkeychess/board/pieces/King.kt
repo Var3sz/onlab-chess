@@ -12,15 +12,13 @@ data class King(
     override var pieceColor: PieceColor,
     override var i: Int,
     override var j: Int,
-    override var side: Side
-    ) : Piece {
+    override var side: Side,
+    override var hasMoved: Boolean = false
+) : Piece {
 
     override var imageID: Int = 0
     override val name: PieceName = PieceName.KING
     override var position: Pair<Int, Int> = Pair(i,j)
-
-    override var hasMoved: Boolean = false
-
 
 
     init {

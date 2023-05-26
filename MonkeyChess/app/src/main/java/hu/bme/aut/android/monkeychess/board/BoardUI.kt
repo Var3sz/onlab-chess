@@ -86,13 +86,9 @@ class BoardUI() {
                     }
                 }
 
-
-                //if(viewModel.isMulti){
-                    Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
-                        Text(text = "flipy flopity\nyou are my flipity ")
-                    }
-              //  }
-
+                Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
+                    Text(text = "flipy flopity\nyou are my flipity ")
+                }
             }
             ExchangePieceAlert(
                 viewModel = viewModel,
