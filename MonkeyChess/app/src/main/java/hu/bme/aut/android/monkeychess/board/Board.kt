@@ -200,9 +200,9 @@ class Board(var aiBoard: Boolean= false){
         ): MutableList<Pair<Int, Int>> {
             val final = mutableListOf<Pair<Int, Int>>()
 
-            //if(piece.pieceColor == color) {
+            if(piece.pieceColor == color) {
             //debug
-            if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+            //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
@@ -415,6 +415,7 @@ class Board(var aiBoard: Boolean= false){
         //Log.d("CURR", currentPlayer.value.toString())
         //king castling
         // Log.d("CAST ${piece.name}", "${piece.hasMoved}")
+
         if (piece.name == PieceName.KING && !piece.hasMoved) {
             CastlingStep(piece, i, j)
             //Log.d("CAST", "${piece.hasMoved}")

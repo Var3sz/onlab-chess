@@ -110,14 +110,14 @@ class MainActivity : ComponentActivity() {
                 
                 val viewModel =BoardViewModel(singleplayer,null,true, PieceColor.BLACK)
                 
-                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel, navController = navController)}, bottomBar = {})
             }
             composable("board_1v1"){
                 val singleplayer = remember {
                     SinglePlayer()
                 }
                 val viewModel =BoardViewModel(singleplayer,null, false, PieceColor.EMPTY)
-                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel, navController = navController)}, bottomBar = {})
             }
 
             composable("profile_screen"){
@@ -176,7 +176,7 @@ class MainActivity : ComponentActivity() {
                 TopAppBarWidget(
                     navController = navController,
                     content = {
-                        BoardUI().GameScreen(viewModel = viewModel)
+                        BoardUI().GameScreen(viewModel = viewModel,  navController = navController)
                     },
                     bottomBar = {}
                 )
@@ -210,7 +210,7 @@ class MainActivity : ComponentActivity() {
                     BoardViewModel(singleplayer, multiplayer, false, PieceColor.EMPTY)
                 }
 
-                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel) }, bottomBar = {})
+                TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel,  navController = navController) }, bottomBar = {})
                 BackHandler { navController.navigate("select_game") }
             }
         }
