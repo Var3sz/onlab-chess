@@ -107,7 +107,9 @@ class MainActivity : ComponentActivity() {
                 val singleplayer = remember {
                     SinglePlayer()
                 }
-                val viewModel =BoardViewModel(singleplayer,null,true, PieceColor.WHITE)
+                
+                val viewModel =BoardViewModel(singleplayer,null,true, PieceColor.BLACK)
+                
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
             composable("board_1v1"){

@@ -127,7 +127,7 @@ class Ai(var board: Board, color: PieceColor) {
 
 
     fun getTheNextStep(): Pair<Piece, Pair<Int, Int>> {
-        minimax(board, originalDepth, true, -6000000, 7000000);
+        minimax(board, originalDepth, true, -6000000, 7000000)
 
         return bestChoice
     }
@@ -167,7 +167,7 @@ class Ai(var board: Board, color: PieceColor) {
                     branch = steps[i]
                 }
                 //init new board
-                val tmp = Board(board.copyBoard(), aiColor.oppositeColor())
+                val tmp = Board(board.copyBoard(), aiColor.oppositeColor(),true)
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
                 tmp.step(tmpPiece,steps[i].second.first, steps[i].second.second)
                 //Log.d("MAX", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
@@ -190,14 +190,14 @@ class Ai(var board: Board, color: PieceColor) {
             val steps = board.getStepsforColorWithPieces(aiColor.oppositeColor(), true)
             for (i in 0 until steps.size){
                 //init new board
-                val tmp = Board(board.copyBoard(), aiColor)
+                val tmp = Board(board.copyBoard(), aiColor, true)
                 val tmpPiece = tmp.getPiece(steps[i].first.position)
                 tmp.step(tmpPiece, steps[i].second.first, steps[i].second.second)
                 //Log.d("MIN", "\n${boardEvaluator(tmp)}\n${tmp.printBoard()}\n")
                 //new board eval
                 val value = minimax(tmp, depth-1, true, alpha, beta)
                 min=Math.min(value, min)
-                alpha=Math.min(beta, value);
+                alpha=Math.min(beta, value)
                 if(beta <= alpha){
                     break
                 }
@@ -209,7 +209,7 @@ class Ai(var board: Board, color: PieceColor) {
 
     private fun boardEvaluator(board: Board): Int {
         var value = 0
-        board.getAllPieces().forEach() {
+        board.getAllPieces().forEach {
             if (it.pieceColor == aiColor) {
                 when (it.name) {
                     PieceName.PAWN -> {
