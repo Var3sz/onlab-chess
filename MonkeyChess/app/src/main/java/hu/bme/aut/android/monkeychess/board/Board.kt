@@ -7,9 +7,13 @@ import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
-import kotlinx.coroutines.runBlocking
 
 class Board(val aiBoard: Boolean= false){
+
+    var blackCanCastleQueenSide: Boolean = false
+    var blackCanCastleKingSide: Boolean = false
+    var whiteCanCastleQueenSide: Boolean = false
+    var whiteCanCastleKingSide: Boolean = false
 
     var board = mutableListOf<MutableList<Tile>>()
     var currentPlayerBoard: PieceColor = PieceColor.EMPTY
@@ -36,13 +40,15 @@ class Board(val aiBoard: Boolean= false){
     constructor(fenBoard: String) : this() {
             if (fenBoard.isNotBlank()) {
                 val fenParts = fenBoard.split(" ")
-                require(fenParts.size == 2) { "Invalid FEN string: $fenBoard" }
+                require(fenParts.size == 3) { "Invalid FEN string: $fenBoard" }
 
                 val fenRows = fenParts[0].split("/")
                 require(fenRows.size == 8) { "Invalid FEN string: $fenBoard" }
 
                 val activeColor = fenParts[1]
                 val isWhiteOnTop = fenBoard.endsWith("rnbqkbnr")
+                val castlingRights = fenParts[2]
+                parseCastlingRights(castlingRights)
 
                 for (i in 0 until 8) {
                     val fenRow = fenRows[i]
@@ -142,6 +148,26 @@ class Board(val aiBoard: Boolean= false){
                 board.add(rowList)
             }
         }
+    }
+
+    private fun parseCastlingRights(castlingRights: String) {
+        resetCastlingRights()
+
+        for (char in castlingRights) {
+            when (char) {
+                'K' -> whiteCanCastleKingSide = true
+                'Q' -> whiteCanCastleQueenSide = true
+                'k' -> blackCanCastleKingSide = true
+                'q' -> blackCanCastleQueenSide = true
+            }
+        }
+    }
+
+    private fun resetCastlingRights() {
+        whiteCanCastleKingSide = false
+        whiteCanCastleQueenSide = false
+        blackCanCastleKingSide = false
+        blackCanCastleQueenSide = false
     }
 
     private fun getPieceFromFENChar(char: Char, color: PieceColor, row: Int, col: Int, isWhiteOnTop: Boolean): Piece {
@@ -291,6 +317,7 @@ class Board(val aiBoard: Boolean= false){
         }
         final.removeAll(invalids)
     }
+
     fun noStepWhenChecked(color: PieceColor): Boolean {
         val enemysteps = getStepsforColor(color.oppositeColor())
         enemysteps.forEach() {
@@ -378,7 +405,6 @@ class Board(val aiBoard: Boolean= false){
                 final.add(Pair(kingRow, kingCol))
             }
         }
-        return
     }
 
     fun CheckGapForCastling(rook: Piece): Boolean {
@@ -763,17 +789,16 @@ class Board(val aiBoard: Boolean= false){
             boardFEN += '/'
         }
 
-
-        //Drop last '/'char
         boardFEN = boardFEN.dropLast(1)
 
-        //adding the active color to FEN
         if(currentPlayerBoard == PieceColor.WHITE){
-            boardFEN+=" w"
+            boardFEN+=" w "
         }
         else if(currentPlayerBoard == PieceColor.BLACK){
-            boardFEN+=" b"
+            boardFEN+=" b "
         }
+
+        boardFEN += generateCastlingFen(this)
 
         return boardFEN
     }
@@ -804,7 +829,6 @@ class Board(val aiBoard: Boolean= false){
 
             }
         }
-
         setWhiteExchangeState(state = false)
         setBlackExchangeState(state = false)
     }
@@ -858,6 +882,27 @@ class Board(val aiBoard: Boolean= false){
         }
     }
 
+    fun generateCastlingFen(board: Board): String {
+        var castlingFen = ""
 
+        if (board.getPiece(7, 4) is King && board.getPiece(7, 4)?.pieceColor == PieceColor.WHITE) {
+            if (board.getPiece(7, 7) is Rook && board.getPiece(7, 7)?.pieceColor == PieceColor.WHITE) {
+                castlingFen += "K"
+            }
+            if (board.getPiece(7, 0) is Rook && board.getPiece(7, 0)?.pieceColor == PieceColor.WHITE) {
+                castlingFen += "Q"
+            }
+        }
 
+        if (board.getPiece(0, 4) is King && board.getPiece(0, 4)?.pieceColor == PieceColor.BLACK) {
+            if (board.getPiece(0, 7) is Rook && board.getPiece(0, 7)?.pieceColor == PieceColor.BLACK) {
+                castlingFen += "k"
+            }
+            if (board.getPiece(0, 0) is Rook && board.getPiece(0, 0)?.pieceColor == PieceColor.BLACK) {
+                castlingFen += "q"
+            }
+        }
+
+        return if (castlingFen.isEmpty()) "-" else castlingFen
+    }
 }
