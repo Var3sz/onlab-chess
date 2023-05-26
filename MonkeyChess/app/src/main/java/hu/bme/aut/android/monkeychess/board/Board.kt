@@ -25,6 +25,7 @@ class Board(var aiBoard: Boolean= false){
 
     var whiteSide = Side.DOWN
 
+
     constructor(pieces: MutableList<Piece>, color: PieceColor, aiBoard: Boolean = false) : this() {
         currentPlayerBoard = color
         for (i in 0 until 8) {
@@ -365,10 +366,12 @@ class Board(var aiBoard: Boolean= false){
                 var kingCol:Int
 
                 if(whiteSide == Side.DOWN) {
+
                     kingCol = if (rookPos.second == 0) 2 else 6
                 }
                 else{
                     kingCol = if (rookPos.second == 0) 1 else 5
+
                 }
                 final.add(Pair(kingRow, kingCol))
             }
@@ -467,7 +470,7 @@ class Board(var aiBoard: Boolean= false){
         }
         if(steps.isNotEmpty()){
             StepforAI(steps.random())
-            return
+
         }else{
             return
         }
@@ -505,11 +508,13 @@ class Board(var aiBoard: Boolean= false){
     }
 
     fun CastlingStep(piece: Piece, i: Int, j: Int) {
+
         val kingRow = if (piece.side == Side.UP) 0 else 7
         val rookCandidates = listOf(
             getPiece(kingRow, 0),
             getPiece(kingRow, 7)
         )
+
         var rook : Piece = Empty(0,0)
         var rookJ = -1
         var castlingSides = Pair(6,2)
@@ -525,6 +530,7 @@ class Board(var aiBoard: Boolean= false){
         }
         if(rook.name == PieceName.ROOK && rookJ != -1){
             ChangePiece(rook, i, rookJ)
+
         }
         ChangePiece(piece, i, j)
     }
@@ -836,7 +842,6 @@ class Board(var aiBoard: Boolean= false){
 
         listOfPieces.forEach() {
             it.flip()
-            //Log.d("FLIP", "name:${it.name} position:${it.position.toString()} color:${it.pieceColor} ")
         }
 
 
