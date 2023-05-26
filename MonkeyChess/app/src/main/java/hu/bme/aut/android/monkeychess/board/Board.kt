@@ -22,8 +22,11 @@ class Board(var aiBoard: Boolean= false){
     var chanceForEnPassant: Boolean = false
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
-
     var whiteSide = Side.DOWN
+
+    var playerOne: String? = null
+    var playerTwo: String? = null
+    var currentUser: String? = null
 
 
     constructor(pieces: MutableList<Piece>, color: PieceColor, aiBoard: Boolean = false) : this() {
@@ -39,7 +42,13 @@ class Board(var aiBoard: Boolean= false){
         loadBoard(pieces)
     }
 
-    constructor(fenBoard: String) : this() {
+    constructor(fenBoard: String, _playerOne: String? = null, _playerTwo: String? = null, _currentUser: String? = null) : this() {
+        playerOne = _playerOne
+        playerTwo = _playerTwo
+        currentUser = _currentUser
+        Log.d("PlayerOneGeci: ", playerOne.toString())
+        Log.d("PlayerTwoGeci: ", playerTwo.toString())
+        Log.d("CurrentUserGeci: ", currentUser.toString())
         if (fenBoard.isNotBlank()) {
             val fenParts = fenBoard.split(" ")
             require(fenParts.size == 3) { "Invalid FEN string: $fenBoard" }
@@ -95,6 +104,10 @@ class Board(var aiBoard: Boolean= false){
                 board.add(rowList)
             }
             currentPlayerBoard = if (activeColor == "w") PieceColor.WHITE else PieceColor.BLACK
+
+            if (playerTwo == currentUser) {
+                FlipTheTable()
+            }
         }
 
         if(fenBoard == ""){
@@ -227,9 +240,9 @@ class Board(var aiBoard: Boolean= false){
         ): MutableList<Pair<Int, Int>> {
             val final = mutableListOf<Pair<Int, Int>>()
 
-            //if(piece.pieceColor == color) {
+            if(piece.pieceColor == color) {
             //debug
-            if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
+            //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
 
                 getavalibleStepsInaLine(piece, final)
                 //pawn movement
@@ -250,6 +263,13 @@ class Board(var aiBoard: Boolean= false){
 
                 }
 
+            }
+
+            if (color == PieceColor.BLACK && currentUser != null && currentUser != playerTwo) {
+                final.clear()
+            }
+            else if(color == PieceColor.WHITE && currentUser != null && currentUser != playerOne){
+                final.clear()
             }
 
             return final

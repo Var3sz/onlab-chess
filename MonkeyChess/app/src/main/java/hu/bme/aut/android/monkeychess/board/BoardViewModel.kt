@@ -50,11 +50,12 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     val playerTwo: LiveData<String?> get() = _playerTwo
 
     private val _playerOneImage: LiveData<String?> = multiplayer?.playerOneImageUrlLiveData ?: NullableLiveData()
-
     private val _playerTwoImage: LiveData<String?> = multiplayer?.playerTwoImageUrlLiveData ?: NullableLiveData()
+    private val _multiplayerCurrentUser: LiveData<String?> = multiplayer?.currentUser ?: NullableLiveData()
 
     val playerOneImage: LiveData<String?> get() = _playerOneImage
     val playerTwoImage: LiveData<String?> get() = _playerTwoImage
+    val multiplayerCurrentUser: LiveData<String?> get() = _multiplayerCurrentUser
 
     private val _gameID = MutableLiveData<String?>()
     val gameID: LiveData<String?> get() = _gameID
@@ -83,7 +84,7 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
                         multiplayer.receiveMove(gameID) { receivedFen ->
                             if (receivedFen != null) {
                                 fen = receivedFen
-                                val updatedBoard = Board(fen.toString())
+                                val updatedBoard = Board(fen.toString(), playerOne.value.toString(), playerTwo.value.toString(), multiplayerCurrentUser.value.toString())
                                 updateBoard(updatedBoard)
                                 Log.d("Received FEN: ", fen.toString())
                             } else {
@@ -103,7 +104,7 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
                 multiplayer?.receiveMove(gameID) { receivedFen ->
                     if (receivedFen != null) {
                         fen = receivedFen
-                        val updatedBoard = Board(fen.toString())
+                        val updatedBoard = Board(fen.toString(), playerOne.value.toString(), playerTwo.value.toString(), multiplayerCurrentUser.value.toString())
                         updateBoard(updatedBoard)
                         Log.d("Received FEN: ", fen.toString())
                     } else {
@@ -117,7 +118,7 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
                 currentPlayer.value = PieceColor.WHITE
             }
             else{
-                _board.value = Board(fen!!)
+                _board.value = Board(fen!!, playerOne.value.toString(), playerTwo.value.toString(), multiplayerCurrentUser.value.toString())
                 val fenParts = fen!!.split(" ")
                 if(fenParts[1] == "w"){
                     currentPlayer.value = PieceColor.WHITE
