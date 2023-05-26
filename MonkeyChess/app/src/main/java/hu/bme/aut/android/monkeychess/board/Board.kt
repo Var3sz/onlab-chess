@@ -8,7 +8,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
-class Board(val aiBoard: Boolean= false){
+class Board(var aiBoard: Boolean= false){
 
     var blackCanCastleQueenSide: Boolean = false
     var blackCanCastleKingSide: Boolean = false
@@ -33,6 +33,7 @@ class Board(val aiBoard: Boolean= false){
                 rowList.add(Tile(false, Empty(i,j)))
             }
             board.add(rowList)
+            this.aiBoard = aiBoard
         }
         loadBoard(pieces)
     }
@@ -476,7 +477,7 @@ class Board(val aiBoard: Boolean= false){
     }
 
      fun doAiStep(aiColor: PieceColor) {
-         val boardForAi: Board = Board(copyBoard(), currentPlayerBoard, true)
+         val boardForAi = Board(copyBoard(), currentPlayerBoard, true)
          val ai = Ai(boardForAi, aiColor)
          ai.board = boardForAi
          val nextStep = ai.getTheNextStep()
