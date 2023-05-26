@@ -17,10 +17,13 @@ import hu.bme.aut.android.monkeychess.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
@@ -33,6 +36,9 @@ class BoardUI() {
         val playerOneMulti by viewModel.playerOne.observeAsState()
         val playerTwoMulti by viewModel.playerTwo.observeAsState()
         val playerOneSingle by viewModel.currentUser.observeAsState()
+        val singlePlayerProfilePicture by viewModel.currentUserProfilePicture.observeAsState()
+        val multiPlayerProfilePicturePlayerOne by viewModel.playerOneImage.observeAsState()
+        val multiPlayerProfilePicturePlayerTwo by viewModel.playerTwoImage.observeAsState()
 
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -50,13 +56,13 @@ class BoardUI() {
                 //PlayerTwo
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
                     if(viewModel.isMulti){
-                        DrawPlayer(playerTwoMulti.toString())
+                        DrawPlayer(playerTwoMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerTwo)
                     }
                     else if (viewModel.doAi){
-                        DrawPlayer("Robot")
+                        DrawPlayer("Robot", R.drawable.robot, null)
                     }
                     else{
-                        DrawPlayer("Player two")
+                        DrawPlayer("Guest", R.drawable.baseline_person_24, null)
                     }
                 }
 
@@ -70,19 +76,20 @@ class BoardUI() {
                 //PlayerOne
                 Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
                     if(viewModel.isMulti){
-                        DrawPlayer(playerOneMulti.toString())
+                        DrawPlayer(playerOneMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerOne)
                     }
                     else if(viewModel.doAi){
-                        DrawPlayer(playerOneSingle.toString())
+                        DrawPlayer(playerOneSingle.toString(), R.drawable.baseline_person_24, singlePlayerProfilePicture)
                     }
                     else{
-                       DrawPlayer(playerOneSingle.toString())
+                       DrawPlayer(playerOneSingle.toString(), R.drawable.baseline_person_24, singlePlayerProfilePicture)
                     }
                 }
 
-
-                Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
-                    Text(text = "flipy flopity\nyou are my flipity ")
+                if(viewModel.isMulti){
+                    Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
+                        Text(text = "flipy flopity\nyou are my flipity ")
+                    }
                 }
             }
             ExchangePieceAlert(
@@ -95,18 +102,23 @@ class BoardUI() {
     }
 
     @Composable
-    fun DrawPlayer(name: String = "PlayerName") {
+    fun DrawPlayer(name: String = "PlayerName", pictureID: Int, pictureRef: String?) {
         Row(
             modifier = Modifier
                 .padding(all = 8.dp)
                 .fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.baseline_person_24),
-                contentDescription = "profile picture",
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(pictureRef ?: pictureID)
+                    .build(),
+                loading = {
+                    CircularProgressIndicator()
+                },
+                contentDescription = "Profile picture",
                 modifier = Modifier
-                    .size(40.dp)
                     .clip(CircleShape)
+                    .size(40.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -178,7 +190,7 @@ class BoardUI() {
                     }
                 }
             }
-            DrawPlayer(viewModel.getCurrentPlayer().toString(),)
+            //DrawPlayer(viewModel.getCurrentPlayer().toString(),)
         }
     }
 

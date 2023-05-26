@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 
 class SinglePlayer {
     val auth = FirebaseAuth.getInstance()
@@ -13,9 +11,7 @@ class SinglePlayer {
 
     var currentUserLiveData = MutableLiveData<String>()
 
-
-    private val storageRef = Firebase.storage.reference
-    private var imageUrlLiveData = MutableLiveData<String>()
+    var imageUrlLiveData = MutableLiveData<String>()
 
     init {
         getCurrentUser()

@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
+import hu.bme.aut.android.monkeychess.board.multi.NullableLiveData
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
@@ -27,10 +28,13 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
 
-    var _currentUser = MutableLiveData<String>(singlePlayer?.currentUserLiveData?.value)
+    /** Single player user related stuff **/
+    private var _currentUser = MutableLiveData<String>(singlePlayer?.currentUserLiveData?.value)
     val currentUser: LiveData<String?> get() = _currentUser
+    private var _currentUserProfilePicture = MutableLiveData<String>(singlePlayer?.imageUrlLiveData?.value)
+    val currentUserProfilePicture: LiveData<String?> get() = _currentUserProfilePicture
 
-
+    /** Multiplayer and multiplayer user related stuff **/
     var fen = multiplayer?.fen
 
     private val _playerOne = MutableLiveData<String>()
@@ -39,6 +43,12 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     private val _playerTwo = MutableLiveData<String>()
     val playerTwo: LiveData<String?> get() = _playerTwo
 
+    private val _playerOneImage: LiveData<String?> = multiplayer?.playerOneImageUrlLiveData ?: NullableLiveData()
+
+    private val _playerTwoImage: LiveData<String?> = multiplayer?.playerTwoImageUrlLiveData ?: NullableLiveData()
+
+    val playerOneImage: LiveData<String?> get() = _playerOneImage
+    val playerTwoImage: LiveData<String?> get() = _playerTwoImage
 
     private val _gameID = MutableLiveData<String?>()
     val gameID: LiveData<String?> get() = _gameID
