@@ -15,6 +15,7 @@ import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
 import hu.bme.aut.android.monkeychess.board.multi.NullableLiveData
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
+import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 import hu.bme.aut.android.monkeychess.board.single.SinglePlayer
 import kotlinx.coroutines.CoroutineScope
@@ -65,8 +66,11 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     var isMulti: Boolean = false
     //var ai = Ai()
 
+    var whiteDefeated = MutableLiveData<Boolean>(false)
+    var blackDefeated = MutableLiveData<Boolean>(false)
 
-//////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
     init{
         if(multiplayer != null){
@@ -169,15 +173,21 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
 
 
     fun ChangeCurrentPlayer() {
+        /*
         if(board.value?.getStepsforColor(currentPlayer.value ?: PieceColor.EMPTY, true)?.isEmpty() == true){
             Log.d("MATE", "${currentPlayer.value} is defeated")
             if(currentPlayer.value == PieceColor.WHITE){
-                whiteDefeated.postValue(true)
+                //whiteDefeated.postValue(true)
             }
             else if(currentPlayer.value == PieceColor.BLACK){
-                blackDefeated.postValue(true)
+                //blackDefeated.postValue(true)
             }
         }
+
+
+         */
+
+
         var color = currentPlayer.value
         color = color?.oppositeColor()
         currentPlayer.postValue(color)
@@ -214,7 +224,9 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     }
 
     fun HideAvailableSteps() {
-        board.value?.HideAvailableSteps()
+        val tmp= Board(board.value?.copyBoard()!!, currentPlayer.value!!)
+        tmp.HideAvailableSteps()
+        updateBoard(tmp)
     }
 
     /////////Getters and Setter

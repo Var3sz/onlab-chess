@@ -182,52 +182,12 @@ class Board(var aiBoard: Boolean= false){
                 }
                 Pawn(color, row, col, side)
             }
-            'r', 'R' -> Rook(color, row, col, getRookSide(color, isWhiteOnTop))
-            'n', 'N' -> Knight(color, row, col, getKnightSide(color, isWhiteOnTop))
-            'b', 'B' -> Bishop(color, row, col, getBishopSide(color, isWhiteOnTop))
-            'q', 'Q' -> Queen(color, row, col, getQueenSide(color, isWhiteOnTop))
-            'k', 'K' -> King(color, row, col, getKingSide(color, isWhiteOnTop))
+            'r', 'R' -> Rook(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'n', 'N' -> Knight(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'b', 'B' -> Bishop(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'q', 'Q' -> Queen(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
+            'k', 'K' -> King(color, row, col, if(color == PieceColor.WHITE) Side.DOWN else Side.UP)
             else -> throw IllegalArgumentException("Invalid FEN character: $char")
-        }
-    }
-
-    private fun getRookSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
-        return if (color == PieceColor.WHITE) {
-            if (isWhiteOnTop) Side.UP else Side.DOWN
-        } else {
-            if (isWhiteOnTop) Side.DOWN else Side.UP
-        }
-    }
-
-    private fun getKnightSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
-        return if (color == PieceColor.WHITE) {
-            if (isWhiteOnTop) Side.UP else Side.DOWN
-        } else {
-            if (isWhiteOnTop) Side.DOWN else Side.UP
-        }
-    }
-
-    private fun getBishopSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
-        return if (color == PieceColor.WHITE) {
-            if (isWhiteOnTop) Side.UP else Side.DOWN
-        } else {
-            if (isWhiteOnTop) Side.DOWN else Side.UP
-        }
-    }
-
-    private fun getQueenSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
-        return if (color == PieceColor.WHITE) {
-            if (isWhiteOnTop) Side.UP else Side.DOWN
-        } else {
-            if (isWhiteOnTop) Side.DOWN else Side.UP
-        }
-    }
-
-    private fun getKingSide(color: PieceColor, isWhiteOnTop: Boolean): Side {
-        return if (color == PieceColor.WHITE) {
-            if (isWhiteOnTop) Side.UP else Side.DOWN
-        } else {
-            if (isWhiteOnTop) Side.DOWN else Side.UP
         }
     }
 
@@ -256,7 +216,7 @@ class Board(var aiBoard: Boolean= false){
 
                 if (runspec == true) {
                     checkAvailableStepsforCheck(piece, piece.pieceColor, final)
-
+                    if(!aiBoard)
                     if (piece.name == PieceName.KING && !piece.hasMoved) {
                         GetValidCastling(piece, final)
                     }
@@ -406,10 +366,12 @@ class Board(var aiBoard: Boolean= false){
                 var kingCol:Int
 
                 if(whiteSide == Side.DOWN) {
-                     kingCol = if (rookPos.second == 0) 2 else 6
+
+                    kingCol = if (rookPos.second == 0) 2 else 6
                 }
                 else{
-                     kingCol = if (rookPos.second == 0) 1 else 5
+                    kingCol = if (rookPos.second == 0) 1 else 5
+
                 }
                 final.add(Pair(kingRow, kingCol))
             }
@@ -495,6 +457,7 @@ class Board(var aiBoard: Boolean= false){
          }else{
             Log.d("RAND" , "/n${printBoard()}/n ilegal step ${nextStep.second} piece ${nextStep.first.name} at pos: ${nextStep.first.position}" )
             rand()
+             return
          }
     }
     fun rand(){
@@ -507,6 +470,7 @@ class Board(var aiBoard: Boolean= false){
         }
         if(steps.isNotEmpty()){
             StepforAI(steps.random())
+
         }else{
             return
         }
@@ -550,31 +514,23 @@ class Board(var aiBoard: Boolean= false){
             getPiece(kingRow, 0),
             getPiece(kingRow, 7)
         )
-        val rook : Piece
-        val rookJ: Int
-        if(whiteSide == Side.DOWN){
-            if(j == 6) {
-                rook = rookCandidates[1]
-                rookJ = 6 - 1
-                ChangePiece(rook, i, rookJ)
-            }
-            else if(j == 2){
-                rook = rookCandidates[0]
-                rookJ = 2 + 1
-                ChangePiece(rook, i, rookJ)
-            }
+
+        var rook : Piece = Empty(0,0)
+        var rookJ = -1
+        var castlingSides = Pair(6,2)
+        if(whiteSide == Side.UP) castlingSides = Pair(5,1)
+
+        if(j == castlingSides.first) {
+            rook = rookCandidates[1]
+            rookJ = castlingSides.first - 1
         }
-        else{
-            if(j == 5) {
-                rook = rookCandidates[1]
-                rookJ = 5 - 1
-                ChangePiece(rook, i, rookJ)
-            }
-            else if(j == 1){
-                rook = rookCandidates[0]
-                rookJ = 1 + 1
-                ChangePiece(rook, i, rookJ)
-            }
+        else if(j == castlingSides.second){
+            rook = rookCandidates[0]
+            rookJ = castlingSides.second + 1
+        }
+        if(rook.name == PieceName.ROOK && rookJ != -1){
+            ChangePiece(rook, i, rookJ)
+
         }
         ChangePiece(piece, i, j)
     }
@@ -590,7 +546,8 @@ class Board(var aiBoard: Boolean= false){
 
         fun ChangeCurrentPlayer() {
 
-                currentPlayerBoard = currentPlayerBoard.oppositeColor()
+
+            currentPlayerBoard = currentPlayerBoard.oppositeColor()
 
         }
 
