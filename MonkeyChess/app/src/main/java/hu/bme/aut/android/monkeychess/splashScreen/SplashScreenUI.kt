@@ -16,10 +16,10 @@ import kotlinx.coroutines.delay
 
 class SplashScreenUI{
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     @Composable
     fun SplashScreen(navController: NavController){
         LaunchedEffect(key1 = true){
-            //delay(2500L)
             if(auth.currentUser != null){
                 navController.navigate("MainMenu_screen")
             }

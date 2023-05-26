@@ -11,27 +11,45 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
+import hu.bme.aut.android.monkeychess.board.multi.NullableLiveData
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
+import hu.bme.aut.android.monkeychess.board.single.SinglePlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 import kotlin.concurrent.thread
 
-class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = false, val  aiColor: PieceColor):  ViewModel() {
+class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val multiplayer: Multiplayer? = null, val doAi: Boolean = false, val  aiColor: PieceColor):  ViewModel() {
     //var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
-
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
     var blackSide = MutableLiveData<Pair<PieceColor, Side>>()
-    var previousMove: Pair<Int, Int>? = null
-    var chanceForEnPassant: Boolean = false
     var whiteExchange = MutableLiveData<Boolean>(false)
     var blackExchange = MutableLiveData<Boolean>(false)
 
+    /** Single player user related stuff **/
+    private var _currentUser = MutableLiveData<String>(singlePlayer?.currentUserLiveData?.value)
+    val currentUser: LiveData<String?> get() = _currentUser
+    private var _currentUserProfilePicture = MutableLiveData<String>(singlePlayer?.imageUrlLiveData?.value)
+    val currentUserProfilePicture: LiveData<String?> get() = _currentUserProfilePicture
+
+    /** Multiplayer and multiplayer user related stuff **/
     var fen = multiplayer?.fen
+
+    private val _playerOne = MutableLiveData<String>()
+    val playerOne: LiveData<String?> get() = _playerOne
+
+    private val _playerTwo = MutableLiveData<String>()
+    val playerTwo: LiveData<String?> get() = _playerTwo
+
+    private val _playerOneImage: LiveData<String?> = multiplayer?.playerOneImageUrlLiveData ?: NullableLiveData()
+
+    private val _playerTwoImage: LiveData<String?> = multiplayer?.playerTwoImageUrlLiveData ?: NullableLiveData()
+
+    val playerOneImage: LiveData<String?> get() = _playerOneImage
+    val playerTwoImage: LiveData<String?> get() = _playerTwoImage
 
     private val _gameID = MutableLiveData<String?>()
     val gameID: LiveData<String?> get() = _gameID
@@ -40,15 +58,21 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
     private val _board = MutableLiveData<Board>()
     val board: LiveData<Board> get() = _board
 
+    var isMulti: Boolean = false
     //var ai = Ai()
 
 
 //////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
     init{
+        if(multiplayer != null){
+            isMulti = true
+        }
             if (multiplayer?.isNewGame == true) {
-                multiplayer.createNewGame(fen!!) { id ->
+                multiplayer.createNewGame(fen!!) { id, pOne, pTwo ->
                     setGameId(id.toString())
+                    setPlayerOne(pOne.toString())
+                    setPlayerTwo(pTwo.toString())
                     viewModelScope.launch {
                         multiplayer.receiveMove(gameID) { receivedFen ->
                             if (receivedFen != null) {
@@ -65,6 +89,8 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
             }
             else if(multiplayer?.isNewGame == false){
                 setGameId(multiplayer.gameId)
+                setPlayerOne(multiplayer.playerOne)
+                setPlayerTwo(multiplayer.playerTwo)
             }
 
             viewModelScope.launch {
@@ -193,6 +219,14 @@ class BoardViewModel(val multiplayer: Multiplayer? = null, val doAi: Boolean = f
 
     fun setGameId(_gameID: String) {
         this._gameID.value = _gameID
+    }
+
+    fun setPlayerOne(_playerOne: String){
+        this._playerOne.value = _playerOne
+    }
+
+    fun setPlayerTwo(_playerTwo: String){
+        this._playerTwo.value = _playerTwo
     }
 
     fun updateBoard(newBoard: Board){

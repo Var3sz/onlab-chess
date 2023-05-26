@@ -1,13 +1,11 @@
 package hu.bme.aut.android.monkeychess.board
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,16 +17,15 @@ import hu.bme.aut.android.monkeychess.R
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import hu.bme.aut.android.monkeychess.board.pieces.Piece
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
-import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
-import okhttp3.internal.connection.Exchange
 
 class BoardUI() {
     @Composable
@@ -36,7 +33,12 @@ class BoardUI() {
         val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
         val blackExchange by viewModel.getBlackExchangeState().observeAsState()
         val boardState by viewModel.board.observeAsState()
-
+        val playerOneMulti by viewModel.playerOne.observeAsState()
+        val playerTwoMulti by viewModel.playerTwo.observeAsState()
+        val playerOneSingle by viewModel.currentUser.observeAsState()
+        val singlePlayerProfilePicture by viewModel.currentUserProfilePicture.observeAsState()
+        val multiPlayerProfilePicturePlayerOne by viewModel.playerOneImage.observeAsState()
+        val multiPlayerProfilePicturePlayerTwo by viewModel.playerTwoImage.observeAsState()
 
         Box(modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -50,9 +52,18 @@ class BoardUI() {
 
             ) {
 
-                //PlayerOne
-                Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawPlayer(playerOne)
+
+                //PlayerTwo
+                Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
+                    if(viewModel.isMulti){
+                        DrawPlayer(playerTwoMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerTwo)
+                    }
+                    else if (viewModel.doAi){
+                        DrawPlayer("Robot", R.drawable.robot, null)
+                    }
+                    else{
+                        DrawPlayer("Guest", R.drawable.baseline_person_24, null)
+                    }
                 }
 
                 //ChessBoard
@@ -62,12 +73,23 @@ class BoardUI() {
                     }
                 }
 
-                //PlayerTwo
-                Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    DrawPlayer(playerTwo)
+                //PlayerOne
+                Box(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
+                    if(viewModel.isMulti){
+                        DrawPlayer(playerOneMulti.toString(), R.drawable.baseline_person_24, multiPlayerProfilePicturePlayerOne)
+                    }
+                    else if(viewModel.doAi){
+                        DrawPlayer(playerOneSingle.toString(), R.drawable.baseline_person_24, singlePlayerProfilePicture)
+                    }
+                    else{
+                       DrawPlayer(playerOneSingle.toString(), R.drawable.baseline_person_24, singlePlayerProfilePicture)
+                    }
                 }
-                Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
-                    Text(text = "flipy flopity\nyou are my flipity ")
+
+                if(viewModel.isMulti){
+                    Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
+                        Text(text = "flipy flopity\nyou are my flipity ")
+                    }
                 }
             }
             ExchangePieceAlert(
@@ -80,19 +102,23 @@ class BoardUI() {
     }
 
     @Composable
-    fun DrawPlayer(name: String = "PlayerName") {
+    fun DrawPlayer(name: String = "PlayerName", pictureID: Int, pictureRef: String?) {
         Row(
             modifier = Modifier
                 .padding(all = 8.dp)
                 .fillMaxWidth()
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.narkos),
-                contentDescription = "profile picture",
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(pictureRef ?: pictureID)
+                    .build(),
+                loading = {
+                    CircularProgressIndicator()
+                },
+                contentDescription = "Profile picture",
                 modifier = Modifier
-                    .size(40.dp)
                     .clip(CircleShape)
+                    .size(40.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -104,16 +130,14 @@ class BoardUI() {
     }
 
     @Composable
-    fun DrawBoard(board: Board, viewModel :BoardViewModel) {
-        //val tilesLiveData by viewModel.tilesLiveData.observeAsState(emptyList<List<Piece>>())
-
+    fun DrawBoard(board: Board, viewModel: BoardViewModel) {
         Column {
             for (i in 0 until 8) {
                 Row {
                     for (j in 0 until 8) {
-                        var gridcolor = Color.Gray
+                        var gridcolor = Color(0xff769656)
                         if ((i + j) % 2 == 0) {
-                            gridcolor = Color.White
+                            gridcolor = Color(0xffeeeedd)
                         }
                         Box(
                             modifier = Modifier
@@ -132,20 +156,14 @@ class BoardUI() {
                                         Log.d(
                                             "Board1",
                                             "i: ${i}, j: ${j} board value: ${
-                                                viewModel.getValue(
-                                                    i,
-                                                    j
-                                                )
+                                                viewModel.getValue(i, j)
                                             } babu:${viewModel.getPiece(i, j).pieceColor} "
                                         )
 
-                                        if (board.getPiece(
-                                                i,
-                                                j
-                                            ).pieceColor != PieceColor.EMPTY
-                                        ) {
+                                        if (board.getPiece(i, j).pieceColor != PieceColor.EMPTY) {
                                             val piece = board.getPiece(i, j)
                                             val steps = viewModel.getAvailableSteps(piece)
+
 
                                             Log.d("BoardStep", "i: ${piece.i}, j: ${piece.j}")
 
@@ -160,29 +178,19 @@ class BoardUI() {
                                         }
                                     }
                                     //viewModel.matrixLiveData.value
-                                },
-                            contentAlignment = Alignment.Center,
-
+                                }
                         ) {
-                            /*
-                            Log.d(
-                                "Board2",
-                                "i: ${i}, j: ${j} board value: ${viewModel.getValue(i,j)} babu:${viewModel.getPiece(i,j)!!.name }"
-                            )
-
-                             */
-
-                            if(viewModel.getValue(i,j) == true ){
+                            if (board.getPiece(i, j).pieceColor != PieceColor.EMPTY) {
+                                DrawPiece(board.getPiece(i, j).imageID)
+                            }
+                            if (viewModel.getValue(i, j) == true) {
                                 DrawCircle()
                             }
-
-                            if(board.getPiece(i,j).pieceColor != PieceColor.EMPTY)
-                                DrawPiece(board.getPiece(i,j).imageID)
                         }
                     }
                 }
             }
-            DrawPlayer(viewModel.getCurrentPlayer().toString())
+            //DrawPlayer(viewModel.getCurrentPlayer().toString(),)
         }
     }
 
@@ -204,10 +212,11 @@ class BoardUI() {
             val canvasWidth = size.width
             val canvasHeight = size.height
 
+            val radius = size.minDimension / 2
             drawCircle(
-                color = Color(0xff0f9d58),
+                color = Color(0xffb3b3b3),
                 center = Offset(x = canvasWidth / 2, y = canvasHeight / 2),
-                radius = size.minDimension / 2,
+                radius = radius,
                 style = Stroke(10F)
             )
         }

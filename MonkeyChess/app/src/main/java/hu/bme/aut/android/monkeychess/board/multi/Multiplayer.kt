@@ -2,6 +2,7 @@ package hu.bme.aut.android.monkeychess.board.multi
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +14,14 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
 
-    private var gameID: String? = gameId
+    var playerOneImageUrlLiveData = MutableLiveData<String>()
+    var playerTwoImageUrlLiveData = MutableLiveData<String>()
 
-    fun createNewGame(fen: String, callback: (String?) -> Unit){
+    init{
+        getProfilePictures()
+    }
+
+    fun createNewGame(fen: String, callback: (String?, String?, String?) -> Unit){
             val userCollection = db.collection("users")
             userCollection.get().addOnSuccessListener { users ->
                 val gameID = generateRandomId(8)
@@ -40,18 +46,17 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
                     )
                     userCollection.document(userID).collection("games").add(gameData).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            callback(gameID)
+                            callback(gameID, playerOne, playerTwo)
                         } else {
-                            callback(null)
+                            callback(null, null, null)
                         }
-                        callback(gameID)
+                        callback(gameID, playerOne, playerTwo)
                     }
                 }
             }
         }.addOnFailureListener { e->
             e.printStackTrace()
-            gameID = null
-            callback(gameID)
+            callback(null ,null, null)
         }
     }
 
@@ -119,6 +124,25 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
         }
     }
 
+
+    private fun getProfilePictures() {
+        db.collection("users").get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                for (document in task.result) {
+                    if (document.data.getValue("Username") == playerOne) {
+                        val imageUrl = document.data.getValue("ImageURL").toString()
+                        playerOneImageUrlLiveData.value = if (imageUrl.isNotEmpty()) imageUrl else "https://firebasestorage.googleapis.com/v0/b/monkeychess-b42f5.appspot.com/o/profile-pictures%2Fprofile-placeholder.png?alt=media&token=95aedef2-d07e-4b68-8045-8f677646fe51"
+                    } else if (document.data.getValue("Username") == playerTwo) {
+                        val imageUrl = document.data.getValue("ImageURL").toString()
+                        playerTwoImageUrlLiveData.value = if (imageUrl.isNotEmpty()) imageUrl else "https://firebasestorage.googleapis.com/v0/b/monkeychess-b42f5.appspot.com/o/profile-pictures%2Fprofile-placeholder.png?alt=media&token=95aedef2-d07e-4b68-8045-8f677646fe51"
+                    }
+                }
+            }
+        }.addOnFailureListener { exception ->
+            Log.d("Exception:", "Error getting documents", exception)
+        }
+    }
+
     fun generateRandomId(length: Int): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
         val random = Random(System.currentTimeMillis())
@@ -130,5 +154,20 @@ class Multiplayer(val playerOne: String, val playerTwo: String, val gameId: Stri
             id.append(randomChar)
         }
         return id.toString()
+    }
+
+    private fun setImageUrlPlayerOne(url: String?){
+        playerOneImageUrlLiveData.value = url
+    }
+
+    private fun setImageUrlPlayerTwo(url: String?){
+        playerTwoImageUrlLiveData.value = url
+    }
+}
+
+
+class NullableLiveData<T>(defaultValue: T? = null) : MutableLiveData<T>() {
+    init {
+        value = defaultValue
     }
 }

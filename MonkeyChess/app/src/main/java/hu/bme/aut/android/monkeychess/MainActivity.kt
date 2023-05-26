@@ -34,6 +34,7 @@ import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponent
 import hu.bme.aut.android.monkeychess.board.multi.select_game.SelectGameScreen
 import hu.bme.aut.android.monkeychess.board.multi.select_game.SelectGameViewModel
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
+import hu.bme.aut.android.monkeychess.board.single.SinglePlayer
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassUI
 import hu.bme.aut.android.monkeychess.forgottenPassword.ForgottenPassViewModel
 import hu.bme.aut.android.monkeychess.mainMenu.MainMenuViewModel
@@ -103,11 +104,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
             composable("board_screen"){
-                val viewModel =BoardViewModel(null,true, PieceColor.BLACK)
+                val singleplayer = remember {
+                    SinglePlayer()
+                }
+                
+                val viewModel =BoardViewModel(singleplayer,null,true, PieceColor.BLACK)
+                
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
             composable("board_1v1"){
-                val viewModel =BoardViewModel(null, false, PieceColor.EMPTY)
+                val singleplayer = remember {
+                    SinglePlayer()
+                }
+                val viewModel =BoardViewModel(singleplayer,null, false, PieceColor.EMPTY)
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel)}, bottomBar = {})
             }
 
@@ -146,18 +155,22 @@ class MainActivity : ComponentActivity() {
                 val player1 = backStackEntry.arguments?.getString("player1")
                 val player2 = backStackEntry.arguments?.getString("player2")
 
+                val singleplayer = remember {
+                    SinglePlayer()
+                }
+
                 val multiplayer = remember {
                     Multiplayer(
                         playerOne = player1.toString(),
                         playerTwo = player2.toString(),
-                        fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w",
+                        fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq",
                         gameId = "",
                         isNewGame = true
                     )
                 }
 
                 val viewModel = remember {
-                    BoardViewModel(multiplayer, false, PieceColor.EMPTY)
+                    BoardViewModel(singleplayer, multiplayer, false, PieceColor.EMPTY)
                 }
 
                 TopAppBarWidget(
@@ -179,6 +192,10 @@ class MainActivity : ComponentActivity() {
                 val gameID = backStackEntry.arguments?.getString("gameID")
                 val fen = Uri.decode(backStackEntry.arguments?.getString("fen"))
 
+                val singleplayer = remember {
+                    SinglePlayer()
+                }
+
                 val multiplayer = remember {
                     Multiplayer(
                         playerOne = player1.toString(),
@@ -190,7 +207,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val viewModel = remember {
-                    BoardViewModel(multiplayer, false, PieceColor.EMPTY)
+                    BoardViewModel(singleplayer, multiplayer, false, PieceColor.EMPTY)
                 }
 
                 TopAppBarWidget(navController = navController, content = { BoardUI().GameScreen(viewModel = viewModel) }, bottomBar = {})
@@ -226,7 +243,5 @@ class MainActivity : ComponentActivity() {
             contentColor = MaterialTheme.colors.background
         )
     }
-
-
 }
 
