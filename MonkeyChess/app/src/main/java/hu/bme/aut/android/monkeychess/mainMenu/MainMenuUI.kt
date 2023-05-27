@@ -23,7 +23,6 @@ import hu.bme.aut.android.monkeychess.R
 
 class MainMenuUI {
 
-    //@Preview
     @Composable
     fun MainMenu(navController: NavController, viewModel: MainMenuViewModel){
         val usernameLiveData by viewModel.getUsername().observeAsState()
@@ -68,7 +67,6 @@ class MainMenuUI {
         Column( modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-
         ){
             //Single Player button
             MainButtons(text = "Single Player", click =  {Log.d("MainMenu", " Single Player clicked" )
@@ -79,10 +77,6 @@ class MainMenuUI {
                 navController.navigate("board_screen")})
             //Multiplayer button
             MainButtons(text = "Multiplayer", click = { navController.navigate("select_game") })
-            //Friends button
-            MainButtons(text = "Friends", click =  {Log.d("MainMenu", " Friends clicked" )})
-            //Stats button
-            MainButtons(text = "Stats", click =  {Log.d("MainMenu", " Stats clicked" )} )
         }
     }
 
@@ -101,6 +95,4 @@ class MainMenuUI {
             Text(text)
         }
     }
-
-
 }

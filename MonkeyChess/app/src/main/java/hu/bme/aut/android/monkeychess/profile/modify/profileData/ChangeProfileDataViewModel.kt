@@ -57,7 +57,6 @@ class ChangeProfileDataViewModel : ViewModel() {
         }
     }
 
-
     fun isChangeProfileDataInputValid(context: Context, navController: NavController){
         if(newUsername.value.toString().isNotEmpty() || newFullname.value.toString().isNotEmpty()){
             changeProfileData(context, navController)
@@ -67,7 +66,6 @@ class ChangeProfileDataViewModel : ViewModel() {
         }
     }
 
-
     fun setNewFullname(_newFullname: String){
         newFullname.value = _newFullname
     }
@@ -75,5 +73,4 @@ class ChangeProfileDataViewModel : ViewModel() {
     fun setNewUsername(_newUsername: String){
         newUsername.value = _newUsername
     }
-
 }

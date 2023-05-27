@@ -10,11 +10,6 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class Board(var aiBoard: Boolean= false){
 
-    var blackCanCastleQueenSide: Boolean = false
-    var blackCanCastleKingSide: Boolean = false
-    var whiteCanCastleQueenSide: Boolean = false
-    var whiteCanCastleKingSide: Boolean = false
-
     var board = mutableListOf<MutableList<Tile>>()
     var currentPlayerBoard: PieceColor = PieceColor.EMPTY
     var previousMove: Pair<Int, Int>? = null
@@ -117,92 +112,66 @@ class Board(var aiBoard: Boolean= false){
                 val rowList = SnapshotStateList<Tile>()
 
                 for (j in 0 until 8) {
-                    //setup board
+
                     //black Pawns
                     if (i == 1) {
                         rowList.add(Tile(false, Pawn(PieceColor.BLACK, i, j, Side.UP)))
-                        //rowList.add(Tile(false,Empty()))
                     }
+
                     //black Rooks
                     else if ((i == 0 && j == 0) || (i == 0 && j == 7)) {
                         rowList.add(Tile(false, Rook(PieceColor.BLACK, i, j, Side.UP)))
                     }
-                    //black Bishops
 
+                    //black Bishops
                     else if((i==0 && j==2)||(i==0 && j==5)){
                         rowList.add(Tile(false,Bishop(PieceColor.BLACK, i, j, Side.UP)))
-                        //rowList.add(Tile(false,Empty()))
                     }
                     //black Knights
                     else if((i==0 && j==1)||(i==0 && j==6)){
                         rowList.add(Tile(false,Knight(PieceColor.BLACK, i, j, Side.UP)))
-                        //rowList.add(Tile(false,Empty()))
 
 
                     } else if ((i == 0 && j == 3)) {
                         rowList.add(Tile(false, Queen(PieceColor.BLACK, i, j, Side.UP)))
-                        //rowList.add(Tile(false,Empty()))
                     } else if ((i == 0 && j == 4)) {
                         rowList.add(Tile(false, King(PieceColor.BLACK, i, j, Side.UP)))
-                        //rowList.add(Tile(false,Empty()))
                     }
-
 
                     //White Side
-
                     else if (i == 6) {
                         rowList.add(Tile(false, Pawn(PieceColor.WHITE, i, j, Side.DOWN)))
-                        //rowList.add(Tile(false,Empty()))
                     }
+
                     //White Rooks
                     else if ((i == 7 && j == 0) || (i == 7 && j == 7)) {
                         rowList.add(Tile(false, Rook(PieceColor.WHITE, i, j, Side.DOWN)))
                     }
+
                     //White Bishops
                     else if((i==7 && j==2)||(i==7 && j==5)){
                         rowList.add(Tile(false,Bishop(PieceColor.WHITE, i, j, Side.DOWN)))
-                        //rowList.add(Tile(false,Empty()))
                     }
+
                     //White Knights
                     else if((i==7 && j==1)||(i==7 && j==6)){
                         rowList.add(Tile(false,Knight(PieceColor.WHITE, i, j, Side.DOWN)))
-                        //rowList.add(Tile(false,Empty()))
                     }
 
+                    //White Queen
                     else if((i==7 && j==3)){
                         rowList.add(Tile(false,Queen(PieceColor.WHITE, i, j, Side.DOWN)))
-                        //rowList.add(Tile(false,Empty()))
                     }
+
+                    //White King
                     else if((i==7 && j==4)){
                         rowList.add(Tile(false,King(PieceColor.WHITE, i, j, Side.DOWN)))
-
-                        //rowList.add(Tile(false,Empty()))
                     } else
                         rowList.add(Tile(false, Empty(i,j)))
                 }
                 board.add(rowList)
             }
         }
-    }
-
-    private fun parseCastlingRights(castlingRights: String) {
-        resetCastlingRights()
-
-        for (char in castlingRights) {
-            when (char) {
-                'K' -> whiteCanCastleKingSide = true
-                'Q' -> whiteCanCastleQueenSide = true
-                'k' -> blackCanCastleKingSide = true
-                'q' -> blackCanCastleQueenSide = true
-            }
-        }
-    }
-
-    private fun resetCastlingRights() {
-        whiteCanCastleKingSide = false
-        whiteCanCastleQueenSide = false
-        blackCanCastleKingSide = false
-        blackCanCastleQueenSide = false
     }
 
     private fun getPieceFromFENChar(
@@ -231,8 +200,6 @@ class Board(var aiBoard: Boolean= false){
         }
     }
 
-
-
         fun getAvailableSteps(
             piece: Piece,
             color: PieceColor,
@@ -241,19 +208,14 @@ class Board(var aiBoard: Boolean= false){
             val final = mutableListOf<Pair<Int, Int>>()
 
             if(piece.pieceColor == color) {
-            //debug
-            //if (piece.pieceColor == color || piece.pieceColor == color.oppositeColor()) {
-
                 getavalibleStepsInaLine(piece, final)
-                //pawn movement
 
+                //pawn movement
                 if (piece.name == PieceName.PAWN) {
                     pawnMovement(piece, final)
                 }
 
                 //castling
-
-
                 if (runspec == true) {
                     checkAvailableStepsforCheck(piece, piece.pieceColor, final)
                     if(!aiBoard)
@@ -318,12 +280,12 @@ class Board(var aiBoard: Boolean= false){
 
                 addPiece(it)
             }
-
         }
 
         tmp.forEach {
             addPiece(it)
         }
+
         final.removeAll(invalids)
     }
 
@@ -331,14 +293,12 @@ class Board(var aiBoard: Boolean= false){
         val enemysteps = getStepsforColor(color.oppositeColor())
         enemysteps.forEach() {
             val tmp = getPiece(it.first, it.second)
-            //Log.d("ez", "${it}")
             if (tmp.name == PieceName.KING && tmp.pieceColor == color) {
                 return true
             }
         }
         return false
     }
-
 
     fun pawnMovement(piece: Piece, final: MutableList<Pair<Int, Int>>) {
         var tmp: Piece
@@ -371,7 +331,6 @@ class Board(var aiBoard: Boolean= false){
 
 
             if(!aiBoard) {
-                //Check for En Passant
                 if (previousMove != null && piece.hasMoved && piece.i == (if (isUp) 4 else 3)) {
 
                     if (piece.j > 0) {
@@ -449,7 +408,6 @@ class Board(var aiBoard: Boolean= false){
                     if (getPiece(rook.i, j).name != PieceName.EMPTY) {
                         return false
                     }
-
                 }
             }
         }
@@ -459,13 +417,8 @@ class Board(var aiBoard: Boolean= false){
     //////////////////////////////////////////////////////////////////////////////
     //  Different steps and step logic
     fun step(piece: Piece, i: Int, j: Int, doai: Boolean = true) {
-        //Log.d("CURR", currentPlayer.value.toString())
-        //king castling
-        // Log.d("CAST ${piece.name}", "${piece.hasMoved}")
-
         if (piece.name == PieceName.KING && !piece.hasMoved) {
             CastlingStep(piece, i, j)
-            //Log.d("CAST", "${piece.hasMoved}")
         }
         else if(piece.name == PieceName.PAWN && chanceForEnPassant){
             EnPassantStep(piece, i, j)
@@ -486,12 +439,7 @@ class Board(var aiBoard: Boolean= false){
         previousMove = Pair(i, j)
         chanceForEnPassant = false
 
-        //checkForCheck(piece.pieceColor)
         ChangeCurrentPlayer()
-        //Log.d("FEN" ,printBoard())
-        Log.d("FEN" , createFEN())
-        var best = Pair<Piece, Pair<Int, Int>>(Empty(0,0), Pair(0,0))
-        //Log.d("NEW BOARD", Board("").printBoard())
     }
 
      fun doAiStep(aiColor: PieceColor) {
@@ -508,6 +456,7 @@ class Board(var aiBoard: Boolean= false){
              return
          }
     }
+
     fun rand(){
         val steps = mutableListOf<Pair<Piece, Pair<Int, Int>>>()
         getPiecesbyColor(PieceColor.BLACK).forEach(){
@@ -593,10 +542,7 @@ class Board(var aiBoard: Boolean= false){
         }
 
         fun ChangeCurrentPlayer() {
-
-
             currentPlayerBoard = currentPlayerBoard.oppositeColor()
-
         }
 
         //////////////////////////////////////////////////////////////////////////////
@@ -679,9 +625,6 @@ class Board(var aiBoard: Boolean= false){
     fun setValue(row: Int, col: Int, value: Boolean) {
         board.get(row).get(col).free = value
     }
-
-
-
 
     ///////////////////////////////////////
         //copy board

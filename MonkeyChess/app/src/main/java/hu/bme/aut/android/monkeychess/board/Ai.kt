@@ -1,11 +1,8 @@
 package hu.bme.aut.android.monkeychess.board
 
-
-import android.util.Log
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
-import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
 class Ai(var board: Board, color: PieceColor) {
 

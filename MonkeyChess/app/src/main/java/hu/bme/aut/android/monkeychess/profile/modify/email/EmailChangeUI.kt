@@ -39,7 +39,6 @@ class EmailChangeUI {
                     .padding(24.dp)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Top,
-                //horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     modifier = Modifier
@@ -117,8 +116,6 @@ class EmailChangeUI {
                     Text("Modify")
                 }
             }
-
         }
     }
-
 }

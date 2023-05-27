@@ -28,9 +28,9 @@ import coil.request.ImageRequest
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 
-class BoardUI() {
+class BoardUI{
     @Composable
-    fun GameScreen(playerOne: String = "Alice", playerTwo: String = "Bob", viewModel :BoardViewModel, navController: NavController) {
+    fun GameScreen(viewModel :BoardViewModel, navController: NavController) {
         val whiteExchange by viewModel.getWhiteExchangeState().observeAsState()
         val blackExchange by viewModel.getBlackExchangeState().observeAsState()
         val boardState by viewModel.board.observeAsState()
@@ -55,11 +55,8 @@ class BoardUI() {
                 verticalArrangement = Arrangement.Center
 
             ) {
-
-
                 //PlayerTwo
                 Row(modifier = Modifier.border(width = 1.dp, color = Color.Black)) {
-                    //DrawPlayer(viewModel.currentPlayer.value.toString(),R.drawable.white_pawn, null)
                     if (viewModel.isMulti) {
                         val isCurrentUserPlayerOne = multiplayerCurrentUser == playerOneMulti
                         val profilePicture = if (isCurrentUserPlayerOne) {
@@ -101,10 +98,6 @@ class BoardUI() {
                     else{
                        DrawPlayer(playerOneSingle.toString(), R.drawable.baseline_person_24, singlePlayerProfilePicture)
                     }
-                }
-
-                Button(onClick = { viewModel.board.value?.FlipTheTable() }) {
-                    Text(text = "flipy flopity\nyou are my flipity ")
                 }
             }
             ExchangePieceAlert(
@@ -171,7 +164,6 @@ class BoardUI() {
                                     if (board.getValue(i, j) == true) {
                                         viewModel.HideAvailableSteps()
                                         viewModel.step(viewModel.getClickedPiece(), i, j)
-                                        //viewModel.ChangeCurrentPlayer()
                                     } else {
                                         if (board.getPiece(i, j).name != PieceName.EMPTY) {
                                             viewModel.setClickedPiece(board.getPiece(i, j))
@@ -194,7 +186,6 @@ class BoardUI() {
 
                                             steps.forEach() {
                                                 viewModel.setValue(it.first, it.second, true)
-                                                //viewModel.tilesLiveData.value?.get(it.first)?.get(it.second)?.free=true
                                                 Log.d(
                                                     "BoardStep",
                                                     "i: ${it.first}, j: ${it.second} } "
@@ -202,7 +193,6 @@ class BoardUI() {
                                             }
                                         }
                                     }
-                                    //viewModel.matrixLiveData.value
                                 }
                         ) {
                             if (board.getPiece(i, j).pieceColor != PieceColor.EMPTY) {
@@ -215,7 +205,6 @@ class BoardUI() {
                     }
                 }
             }
-            //DrawPlayer(viewModel.getCurrentPlayer().toString(),)
         }
     }
 
@@ -389,7 +378,6 @@ class BoardUI() {
                         }
                     }
                 }
-
             )
         }
     }

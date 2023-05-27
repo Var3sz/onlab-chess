@@ -102,16 +102,8 @@ class RegisterViewModel: ViewModel() {
         confirmPassword.value = _confirmpassword
     }
 
-    fun getFullname(): String?{
-        return fullname.value
-    }
-
     fun getEmail(): String?{
         return email.value
-    }
-
-    fun getUsername(): String?{
-        return username.value
     }
 
     fun getPassword(): String?{

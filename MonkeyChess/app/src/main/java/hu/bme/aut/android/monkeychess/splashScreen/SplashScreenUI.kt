@@ -1,6 +1,5 @@
 package hu.bme.aut.android.monkeychess.splashScreen
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import hu.bme.aut.android.monkeychess.R
-import kotlinx.coroutines.delay
 
 class SplashScreenUI{
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()

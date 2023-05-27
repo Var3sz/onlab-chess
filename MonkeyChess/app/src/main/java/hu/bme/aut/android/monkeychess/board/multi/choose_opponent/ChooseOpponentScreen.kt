@@ -1,6 +1,5 @@
 package hu.bme.aut.android.monkeychess.board.multi.choose_opponent
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ChooseOpponentScreen(navController: NavController, viewModel: ChooseOpponentViewModel){

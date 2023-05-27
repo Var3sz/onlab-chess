@@ -3,7 +3,6 @@ package hu.bme.aut.android.monkeychess.profile.modify.email
 import android.content.Context
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController

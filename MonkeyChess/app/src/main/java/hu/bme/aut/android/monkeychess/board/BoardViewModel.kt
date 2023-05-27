@@ -1,12 +1,6 @@
 package hu.bme.aut.android.monkeychess.board
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,32 +9,28 @@ import hu.bme.aut.android.monkeychess.board.multi.Multiplayer
 import hu.bme.aut.android.monkeychess.board.multi.NullableLiveData
 import hu.bme.aut.android.monkeychess.board.pieces.*
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
-import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
-import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 import hu.bme.aut.android.monkeychess.board.single.SinglePlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.concurrent.thread
 
 class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val multiplayer: Multiplayer? = null, val doAi: Boolean = false, val  aiColor: PieceColor):  ViewModel() {
-    //var tilesLiveData = MutableLiveData<SnapshotStateList<SnapshotStateList<Tile>>>()
     var clickedPiece = MutableLiveData<Piece>()
     var currentPlayer = MutableLiveData<PieceColor>()
-    var blackSide = MutableLiveData<Pair<PieceColor, Side>>()
-    var whiteExchange = MutableLiveData<Boolean>(false)
-    var blackExchange = MutableLiveData<Boolean>(false)
+    var whiteExchange = MutableLiveData(false)
+    var blackExchange = MutableLiveData(false)
 
-
+    /** Single-player user data **/
     private var _currentUser = MutableLiveData<String>(singlePlayer?.currentUserLiveData?.value)
     val currentUser: LiveData<String?> get() = _currentUser
     private var _currentUserProfilePicture = MutableLiveData<String>(singlePlayer?.imageUrlLiveData?.value)
     val currentUserProfilePicture: LiveData<String?> get() = _currentUserProfilePicture
 
+    /** Check mate **/
+    private var whiteDefeated = MutableLiveData(false)
+    private var blackDefeated = MutableLiveData(false)
 
-    private var whiteDefeated = MutableLiveData<Boolean>(false)
-    private var blackDefeated = MutableLiveData<Boolean>(false)
-
+    /** Multi-player user and game data **/
     var fen = multiplayer?.fen
 
     private val _playerOne = MutableLiveData<String>()
@@ -60,14 +50,10 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     private val _gameID = MutableLiveData<String?>()
     val gameID: LiveData<String?> get() = _gameID
 
+    var isMulti: Boolean = false
 
     private val _board = MutableLiveData<Board>()
     val board: LiveData<Board> get() = _board
-
-    var isMulti: Boolean = false
-    //var ai = Ai()
-
-
 
     //////////////////////////////////////////////////////////////////////////////
 //  Logic for finding the available steps
@@ -145,15 +131,10 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     //////////////////////////////////////////////////////////////////////////////
     //  Different steps and step logic
     fun step(piece: Piece, i: Int, j: Int, doai: Boolean = false) {
-
-
         Log.d("CURRENT PLAYER", board.value?.currentPlayerBoard.toString())
         Log.d("PLAYER ON VIEWMODEL", currentPlayer.value.toString())
         board.value?.step(piece,i,j,doai)
         ChangeCurrentPlayer()
-
-       // Log.d("MateCheck","Number of steps for ${currentPlayer.value ?: PieceColor.EMPTY}: ${board.value?.getStepsforColor(currentPlayer.value ?: PieceColor.EMPTY, true)?.size.toString()} ")
-
 
         if(doAi && whiteDefeated.value == false && blackDefeated.value == false){
             Log.d("AI", doAi.toString())
@@ -161,16 +142,12 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
             myScope.launch {
                 doAiStep()
             }
-
-
         }
         multiplayer?.sendMove(gameID.value.toString(), board.value!!.createFEN())
     }
 
     private suspend fun doAiStep() {
         board.value?.doAiStep(aiColor)
-
-        //board.value?.ChangeCurrentPlayer()
         ChangeCurrentPlayer(true)
     }
 
@@ -183,27 +160,18 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
             Log.d("MATE", "${currentPlayer.value!!.oppositeColor()} is defeated by ${currentPlayer.value.toString()}")
             if(currentPlayer.value == PieceColor.BLACK){
                 whiteDefeated.postValue(true)
-
             }
             else if(currentPlayer.value == PieceColor.WHITE){
                 blackDefeated.postValue(true)
             }
         }
-
             var color = currentPlayer.value
             color = color?.oppositeColor()
             currentPlayer.postValue(color)
-
-
     }
 
     //////////////////////////////////////////////////////////////////////////////
 // getter for pieces or bord information
-    fun getCurrentPlayer(): PieceColor {
-        return currentPlayer.value ?: PieceColor.EMPTY
-    }
-
-
     fun getValue(row: Int, col: Int): Boolean? {
         return board.value?.getValue(row,col)
     }
@@ -216,9 +184,8 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
         return clickedPiece.value!!
     }
 
-
     //////////////////////////////////////////////////////////////////////////////
-// setters for pieces or bord information
+// setters for pieces or board information
     fun setValue(row: Int, col: Int, value: Boolean) {
         board.value?.setValue(row,col,value)
     }
@@ -232,16 +199,8 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
     }
 
     /////////Getters and Setter
-    fun setWhiteExchangeState(state: Boolean){
-        this.whiteExchange.value = state
-    }
-
     fun getWhiteExchangeState(): MutableLiveData<Boolean>{
         return board.value?.getWhiteExchangeState()!!
-        //return whiteExchange
-    }
-    fun setBlackExchangeState(state: Boolean){
-        this.blackExchange.value = state
     }
 
     fun getBlackExchangeState(): MutableLiveData<Boolean>{

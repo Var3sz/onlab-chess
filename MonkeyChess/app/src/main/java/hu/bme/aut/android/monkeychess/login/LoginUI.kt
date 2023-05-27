@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +23,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import hu.bme.aut.android.monkeychess.login.LoginViewModel
 
 public class LoginUI{
     @Composable
@@ -38,7 +36,6 @@ public class LoginUI{
                         .padding(24.dp)
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.Top,
-                    //horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                         modifier = Modifier

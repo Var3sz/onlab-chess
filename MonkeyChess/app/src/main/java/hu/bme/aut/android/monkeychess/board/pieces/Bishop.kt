@@ -1,10 +1,6 @@
 package hu.bme.aut.android.monkeychess.board.pieces
 
-import android.util.Log
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import hu.bme.aut.android.monkeychess.R
-import hu.bme.aut.android.monkeychess.board.BoardViewModel
-import hu.bme.aut.android.monkeychess.board.Tile
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
@@ -86,7 +82,4 @@ data class Bishop(
 
         return steps
     }
-
-
-
 }

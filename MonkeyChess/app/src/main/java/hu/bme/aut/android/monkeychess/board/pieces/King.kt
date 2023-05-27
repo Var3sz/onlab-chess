@@ -1,8 +1,6 @@
 package hu.bme.aut.android.monkeychess.board.pieces
 
-import android.util.Log
 import hu.bme.aut.android.monkeychess.R
-import hu.bme.aut.android.monkeychess.board.BoardViewModel
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
@@ -81,11 +79,6 @@ data class King(
             if(j + 1 < 8 )
                 steps[7].add(Pair(i - 1, j + 1))
         }
-
-
         return steps
     }
-
-
-
 }

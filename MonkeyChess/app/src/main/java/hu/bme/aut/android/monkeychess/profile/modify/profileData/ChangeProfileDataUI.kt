@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +38,6 @@ class ChangeProfileDataUI {
                     .padding(24.dp)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Top,
-                //horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     modifier = Modifier
@@ -98,9 +96,6 @@ class ChangeProfileDataUI {
                     Text("Modify")
                 }
             }
-
         }
     }
-
-
 }

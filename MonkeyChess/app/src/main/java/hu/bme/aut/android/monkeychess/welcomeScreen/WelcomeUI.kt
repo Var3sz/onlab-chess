@@ -18,7 +18,7 @@ import hu.bme.aut.android.monkeychess.R
 class WelcomeUI : ComponentActivity() {
 
     @Composable
-    fun WelcomeScreenContent(navController: NavController){
+    fun WelcomeScreenContent(){
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement =  Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
 
             Box(contentAlignment = Alignment.Center){

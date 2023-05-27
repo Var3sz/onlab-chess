@@ -29,11 +29,6 @@ class Empty(
     override var hasMoved: Boolean = false
     override var pieceColor: PieceColor = PieceColor.EMPTY
 
-
-
-
     override fun flip() {
     }
-
-
 }

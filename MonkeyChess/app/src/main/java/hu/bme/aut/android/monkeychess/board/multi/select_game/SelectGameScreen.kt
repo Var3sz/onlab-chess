@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.multi.Games
-import hu.bme.aut.android.monkeychess.board.multi.choose_opponent.ChooseOpponentViewModel
 
 @Composable
 fun SelectGameScreen(navController: NavController, viewModel: SelectGameViewModel){

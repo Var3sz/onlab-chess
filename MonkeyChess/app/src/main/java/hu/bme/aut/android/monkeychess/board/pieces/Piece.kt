@@ -1,6 +1,5 @@
 package hu.bme.aut.android.monkeychess.board.pieces
 
-import hu.bme.aut.android.monkeychess.R
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side

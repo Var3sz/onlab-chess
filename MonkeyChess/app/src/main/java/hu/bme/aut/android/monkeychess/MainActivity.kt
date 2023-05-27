@@ -3,7 +3,6 @@ package hu.bme.aut.android.monkeychess
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -73,7 +72,7 @@ class MainActivity : ComponentActivity() {
                 TopAppBarWidget(navController = navController, content =  { SplashScreenUI().SplashScreen(navController)})
             }
             composable("welcome_screen"){
-                TopAppBarWidget(navController = navController, content =  { WelcomeUI().WelcomeScreenContent(navController)}, bottomBar = {WelcomeUI().WelcomeScreenButtons(navController)})
+                TopAppBarWidget(navController = navController, content =  { WelcomeUI().WelcomeScreenContent()}, bottomBar = {WelcomeUI().WelcomeScreenButtons(navController)})
                 BackHandler {
                    Lifecycle.Event.ON_RESUME
                 }
@@ -216,10 +215,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-    /**
-     * TopAppBar
-     * */
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun TopAppBarWidget(navController: NavController, content: @Composable () -> Unit={}, bottomBar: @Composable () -> Unit={} ) {
