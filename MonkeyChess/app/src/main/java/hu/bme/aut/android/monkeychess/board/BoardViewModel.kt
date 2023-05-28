@@ -123,9 +123,28 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
             }
     }
 
-    fun getAvailableSteps(piece: Piece, color: PieceColor = currentPlayer.value!!, runspec: Boolean = true): MutableList<Pair<Int, Int>> {
-        Log.d("COLOR", "view: ${currentPlayer.value} board: ${ board.value?.currentPlayerBoard}")
+    fun getAvailableSteps(
+        piece: Piece,
+        color: PieceColor = currentPlayer.value!!,
+        runspec: Boolean = true
+    ): MutableList<Pair<Int, Int>>? {
+        Log.d("COLOR", "view: ${currentPlayer.value} board: ${board.value?.currentPlayerBoard}")
         board.value?.currentPlayerBoard = currentPlayer.value!!
+
+        if(multiplayer != null){
+            if(color == PieceColor.BLACK && board.value?.currentUser != playerTwo.value){
+                return mutableListOf()
+            }
+            else if(color == PieceColor.WHITE && board.value?.currentUser != playerOne.value){
+                return mutableListOf()
+            }
+            return  board.value?.getAvailableSteps(
+                piece,
+                color,
+                runspec
+            )
+        }
+
         return board.value?.getAvailableSteps(piece, color,runspec ) ?: return mutableListOf<Pair<Int, Int>>()
     }
 

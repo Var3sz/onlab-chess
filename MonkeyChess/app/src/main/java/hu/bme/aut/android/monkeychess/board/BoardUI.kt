@@ -184,7 +184,7 @@ class BoardUI{
 
                                             Log.d("BoardStep", "i: ${piece.i}, j: ${piece.j}")
 
-                                            steps.forEach() {
+                                            steps?.forEach() {
                                                 viewModel.setValue(it.first, it.second, true)
                                                 Log.d(
                                                     "BoardStep",

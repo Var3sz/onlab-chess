@@ -8,6 +8,7 @@ import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceColor
 import hu.bme.aut.android.monkeychess.board.pieces.enums.PieceName
 import hu.bme.aut.android.monkeychess.board.pieces.enums.Side
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 class Board(var aiBoard: Boolean= false){
 
     var board = mutableListOf<MutableList<Tile>>()
@@ -195,41 +196,31 @@ class Board(var aiBoard: Boolean= false){
         }
     }
 
-        fun getAvailableSteps(
-            piece: Piece,
-            color: PieceColor,
-            runspec: Boolean = true
-        ): MutableList<Pair<Int, Int>> {
-            val final = mutableListOf<Pair<Int, Int>>()
+    fun getAvailableSteps(
+        piece: Piece,
+        color: PieceColor,
+        runspec: Boolean = true
+    ): MutableList<Pair<Int, Int>> {
+        val final = mutableListOf<Pair<Int, Int>>()
 
-            if(piece.pieceColor == color) {
-                getavalibleStepsInaLine(piece, final)
+        if (piece.pieceColor == color) {
+            getavalibleStepsInaLine(piece, final)
 
-                //pawn movement
-                if (piece.name == PieceName.PAWN) {
-                    pawnMovement(piece, final)
+            // Pawn movement
+            if (piece.name == PieceName.PAWN) {
+                pawnMovement(piece, final)
+            }
+
+            // Castling
+            if (runspec) {
+                checkAvailableStepsforCheck(piece, piece.pieceColor, final)
+                if (!aiBoard && piece.name == PieceName.KING && !piece.hasMoved) {
+                    GetValidCastling(piece, final)
                 }
-
-                //castling
-                if (runspec == true) {
-                    checkAvailableStepsforCheck(piece, piece.pieceColor, final)
-                    if(!aiBoard)
-                    if (piece.name == PieceName.KING && !piece.hasMoved) {
-                        GetValidCastling(piece, final)
-                    }
-
-                }
-
             }
-            if (color == PieceColor.BLACK && currentUser != null && currentUser != playerTwo) {
-                return mutableListOf()
-            }
-            else if(color == PieceColor.WHITE && currentUser != null && currentUser != playerOne){
-                return mutableListOf()
-            }
-
-            return final
         }
+        return final
+    }
 
         fun getavalibleStepsInaLine(piece: Piece, final: MutableList<Pair<Int, Int>>) {
             val valid = piece.getValidSteps()
