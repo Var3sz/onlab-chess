@@ -71,7 +71,8 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
                             if (receivedFen != null) {
                                 fen = receivedFen
                                 val updatedBoard = Board(fen.toString(), playerOne.value.toString(), playerTwo.value.toString(), multiplayerCurrentUser.value.toString())
-                                updateBoard(updatedBoard)
+                                val color = receivedFen.split(" ").get(1)
+                                updateBoard(updatedBoard, color)
                                 Log.d("Received FEN: ", fen.toString())
                             } else {
 
@@ -91,7 +92,8 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
                     if (receivedFen != null) {
                         fen = receivedFen
                         val updatedBoard = Board(fen.toString(), playerOne.value.toString(), playerTwo.value.toString(), multiplayerCurrentUser.value.toString())
-                        updateBoard(updatedBoard)
+                        val color = receivedFen.split(" ").get(1)
+                        updateBoard(updatedBoard, color)
                         Log.d("Received FEN: ", fen.toString())
                     } else {
 
@@ -106,12 +108,12 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
             else{
                 _board.value = Board(fen!!, playerOne.value.toString(), playerTwo.value.toString(), multiplayerCurrentUser.value.toString())
                 val fenParts = fen!!.split(" ")
-                if(fenParts[1] == "w"){
+                /*if(fenParts[1] == "w"){
                     currentPlayer.value = PieceColor.WHITE
                 }
                 else{
                     currentPlayer.value = PieceColor.BLACK
-                }
+                }*/
             }
 
             if(aiColor == PieceColor.WHITE && doAi){
@@ -219,8 +221,10 @@ class BoardViewModel(private val singlePlayer: SinglePlayer? = null, private val
         this._playerTwo.value = _playerTwo
     }
 
-    fun updateBoard(newBoard: Board){
+    fun updateBoard(newBoard: Board, color: String){
         _board.value = newBoard
+        currentPlayer.value = if (color == "w") PieceColor.WHITE else PieceColor.BLACK
+
     }
 
     fun getBlackDefeated(): MutableLiveData<Boolean> {

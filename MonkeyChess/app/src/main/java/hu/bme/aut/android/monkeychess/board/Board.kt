@@ -41,9 +41,6 @@ class Board(var aiBoard: Boolean= false){
         playerOne = _playerOne
         playerTwo = _playerTwo
         currentUser = _currentUser
-        Log.d("PlayerOneGeci: ", playerOne.toString())
-        Log.d("PlayerTwoGeci: ", playerTwo.toString())
-        Log.d("CurrentUserGeci: ", currentUser.toString())
         if (fenBoard.isNotBlank()) {
             val fenParts = fenBoard.split(" ")
             require(fenParts.size == 3) { "Invalid FEN string: $fenBoard" }
@@ -51,7 +48,6 @@ class Board(var aiBoard: Boolean= false){
             val fenRows = fenParts[0].split("/")
             require(fenRows.size == 8) { "Invalid FEN string: $fenBoard" }
 
-            val activeColor = fenParts[1]
             val isWhiteOnTop = fenBoard.endsWith("rnbqkbnr")
 
             val castlingRights = fenParts[2]
@@ -98,7 +94,6 @@ class Board(var aiBoard: Boolean= false){
                 }
                 board.add(rowList)
             }
-            currentPlayerBoard = if (activeColor == "w") PieceColor.WHITE else PieceColor.BLACK
 
             if (playerTwo == currentUser) {
                 FlipTheTable()
@@ -226,12 +221,11 @@ class Board(var aiBoard: Boolean= false){
                 }
 
             }
-
             if (color == PieceColor.BLACK && currentUser != null && currentUser != playerTwo) {
-                final.clear()
+                return mutableListOf()
             }
             else if(color == PieceColor.WHITE && currentUser != null && currentUser != playerOne){
-                final.clear()
+                return mutableListOf()
             }
 
             return final
